@@ -2,24 +2,24 @@ import { Transaction, TransactionArgument, TransactionObjectInput, TransactionRe
 
 export interface IElendMarketContract {
   initObligation(tx: Transaction, typeArgs: string, args: InitObligationArgs): TransactionResult;
-  refreshReserve(tx: Transaction, typeArgs: [string, string], args: RefreshReserveArgs): TransactionResult;
-  refreshObligation(tx: Transaction, typeArgs: [string, string, string, string], args: RefreshObligation): TransactionResult;
+  refreshReserve(tx: Transaction, typeArgs: [string, string], args: RefreshReserveArgs): void;
+  refreshObligation(tx: Transaction, typeArgs: [string, string, string, string], args: RefreshObligation): void;
   depositReserveLiquidityAndMintCTokens(
     tx: Transaction,
     typeArgs: [string, string],
     args: DepositReserveLiquidityAndMintCTokensArgs
   ): TransactionResult;
-  depositCTokensIntoObligation(tx: Transaction, typeArgs: [string, string], args: DepositCTokensIntoObligationArgs): TransactionResult;
+  depositCTokensIntoObligation(tx: Transaction, typeArgs: [string, string], args: DepositCTokensIntoObligationArgs): void;
   withdrawCTokensAndRedeemLiquidity(tx: Transaction, typeArgs: [string, string], args: WithdrawCTokensAndRedeemLiquidityArgs): TransactionResult;
   borrowObligationLiquidity(tx: Transaction, typeArgs: [string, string], args: BorrowObligationLiquidityArgs): TransactionResult;
-  repayObligationLiquidity(tx: Transaction, typeArgs: [string, string], args: RepayObligationLiquidityArgs): TransactionResult;
-  lockToLiquidate(tx: Transaction, typeArgs: string, args: LockToLiquidateArgs): TransactionResult;
+  repayObligationLiquidity(tx: Transaction, typeArgs: [string, string], args: RepayObligationLiquidityArgs): void;
+  lockToLiquidate(tx: Transaction, typeArgs: string, args: LockToLiquidateArgs): void;
   calculateLiquidate(tx: Transaction, typeArgs: [string, string], args: CalculateLiquidateArgs): TransactionResult;
-  repayLiquidateReserve(tx: Transaction, typeArgs: [string, string], args: RepayLiquidateReserveArgs): TransactionResult;
-  updateRewardConfig(tx: Transaction, typeArgs: [string, string], args: UpdateRewardConfigArgs): TransactionResult;
-  initUserReward(tx: Transaction, typeArgs: [string, string], args: InitUserRewardArgs): TransactionResult;
-  updateUserReward(tx: Transaction, typeArgs: [string, string], args: UpdateUserRewardArgs): TransactionResult;
-  claimReward(tx: Transaction, typeArgs: [string, string], args: ClaimRewardArgs): TransactionResult;
+  repayLiquidateReserve(tx: Transaction, typeArgs: [string, string], args: RepayLiquidateReserveArgs): void;
+  updateRewardConfig(tx: Transaction, typeArgs: [string, string], args: UpdateRewardConfigArgs): void;
+  initUserReward(tx: Transaction, typeArgs: [string, string], args: InitUserRewardArgs): void;
+  updateUserReward(tx: Transaction, typeArgs: [string, string], args: UpdateUserRewardArgs): void;
+  claimReward(tx: Transaction, typeArgs: [string, string], args: ClaimRewardArgs): void;
 }
 
 interface InitObligationArgs {
