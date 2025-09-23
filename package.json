@@ -8,7 +8,10 @@
     "build": "tsc",
     "build:clean": "rm -rf dist && tsc",
     "typecheck": "tsc --project ./tsconfig.json --noEmit",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -26,6 +29,10 @@
     "@pythnetwork/pyth-sui-js": "^2.2.0"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.0",
+    "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   }
