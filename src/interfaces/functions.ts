@@ -13,7 +13,6 @@ export interface IElendMarketContract {
   withdrawCTokensAndRedeemLiquidity(tx: Transaction, typeArgs: [string, string], args: WithdrawCTokensAndRedeemLiquidityArgs): TransactionResult;
   borrowObligationLiquidity(tx: Transaction, typeArgs: [string, string], args: BorrowObligationLiquidityArgs): TransactionResult;
   repayObligationLiquidity(tx: Transaction, typeArgs: [string, string], args: RepayObligationLiquidityArgs): TransactionResult;
-
   lockToLiquidate(tx: Transaction, typeArgs: string, args: LockToLiquidateArgs): TransactionResult;
   calculateLiquidate(tx: Transaction, typeArgs: [string, string], args: CalculateLiquidateArgs): TransactionResult;
   repayLiquidateReserve(tx: Transaction, typeArgs: [string, string], args: RepayLiquidateReserveArgs): TransactionResult;
