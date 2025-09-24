@@ -1,4 +1,4 @@
-import { Transaction } from '@mysten/sui/dist/cjs/transactions';
+import { Transaction } from '@mysten/sui/transactions';
 
 import { DepositReserveLiquidityAndObligationCollateralOperationArgs, IDepositElendMarketOperation } from '../../interfaces/operations';
 
