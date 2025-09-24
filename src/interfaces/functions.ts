@@ -13,9 +13,6 @@ export interface IElendMarketContract {
   withdrawCTokensAndRedeemLiquidity(tx: Transaction, typeArgs: [string, string], args: WithdrawCTokensAndRedeemLiquidityArgs): TransactionResult;
   borrowObligationLiquidity(tx: Transaction, typeArgs: [string, string], args: BorrowObligationLiquidityArgs): TransactionResult;
   repayObligationLiquidity(tx: Transaction, typeArgs: [string, string], args: RepayObligationLiquidityArgs): void;
-  lockToLiquidate(tx: Transaction, typeArgs: string, args: LockToLiquidateArgs): void;
-  calculateLiquidate(tx: Transaction, typeArgs: [string, string], args: CalculateLiquidateArgs): TransactionResult;
-  repayLiquidateReserve(tx: Transaction, typeArgs: [string, string], args: RepayLiquidateReserveArgs): void;
   updateRewardConfig(tx: Transaction, typeArgs: [string, string], args: UpdateRewardConfigArgs): void;
   initUserReward(tx: Transaction, typeArgs: [string, string], args: InitUserRewardArgs): void;
   updateUserReward(tx: Transaction, typeArgs: [string, string], args: UpdateUserRewardArgs): void;
@@ -86,30 +83,6 @@ interface RepayObligationLiquidityArgs {
   obligation: TransactionObjectInput;
   repayCoin: TransactionObjectInput;
   repayAmount: bigint | TransactionArgument;
-  clock: TransactionObjectInput;
-}
-
-interface LockToLiquidateArgs {
-  operatorCap: TransactionObjectInput;
-  version: TransactionObjectInput;
-  reserve: TransactionObjectInput;
-  obligation: TransactionObjectInput;
-  clock: TransactionObjectInput;
-}
-
-interface CalculateLiquidateArgs {
-  operatorCap: TransactionObjectInput;
-  version: TransactionObjectInput;
-  reserve: TransactionObjectInput;
-  obligation: TransactionObjectInput;
-}
-
-interface RepayLiquidateReserveArgs {
-  operatorCap: TransactionObjectInput;
-  version: TransactionObjectInput;
-  repayReserve: TransactionObjectInput;
-  obligation: TransactionObjectInput;
-  repayCoin: TransactionObjectInput;
   clock: TransactionObjectInput;
 }
 
