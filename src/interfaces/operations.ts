@@ -1,7 +1,7 @@
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 
-import { Market, Obligation, Reserve, RewardConfig, UserReward } from '../types/object';
+import { Market, MarketRegistry, Obligation, Reserve, RewardConfig, UserReward } from '../types/object';
 import { NetworkConfig } from './config';
 
 // Lending Operations
@@ -49,11 +49,11 @@ export interface IElendMarketRewardOperation {
 
 // Query Operations
 export interface IElendMarketQueryOperation {
-  fetchMarket(marketId: string): Promise<Market>;
-  fetchReserve(reserveId: string): Promise<Reserve>;
-  fetchObligation(obligationId: string): Promise<Obligation>;
+  fetchMarket(marketId: string): Promise<Market | null>;
+  fetchReserve(reserveId: string): Promise<Reserve | null>;
+  fetchObligation(obligationId: string): Promise<Obligation | null>;
   fetchRewardConfigs(reserveId: string, option: number, rewardTokenType?: string): Promise<RewardConfig[]>;
-  fetchUserReward(reserveId: string, obligationId: string, owner: string): Promise<UserReward>;
+  fetchUserReward(reserveId: string, obligationId: string, owner: string): Promise<UserReward | null>;
 }
 
 // Calculation Operations

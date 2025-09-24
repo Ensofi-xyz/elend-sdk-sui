@@ -2,7 +2,12 @@ import { Decimal } from '../utils/decimal';
 
 export interface MarketRegistry {}
 
-export interface Market {}
+export interface Market {
+  id: string;
+  name: string;
+  reserve_infos: string;
+  reserves: string[];
+}
 
 export interface Reserve {
   id: string;
@@ -83,7 +88,40 @@ export interface ObligationOwnerCap {
   id: string;
   obligation: string;
 }
-export interface Obligation {}
+
+export interface ObligationCollateral {
+  depositedAmount: number;
+  marketValue: Decimal;
+}
+
+export interface ObligationLiquidity {
+  borrowedAmount: Decimal;
+  cumulativeBorrowRate: Decimal;
+  marketValue: Decimal;
+  borrowFactorAdjustedMarketValue: Decimal;
+}
+
+export interface Obligation {
+  id: string;
+  owner: string;
+  deposits: string[];
+  borrows: string[];
+  lowestReserveDepositLiquidationLtv: number;
+  totalDepositedValue: Decimal;
+  borrowFactorAdjustedDebtValue: Decimal;
+  highestBorrowFactorBps: number;
+  allowedBorrowValue: Decimal;
+  unhealthyBorrowValue: Decimal;
+  depositsTokenType: Map<string, string>;
+  borrowsTokenType: Map<string, string>;
+  depositsTier: Map<string, number>;
+  borrowsTier: Map<string, number>;
+  numOfObsoleteReserves: number;
+  hasDebt: boolean;
+  lastUpdate: LastUpdate;
+  locking: boolean;
+  liquidatingAssetReserve: number;
+}
 
 export interface RewardConfig {}
 

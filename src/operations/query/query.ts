@@ -1,7 +1,7 @@
 import { SuiClient } from '@mysten/sui/client';
 
 import { IElendMarketQueryOperation } from '../../interfaces/operations';
-import { Market, Obligation, Reserve, RewardConfig, UserReward } from '../../types/object';
+import { Market, MarketRegistry, Obligation, Reserve, RewardConfig, UserReward } from '../../types/object';
 
 export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
   private client: SuiClient;
@@ -10,11 +10,33 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
     this.client = client;
   }
 
-  fetchMarket(marketId: string): Promise<Market> {
-    throw new Error('Method not implemented.');
+  async fetchMarket(marketId: string): Promise<Market | null> {
+    const response = await this.client.getObject({
+      id: marketId,
+      options: {
+        showContent: true,
+      },
+    });
+
+    if (response.error) {
+      console.log('error', response.error);
+      throw new Error('Failed to fetch reserve');
+    }
+
+    if (response.data?.content) {
+      const data = (response.data?.content as any)['fields'];
+      return {
+        id: data.id.id,
+        name: data.name,
+        reserves: data.reserves,
+        reserve_infos: data.reserve_infos.fields.id.id,
+      } as Market;
+    } else {
+      return null;
+    }
   }
 
-  async fetchReserve(reserveId: string): Promise<Reserve> {
+  async fetchReserve(reserveId: string): Promise<Reserve | null> {
     const response = await this.client.getObject({
       id: reserveId,
       options: {
@@ -27,10 +49,11 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
       throw new Error('Failed to fetch reserve');
     }
 
-    return response.data!;
+    //TODO update this
+    return null;
   }
 
-  async fetchObligation(obligationId: string): Promise<Obligation> {
+  async fetchObligation(obligationId: string): Promise<Obligation | null> {
     const response = await this.client.getObject({
       id: obligationId,
       options: {
@@ -43,8 +66,10 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
       throw new Error('Failed to fetch obligation');
     }
 
-    return response.data!;
+    //TODO update this
+    return null;
   }
+
   fetchRewardConfigs(reserveId: string, option: number, rewardTokenType?: string): Promise<RewardConfig[]> {
     throw new Error('Method not implemented.');
   }
