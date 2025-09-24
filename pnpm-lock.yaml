@@ -17,10 +17,19 @@ importers:
       '@pythnetwork/pyth-sui-js':
         specifier: ^2.2.0
         version: 2.2.0(typescript@5.9.2)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      ws:
+        specifier: ^8.18.3
+        version: 8.18.3
     devDependencies:
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^5.2.2
         version: 5.2.2(prettier@3.6.2)
+      '@types/lodash':
+        specifier: ^4.17.20
+        version: 4.17.20
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -203,6 +212,9 @@ packages:
 
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
+
+  '@types/lodash@4.17.20':
+    resolution: {integrity: sha512-H3MHACvFUEiujabxhaI/ImO6gUrd8oOurg7LQtS7mbwIXA/cUqWrvBsaeJ23aZEPk1TAYkurjfMbSELfoCXlGA==}
 
   '@types/node@24.5.2':
     resolution: {integrity: sha512-FYxk1I7wPv3K2XBaoyH2cTnocQEu8AOZ60hPbsyukMPLv5/5qr7V1i8PLHdl6Zf87I+xZXFvPCXYjiTFq+YSDQ==}
@@ -785,6 +797,8 @@ snapshots:
   '@tsconfig/node14@1.0.3': {}
 
   '@tsconfig/node16@1.0.4': {}
+
+  '@types/lodash@4.17.20': {}
 
   '@types/node@24.5.2':
     dependencies:

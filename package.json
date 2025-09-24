@@ -26,10 +26,13 @@
   "dependencies": {
     "@mysten/bcs": "^1.8.0",
     "@mysten/sui": "^1.38.0",
-    "@pythnetwork/pyth-sui-js": "^2.2.0"
+    "@pythnetwork/pyth-sui-js": "^2.2.0",
+    "lodash": "^4.17.21",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "@types/lodash": "^4.17.20",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.0",
     "prettier": "^3.6.2",
