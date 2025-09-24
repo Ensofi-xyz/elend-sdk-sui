@@ -5,11 +5,15 @@ import { Market, Obligation, Reserve, RewardConfig, UserReward } from '../types/
 import { NetworkConfig } from './config';
 
 // Lending Operations
+export interface InitObligationArgs {
+  owner: string;
+  suiClient: SuiClient;
+}
+
 export interface DepositReserveLiquidityAndObligationCollateralOperationArgs {
   owner: string;
   reserve: string;
   amount: number;
-  networkConfig: NetworkConfig;
   suiClient: SuiClient;
 }
 
@@ -20,7 +24,8 @@ export interface BorrowObligationLiquidityOperationArgs {}
 export interface RepayObligationLiquidityOperationArgs {}
 
 export interface IDepositElendMarketOperation {
-  buildDepositTxn(args: DepositReserveLiquidityAndObligationCollateralOperationArgs): Transaction;
+  buildInitObligationTxn(args: InitObligationArgs): Promise<Transaction>;
+  buildDepositTxn(args: DepositReserveLiquidityAndObligationCollateralOperationArgs): Promise<Transaction>;
 }
 
 export interface IWithdrawElendMarketOperation {
@@ -44,11 +49,11 @@ export interface IElendMarketRewardOperation {
 
 // Query Operations
 export interface IElendMarketQueryOperation {
-  fetchMarket(marketId: string): Market;
-  fetchReserve(reserveId: string): Reserve;
-  fetchObligation(obligationId: string): Obligation;
-  fetchRewardConfigs(reserveId: string, option: number, rewardTokenType?: string): RewardConfig[];
-  fetchUserReward(reserveId: string, obligationId: string, owner: string): UserReward;
+  fetchMarket(marketId: string): Promise<Market>;
+  fetchReserve(reserveId: string): Promise<Reserve>;
+  fetchObligation(obligationId: string): Promise<Obligation>;
+  fetchRewardConfigs(reserveId: string, option: number, rewardTokenType?: string): Promise<RewardConfig[]>;
+  fetchUserReward(reserveId: string, obligationId: string, owner: string): Promise<UserReward>;
 }
 
 // Calculation Operations

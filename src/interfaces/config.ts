@@ -5,6 +5,7 @@ interface ConfigObject {
 }
 
 export interface ElendMarketConfig {
+  package: string;
   marketType: Record<string, string>;
   rewardTokenType: Record<string, string>;
   marketRegistry: ConfigObject;
