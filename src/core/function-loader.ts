@@ -22,7 +22,7 @@ export class ElendMarketContract implements IElendMarketContract {
 
   constructor(private networkConfig: NetworkConfig) {
     const config = this.networkConfig.packages[this.networkConfig.latestVersion];
-    this.packageId = config.version.package; // Assuming package ID is stored here
+    this.packageId = config.version.package;
   }
 
   initObligation(tx: Transaction, typeArgs: string, args: InitObligationArgs): TransactionResult {
@@ -38,11 +38,23 @@ export class ElendMarketContract implements IElendMarketContract {
   }
 
   refreshReserve(tx: Transaction, typeArgs: [string, string], args: RefreshReserveArgs): void {
-    throw new Error('refreshReserve: Implementation pending - TODO');
+    const { version, reserve, priceInfoObject, clock } = args;
+
+    tx.moveCall({
+      target: `${this.packageId}::lending_market::refresh_reserve`,
+      typeArguments: typeArgs,
+      arguments: [tx.object(version), tx.object(reserve), tx.object(priceInfoObject), tx.object(clock)],
+    });
   }
 
   refreshObligation(tx: Transaction, typeArgs: [string, string, string, string], args: RefreshObligation): void {
-    throw new Error('refreshObligation: Implementation pending - TODO');
+    const { version, obligation, reserveT1, reserveT2, reserveT3, clock } = args;
+
+    tx.moveCall({
+      target: `${this.packageId}::lending_market::refresh_obligation`,
+      typeArguments: typeArgs,
+      arguments: [tx.object(version), tx.object(obligation), tx.object(reserveT1), tx.object(reserveT2), tx.object(reserveT3), tx.object(clock)],
+    });
   }
 
   depositReserveLiquidityAndMintCTokens(
@@ -50,11 +62,25 @@ export class ElendMarketContract implements IElendMarketContract {
     typeArgs: [string, string],
     args: DepositReserveLiquidityAndMintCTokensArgs
   ): TransactionResult {
-    throw new Error('depositReserveLiquidityAndMintCTokens: Implementation pending - TODO');
+    const { version, reserve, coin, priceInfoObject, clock } = args;
+
+    const result = tx.moveCall({
+      target: `${this.packageId}::lending_market::deposit_reserve_liquidity_and_mint_ctokens`,
+      typeArguments: typeArgs,
+      arguments: [tx.object(version), tx.object(reserve), tx.object(coin), tx.object(priceInfoObject), tx.object(clock)],
+    });
+
+    return result;
   }
 
   depositCTokensIntoObligation(tx: Transaction, typeArgs: [string, string], args: DepositCTokensIntoObligationArgs): void {
-    throw new Error('depositCTokensIntoObligation: Implementation pending - TODO');
+    const { obligationOwnerCap, version, reserve, obligation, cToken, clock } = args;
+
+    tx.moveCall({
+      target: `${this.packageId}::lending_market::deposit_ctokens_into_obligation`,
+      typeArguments: typeArgs,
+      arguments: [tx.object(obligationOwnerCap), tx.object(version), tx.object(reserve), tx.object(obligation), tx.object(cToken), tx.object(clock)],
+    });
   }
 
   withdrawCTokensAndRedeemLiquidity(tx: Transaction, typeArgs: [string, string], args: WithdrawCTokensAndRedeemLiquidityArgs): TransactionResult {
