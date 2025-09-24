@@ -1,2 +1,1 @@
-export { ElendMarketContract } from './contract';
-export { FunctionLoader } from './function-loader';
+export { ElendMarketContract } from './function-loader';
