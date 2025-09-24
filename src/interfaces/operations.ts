@@ -1,9 +1,17 @@
+import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 
 import { Market, Obligation, Reserve, RewardConfig, UserReward } from '../types/object';
+import { NetworkConfig } from './config';
 
 // Lending Operations
-export interface DepositReserveLiquidityAndObligationCollateralOperationArgs {}
+export interface DepositReserveLiquidityAndObligationCollateralOperationArgs {
+  owner: string;
+  reserve: string;
+  amount: number;
+  networkConfig: NetworkConfig;
+  suiClient: SuiClient;
+}
 
 export interface WithdrawCTokensAndRedeemLiquidityOperationArgs {}
 

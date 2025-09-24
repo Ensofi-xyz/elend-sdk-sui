@@ -1,16 +1,17 @@
-import { SuiClient } from "@mysten/sui/client";
-import { NetworkConfig } from "./interfaces/config";
-import { Reserve } from "./types/object";
-import { 
-  IBorrowElendMarketOperation, 
-  IDepositElendMarketOperation, 
-  IElendMarketObligationCalculationOperation, 
-  IElendMarketQueryOperation, 
-  IElendMarketReserveCalculationOperation, 
-  IElendMarketRewardOperation, 
-  IRepayElendMarketOperation, 
-  IWithdrawElendMarketOperation 
-} from "./interfaces/operations";
+import { SuiClient } from '@mysten/sui/client';
+
+import { NetworkConfig } from './interfaces/config';
+import {
+  IBorrowElendMarketOperation,
+  IDepositElendMarketOperation,
+  IElendMarketObligationCalculationOperation,
+  IElendMarketQueryOperation,
+  IElendMarketReserveCalculationOperation,
+  IElendMarketRewardOperation,
+  IRepayElendMarketOperation,
+  IWithdrawElendMarketOperation,
+} from './interfaces/operations';
+import { Reserve } from './types/object';
 
 export class ElendClient {
   public readonly networkConfig: NetworkConfig;
@@ -31,31 +32,17 @@ export class ElendClient {
   obligationCalculationOperation: IElendMarketObligationCalculationOperation;
   rewardCalculationOperation: IElendMarketRewardOperation;
 
-  constructor () {
+  constructor() {}
 
-  }
+  refreshObligation(): Promise<void> {}
 
-  refreshObligation(): Promise<void> {
+  refreshReserves(): Promise<void> {}
 
-  }
-  
-  refreshReserves(): Promise<void> {
+  deposit(): Promise<void> {}
 
-  }
+  borrow(): Promise<void> {}
 
-  deposit(): Promise<void> {
+  withdraw(): Promise<void> {}
 
-  };
-
-  borrow(): Promise<void> {
-
-  }
-
-  withdraw(): Promise<void> {
-
-  }
-
-  repay(): Promise<void> {
-
-  }
+  repay(): Promise<void> {}
 }
