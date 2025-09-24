@@ -13,9 +13,23 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
   fetchMarket(marketId: string): Promise<Market> {
     throw new Error('Method not implemented.');
   }
-  fetchReserve(reserveId: string): Promise<Reserve> {
-    throw new Error('Method not implemented.');
+
+  async fetchReserve(reserveId: string): Promise<Reserve> {
+    const response = await this.client.getObject({
+      id: reserveId,
+      options: {
+        showContent: true,
+      },
+    });
+
+    if (response.error) {
+      console.log('error', response.error);
+      throw new Error('Failed to fetch reserve');
+    }
+
+    return response.data!;
   }
+
   async fetchObligation(obligationId: string): Promise<Obligation> {
     const response = await this.client.getObject({
       id: obligationId,

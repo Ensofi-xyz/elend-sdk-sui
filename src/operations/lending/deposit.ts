@@ -61,16 +61,35 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
     });
 
     const obligationOwnerCap = response.data[0] as ObligationOwnerCap;
-    let obligationOwnerCapObject;
-    let obligationId: string;
-
     if (isNil(obligationOwnerCap)) {
       throw new Error('Must Init Obligation First');
     }
+    const obligationId = obligationOwnerCap.obligation;
+
+    // TODO - get reward config
 
     // TODO: Continue with the rest of the deposit flow
     // - Refresh reserves
+
     // - Refresh obligation
+    this.contract.refreshObligation(
+      tx,
+      [
+        packageInfo.marketType['MAIN_POOL'],
+        'Reserve T1', // TODO update
+        'Reserve T2', // TODO update
+        'Reserve T3', // TODO update
+      ],
+      {
+        version: packageInfo.version.id,
+        obligation: obligationId,
+        reserveT1: 'reserveT1', // TODO update
+        reserveT2: 'reserveT2', // TODO update
+        reserveT3: 'reserveT3', // TODO update
+        clock: SUI_SYSTEM_CLOCK,
+      }
+    );
+
     // - Handle deposit operation
 
     return tx;
