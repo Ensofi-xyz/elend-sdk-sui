@@ -1,7 +1,16 @@
 import { SuiClient } from "@mysten/sui/client";
 import { NetworkConfig } from "./interfaces/config";
 import { Reserve } from "./types/object";
-import { IBorrowElendMarketOperation, IDepositElendMarketOperation, IElendMarketCalculationOperation, IElendMarketQueryOperation, IElendMarketRewardOperation, IRepayElendMarketOperation, IWithdrawElendMarketOperation } from "./interfaces/operations";
+import { 
+  IBorrowElendMarketOperation, 
+  IDepositElendMarketOperation, 
+  IElendMarketObligationCalculationOperation, 
+  IElendMarketQueryOperation, 
+  IElendMarketReserveCalculationOperation, 
+  IElendMarketRewardOperation, 
+  IRepayElendMarketOperation, 
+  IWithdrawElendMarketOperation 
+} from "./interfaces/operations";
 
 export class ElendClient {
   public readonly networkConfig: NetworkConfig;
@@ -10,24 +19,43 @@ export class ElendClient {
   public obligationOwner: string | null;
   public associateReservesObligation: Map<string, Reserve>;
 
-  public depositOperation: IDepositElendMarketOperation;
-  public borrowOperation: IBorrowElendMarketOperation;
-  public withdrawOperation: IWithdrawElendMarketOperation;
-  public repayOperation: IRepayElendMarketOperation;
+  depositOperation: IDepositElendMarketOperation;
+  borrowOperation: IBorrowElendMarketOperation;
+  withdrawOperation: IWithdrawElendMarketOperation;
+  repayOperation: IRepayElendMarketOperation;
 
-  public rewardOperation: IElendMarketRewardOperation;
-  public queryOperation: IElendMarketQueryOperation;
-  public calculationOperation: IElendMarketCalculationOperation;
+  rewardOperation: IElendMarketRewardOperation;
+  queryOperation: IElendMarketQueryOperation;
+
+  reserveCalculationOperation: IElendMarketReserveCalculationOperation;
+  obligationCalculationOperation: IElendMarketObligationCalculationOperation;
+  rewardCalculationOperation: IElendMarketRewardOperation;
 
   constructor () {
 
   }
 
-  refreshObligation(): Promise<void>;
-  refreshReserves(): Promise<void>;
+  refreshObligation(): Promise<void> {
 
-  deposit(): Promise<void>;
-  borrow(): Promise<void>;
-  withdraw(): Promise<void>;
-  repay(): Promise<void>;
+  }
+  
+  refreshReserves(): Promise<void> {
+
+  }
+
+  deposit(): Promise<void> {
+
+  };
+
+  borrow(): Promise<void> {
+
+  }
+
+  withdraw(): Promise<void> {
+
+  }
+
+  repay(): Promise<void> {
+
+  }
 }

@@ -2,6 +2,7 @@ import { Transaction } from '@mysten/sui/transactions';
 
 import { Market, Obligation, Reserve, RewardConfig, UserReward } from '../types/object';
 
+// Lending Operations
 export interface DepositReserveLiquidityAndObligationCollateralOperationArgs {}
 
 export interface WithdrawCTokensAndRedeemLiquidityOperationArgs {}
@@ -26,12 +27,14 @@ export interface IRepayElendMarketOperation {
   buildRepayTxn(args: RepayObligationLiquidityOperationArgs): Transaction;
 }
 
+// Reward Operations
 export interface ClaimRewardOperationArgs {}
 
 export interface IElendMarketRewardOperation {
   buildClaimRewardTxn(args: ClaimRewardOperationArgs): Transaction;
 }
 
+// Query Operations
 export interface IElendMarketQueryOperation {
   fetchMarket(marketId: string): Market;
   fetchReserve(reserveId: string): Reserve;
@@ -40,7 +43,8 @@ export interface IElendMarketQueryOperation {
   fetchUserReward(reserveId: string, obligationId: string, owner: string): UserReward;
 }
 
-export interface IElendMarketCalculationOperation {
+// Calculation Operations
+export interface IElendMarketReserveCalculationOperation {
   getTotalSuppliedUSDValueOnMarket(): void;
   getTotalBorrowedUSDValueOnMarket(): void;
   getDetailSuppliedOnMarket(): void;
@@ -49,6 +53,9 @@ export interface IElendMarketCalculationOperation {
   getDetailBorrowApy(): void;
   totalSupplyAPYWithNewAvailableSupplyAmount(): void;
   totalBorrowAPYWithNewBorrowedAmount(): void;
+}
+
+export interface IElendMarketObligationCalculationOperation {
   getTotalSuppliedUSDValueObligation(): void;
   getTotalBorrowedUSDValueObligation(): void;
   getDetailSuppliedOnMarketObligation(): void;
@@ -56,6 +63,9 @@ export interface IElendMarketCalculationOperation {
   calculateCurrentHealthRatioObligation(): void;
   calculateRemainingBorrowAmount(): void;
   calculateAllowedWithdrawAmount(): void;
+}
+
+export interface IElendMarketRewardCalculationOperation {
   getTotalIncentiveRewardStatisticObligation(): void;
   calculateIncentiveRewardApyInterest(): void;
   estimateIncentiveRewardNewApyInterest(): void;
