@@ -140,10 +140,6 @@ export class ElendClient {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
-    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
-    if (isNil(obligationOwnerCap)) {
-      throw Error('Have not init obligation yet');
-    }
 
     return this.depositOperation.buildDepositTxn({
       owner: this.obligationOwner,
@@ -155,11 +151,6 @@ export class ElendClient {
   async borrow(reserve: string, liquidityAmount: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
-    }
-
-    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
-    if (isNil(obligationOwnerCap)) {
-      throw Error('Have not init obligation yet');
     }
 
     return this.borrowOperation.buildBorrowTxn({
@@ -174,11 +165,6 @@ export class ElendClient {
       throw Error('Have not load obligation owner yet');
     }
 
-    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
-    if (isNil(obligationOwnerCap)) {
-      throw Error('Have not init obligation yet');
-    }
-
     return this.withdrawOperation.buildWithdrawTxn({
       owner: this.obligationOwner,
       reserve,
@@ -189,11 +175,6 @@ export class ElendClient {
   async repay(reserve: string, liquidityAmount: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
-    }
-
-    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
-    if (isNil(obligationOwnerCap)) {
-      throw Error('Have not init obligation yet');
     }
 
     return this.repayOperation.buildRepayTxn({});
