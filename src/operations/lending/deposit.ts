@@ -8,7 +8,7 @@ import { ObjectId } from '@pythnetwork/pyth-sui-js/lib/client';
 
 import { SUI_SYSTEM_CLOCK } from '../../common/constant';
 import { ElendMarketContract } from '../../core';
-import { NetworkConfig } from '../../interfaces/config';
+import { ElendMarketConfig, NetworkConfig } from '../../interfaces/config';
 import { IElendMarketContract } from '../../interfaces/functions';
 import {
   DepositReserveLiquidityAndObligationCollateralOperationArgs,
@@ -65,18 +65,7 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
 
     const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
 
-    const obligationOwnerCapStructType = `${packageInfo.package}::obligation::ObligationOwnerCap<${packageInfo.marketType['MAIN_POOL']}>`;
-    const response = await this.suiClient.getOwnedObjects({
-      owner: owner,
-      options: {
-        showContent: true,
-      },
-      filter: {
-        StructType: obligationOwnerCapStructType,
-      },
-    });
-
-    const obligationOwnerCap = response.data[0] as ObligationOwnerCap;
+    const obligationOwnerCap = await this.getObligationOwnerCapObject(owner);
     if (isNil(obligationOwnerCap)) {
       throw new Error('Must Init Obligation First');
     }
@@ -90,14 +79,15 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
     const reservePythPriceFeedIds = new Map<string, string>();
 
     for (const [tokenType, reserve] of Object.entries(reserves)) {
-      (this, reservePythPriceFeedIds.set(reserve.id, pythPriceFeedIds[tokenType]));
+      reservePythPriceFeedIds.set(reserve.id, pythPriceFeedIds[tokenType]);
     }
 
     const obligationData = await this.query.fetchObligation(obligationId);
     if (isNil(obligationData)) throw Error('Not found obligation to deposit');
-    const reservesToRefresh = [];
-    reservesToRefresh.push(...obligationData.deposits);
-    reservesToRefresh.push(...obligationData.borrows);
+    const reservesToRefresh: Set<string> = new Set();
+    reservesToRefresh.add(reserve);
+    obligationData.deposits.forEach(d => reservesToRefresh.add(d));
+    obligationData.borrows.forEach(b => reservesToRefresh.add(b));
 
     const pythConnection = new SuiPriceServiceConnection(this.networkConfig.pythHermesUrl);
     const priceFeedIdsNeedUpdate: string[] = [];
@@ -109,12 +99,13 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
     }
 
     let priceFeedObjectReserveDeposit: ObjectId;
-    if (priceFeedIdsNeedUpdate.length === reservesToRefresh.length) {
+    if (priceFeedIdsNeedUpdate.length === reservesToRefresh.size) {
       const priceUpdateData = await pythConnection.getPriceFeedsUpdateData(priceFeedIdsNeedUpdate);
       const priceInfoObjects = await this.pythClient.updatePriceFeeds(tx, priceUpdateData, priceFeedIdsNeedUpdate);
+      const reservesToRefreshArr = Array.from(reservesToRefresh);
 
-      for (let i = 0; i < reservesToRefresh.length; i++) {
-        const reserveToRefresh = reservesToRefresh[i];
+      for (let i = 0; i < reservesToRefreshArr.length; i++) {
+        const reserveToRefresh = reservesToRefreshArr[i];
         if (reserveToRefresh === reserve) {
           priceFeedObjectReserveDeposit = priceInfoObjects[i];
         }
@@ -185,7 +176,7 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
       amount: number;
       obligationOwnerCap: string;
       obligationId: string;
-      packageInfo: any;
+      packageInfo: ElendMarketConfig;
       priceFeedObjectReserveDeposit: ObjectId;
     }
   ): Promise<void> {
@@ -216,7 +207,7 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
     });
   }
 
-  private getTokenTypeForReserve(reserveId: string, packageInfo: any): string | null {
+  private getTokenTypeForReserve(reserveId: string, packageInfo: ElendMarketConfig): string | null {
     const reserves = packageInfo.reserves;
     for (const [tokenType, reserveInfo] of Object.entries(reserves)) {
       if ((reserveInfo as any).id === reserveId) {

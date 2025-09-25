@@ -1,4 +1,4 @@
-import { Transaction, TransactionArgument, TransactionObjectInput, TransactionResult } from '@mysten/sui/transactions';
+import { Transaction, TransactionResult } from '@mysten/sui/transactions';
 
 import { NetworkConfig } from '../interfaces/config';
 import {
@@ -84,7 +84,22 @@ export class ElendMarketContract implements IElendMarketContract {
   }
 
   withdrawCTokensAndRedeemLiquidity(tx: Transaction, typeArgs: [string, string], args: WithdrawCTokensAndRedeemLiquidityArgs): TransactionResult {
-    throw new Error('withdrawCTokensAndRedeemLiquidity: Implementation pending - TODO');
+    const { obligationOwnerCap, version, reserve, obligation, collateralAmount, clock } = args;
+
+    const result = tx.moveCall({
+      target: `${this.packageId}::lending_market::withdraw_ctoken_and_redeem_liquidity`,
+      typeArguments: typeArgs,
+      arguments: [
+        tx.object(obligationOwnerCap),
+        tx.object(version),
+        tx.object(reserve),
+        tx.object(obligation),
+        tx.pure.u64(collateralAmount),
+        tx.object(clock),
+      ],
+    });
+
+    return result;
   }
 
   borrowObligationLiquidity(tx: Transaction, typeArgs: [string, string], args: BorrowObligationLiquidityArgs): TransactionResult {
