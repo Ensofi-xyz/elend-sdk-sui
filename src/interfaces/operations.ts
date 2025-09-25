@@ -7,14 +7,12 @@ import { NetworkConfig } from './config';
 // Lending Operations
 export interface InitObligationArgs {
   owner: string;
-  suiClient: SuiClient;
 }
 
 export interface DepositReserveLiquidityAndObligationCollateralOperationArgs {
   owner: string;
   reserve: string;
   amount: number;
-  suiClient: SuiClient;
 }
 
 export interface WithdrawCTokensAndRedeemLiquidityOperationArgs {}
