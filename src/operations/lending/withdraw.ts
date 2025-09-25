@@ -16,7 +16,9 @@ import {
   WithdrawCTokensAndRedeemLiquidityOperationArgs,
 } from '../../interfaces/operations';
 import { ObligationOwnerCap } from '../../types/object';
+import { getTokenTypeForReserve } from '../../utils/common';
 import { ElendMarketQueryOperation } from '../query/query';
+import { refreshReserves } from './common';
 
 export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperation {
   private contract: IElendMarketContract;
@@ -27,7 +29,7 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
 
   constructor(networkConfig: NetworkConfig, suiClient: SuiClient) {
     this.contract = new ElendMarketContract(networkConfig);
-    this.query = new ElendMarketQueryOperation(suiClient);
+    this.query = new ElendMarketQueryOperation(suiClient, networkConfig);
     this.networkConfig = networkConfig;
     this.pythClient = new SuiPythClient(
       suiClient,
@@ -41,60 +43,23 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
     const { owner, reserve, collateralAmount } = args;
     const tx = new Transaction();
 
-    const obligationOwnerCap = await this.getObligationOwnerCapObject(owner);
+    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner);
     if (isNil(obligationOwnerCap)) throw new Error('Obligation Not Init');
 
     const obligationId = obligationOwnerCap.obligation;
+    const obligationData = await this.query.fetchObligation(obligationId);
+    if (isNil(obligationData)) throw Error('Not found obligation to deposit');
     const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
 
     // - Refresh reserves
     const reserves = packageInfo.reserves;
-    const pythPriceFeedIds = packageInfo.pythPriceFeedId;
-    const reservePythPriceFeedIds = new Map<string, string>();
-
-    for (const [tokenType, reserve] of Object.entries(reserves)) {
-      reservePythPriceFeedIds.set(reserve.id, pythPriceFeedIds[tokenType]);
-    }
-    const obligationData = await this.query.fetchObligation(obligationId);
-    if (isNil(obligationData)) throw Error('Not found obligation to deposit');
-    const reservesToRefresh: Set<string> = new Set();
-    reservesToRefresh.add(reserve);
-    obligationData.deposits.forEach(d => reservesToRefresh.add(d));
-    obligationData.borrows.forEach(b => reservesToRefresh.add(b));
-
-    const pythConnection = new SuiPriceServiceConnection(this.networkConfig.pythHermesUrl);
-    const priceFeedIdsNeedUpdate: string[] = [];
-    for (const reserveToRefresh of reservesToRefresh) {
-      const pythPriceFeedId = reservePythPriceFeedIds.get(reserveToRefresh);
-      if (isNil(pythPriceFeedId)) throw Error('Not found pyth price feed id of associate reserves');
-
-      priceFeedIdsNeedUpdate.push(pythPriceFeedId);
-    }
-
-    let priceFeedObjectReserveDeposit: ObjectId;
-    if (priceFeedIdsNeedUpdate.length === reservesToRefresh.size) {
-      const priceUpdateData = await pythConnection.getPriceFeedsUpdateData(priceFeedIdsNeedUpdate);
-      const priceInfoObjects = await this.pythClient.updatePriceFeeds(tx, priceUpdateData, priceFeedIdsNeedUpdate);
-      const reservesToRefreshArr = Array.from(reservesToRefresh);
-
-      for (let i = 0; i < reservesToRefreshArr.length; i++) {
-        const reserveToRefresh = reservesToRefreshArr[i];
-        if (reserveToRefresh === reserve) {
-          priceFeedObjectReserveDeposit = priceInfoObjects[i];
-        }
-        let tokenType = Object.keys(reserves).find(tokenType => reserves[tokenType].id == reserveToRefresh);
-        if (isNil(tokenType)) throw Error('not found token type of associate reserves');
-
-        this.contract.refreshReserve(tx, [packageInfo.marketType['MAIN_POOL'], tokenType], {
-          version: packageInfo.version.id,
-          reserve: reserveToRefresh,
-          priceInfoObject: priceInfoObjects[i],
-          clock: SUI_SYSTEM_CLOCK,
-        });
-      }
-    } else {
-      throw Error('Can not get price update for reserve');
-    }
+    await refreshReserves(tx, {
+      obligationData,
+      reserve,
+      pythClient: this.pythClient,
+      networkConfig: this.networkConfig,
+      contract: this.contract,
+    });
 
     // - Refresh obligation
     this.contract.refreshObligation(
@@ -123,23 +88,6 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
     return tx;
   }
 
-  private async getObligationOwnerCapObject(owner: string): Promise<ObligationOwnerCap> {
-    const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
-
-    const obligationOwnerCapStructType = `${packageInfo.package}::obligation::ObligationOwnerCap<${packageInfo.marketType['MAIN_POOL']}>`;
-    const response = await this.suiClient.getOwnedObjects({
-      owner: owner,
-      options: {
-        showContent: true,
-      },
-      filter: {
-        StructType: obligationOwnerCapStructType,
-      },
-    });
-
-    return response.data[0] as ObligationOwnerCap;
-  }
-
   private async handleWithdrawOperation(
     tx: Transaction,
     args: {
@@ -153,7 +101,7 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
   ): Promise<void> {
     const { owner, reserve, collateralAmount, obligationOwnerCap, obligationId, packageInfo } = args;
 
-    const tokenType = this.getTokenTypeForReserve(reserve, packageInfo);
+    const tokenType = getTokenTypeForReserve(reserve, packageInfo);
     if (!tokenType) {
       throw new Error(`Token type not found for reserve: ${reserve}`);
     }
@@ -168,15 +116,5 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
     });
 
     tx.transferObjects([coin], owner);
-  }
-
-  private getTokenTypeForReserve(reserveId: string, packageInfo: ElendMarketConfig): string | null {
-    const reserves = packageInfo.reserves;
-    for (const [tokenType, reserveInfo] of Object.entries(reserves)) {
-      if ((reserveInfo as any).id === reserveId) {
-        return tokenType;
-      }
-    }
-    return null;
   }
 }

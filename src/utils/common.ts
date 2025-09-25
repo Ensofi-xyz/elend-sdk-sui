@@ -1,8 +1,7 @@
-import { NetworkConfig } from '../interfaces/config';
+import { ElendMarketConfig } from '../interfaces/config';
 
-export const getTokenTypeForReserve = (reserveId: string, networkConfig: NetworkConfig): string | null => {
-  const packageInfo = networkConfig.packages[networkConfig.latestVersion];
-  const reserves = packageInfo.reserves;
+export const getTokenTypeForReserve = (reserveId: string, packageConfig: ElendMarketConfig): string | null => {
+  const reserves = packageConfig.reserves;
   for (const [tokenType, reserveInfo] of Object.entries(reserves)) {
     if ((reserveInfo as any).id === reserveId) {
       return tokenType;

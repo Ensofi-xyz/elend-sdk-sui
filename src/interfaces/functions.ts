@@ -72,7 +72,7 @@ export interface BorrowObligationLiquidityArgs {
   version: TransactionObjectInput;
   reserve: TransactionObjectInput;
   obligation: TransactionObjectInput;
-  liquidityAmount: bigint | TransactionArgument;
+  liquidityAmount: bigint;
   clock: TransactionObjectInput;
 }
 
