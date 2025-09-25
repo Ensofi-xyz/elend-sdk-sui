@@ -17,6 +17,7 @@ import {
   InitObligationArgs,
 } from '../../interfaces/operations';
 import { ObligationOwnerCap } from '../../types/object';
+import { splitCoin } from '../../utils/split-coin';
 import { ElendMarketQueryOperation } from '../query/query';
 
 export class DepositElendMarketOperation implements IDepositElendMarketOperation {
@@ -195,11 +196,7 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
       throw new Error(`Token type not found for reserve: ${reserve}`);
     }
 
-    const depositCoin = await this.splitCoinForDeposit(tx, {
-      owner,
-      tokenType,
-      amount,
-    });
+    const depositCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [amount]);
 
     const cToken = this.contract.depositReserveLiquidityAndMintCTokens(tx, [packageInfo.marketType['MAIN_POOL'], tokenType], {
       version: packageInfo.version.id,
@@ -227,52 +224,5 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
       }
     }
     return null;
-  }
-
-  private async splitCoinForDeposit(
-    tx: Transaction,
-    args: {
-      owner: string;
-      tokenType: string;
-      amount: number;
-    }
-  ): Promise<any> {
-    const { owner, tokenType, amount } = args;
-
-    const coinsResponse = await this.suiClient.getCoins({
-      owner: owner,
-      coinType: tokenType,
-    });
-
-    if (coinsResponse.data.length === 0) {
-      throw new Error(`No coins found for token type: ${tokenType}`);
-    }
-
-    const totalBalance = coinsResponse.data.reduce((sum, coin) => sum + BigInt(coin.balance), 0n);
-
-    if (totalBalance < BigInt(amount)) {
-      throw new Error(`Insufficient balance. Required: ${amount}, Available: ${totalBalance}`);
-    }
-
-    const largeCoin = coinsResponse.data.find(coin => BigInt(coin.balance) >= BigInt(amount));
-
-    if (largeCoin) {
-      if (BigInt(largeCoin.balance) === BigInt(amount)) {
-        return tx.object(largeCoin.coinObjectId);
-      } else {
-        const [splitCoin] = tx.splitCoins(tx.object(largeCoin.coinObjectId), [amount]);
-        return splitCoin;
-      }
-    } else {
-      const primaryCoin = coinsResponse.data[0];
-      const coinsToMerge = coinsResponse.data.slice(1).map(coin => tx.object(coin.coinObjectId));
-
-      if (coinsToMerge.length > 0) {
-        tx.mergeCoins(tx.object(primaryCoin.coinObjectId), coinsToMerge);
-      }
-
-      const [splitCoin] = tx.splitCoins(tx.object(primaryCoin.coinObjectId), [amount]);
-      return splitCoin;
-    }
   }
 }
