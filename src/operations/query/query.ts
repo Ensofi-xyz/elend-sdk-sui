@@ -1,17 +1,37 @@
 import { SuiClient } from '@mysten/sui/client';
 
+import { NetworkConfig } from '../../interfaces/config';
 import { IElendMarketQueryOperation } from '../../interfaces/operations';
-import { Market, MarketRegistry, Obligation, Reserve, RewardConfig, UserReward } from '../../types/object';
+import { Market, MarketRegistry, Obligation, ObligationOwnerCap, Reserve, RewardConfig, UserReward } from '../../types/object';
 
 export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
-  private client: SuiClient;
+  private suiClient: SuiClient;
+  private networkConfig: NetworkConfig;
 
-  constructor(client: SuiClient) {
-    this.client = client;
+  constructor(client: SuiClient, networkConfig: NetworkConfig) {
+    this.suiClient = client;
+    this.networkConfig = networkConfig;
+  }
+
+  async fetchObligationOwnerCapObject(owner: string): Promise<ObligationOwnerCap | null> {
+    const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
+
+    const obligationOwnerCapStructType = `${packageInfo.package}::obligation::ObligationOwnerCap<${packageInfo.marketType['MAIN_POOL']}>`;
+    const response = await this.suiClient.getOwnedObjects({
+      owner: owner,
+      options: {
+        showContent: true,
+      },
+      filter: {
+        StructType: obligationOwnerCapStructType,
+      },
+    });
+
+    return response.data[0] as ObligationOwnerCap;
   }
 
   async fetchMarket(marketId: string): Promise<Market | null> {
-    const response = await this.client.getObject({
+    const response = await this.suiClient.getObject({
       id: marketId,
       options: {
         showContent: true,
@@ -37,7 +57,7 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
   }
 
   async fetchReserve(reserveId: string): Promise<Reserve | null> {
-    const response = await this.client.getObject({
+    const response = await this.suiClient.getObject({
       id: reserveId,
       options: {
         showContent: true,
@@ -54,7 +74,7 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
   }
 
   async fetchObligation(obligationId: string): Promise<Obligation | null> {
-    const response = await this.client.getObject({
+    const response = await this.suiClient.getObject({
       id: obligationId,
       options: {
         showOwner: true,

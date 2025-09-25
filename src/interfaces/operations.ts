@@ -1,7 +1,7 @@
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 
-import { Market, MarketRegistry, Obligation, Reserve, RewardConfig, UserReward } from '../types/object';
+import { Market, MarketRegistry, Obligation, ObligationOwnerCap, Reserve, RewardConfig, UserReward } from '../types/object';
 import { NetworkConfig } from './config';
 
 // Lending Operations
@@ -21,7 +21,11 @@ export interface WithdrawCTokensAndRedeemLiquidityOperationArgs {
   collateralAmount: number;
 }
 
-export interface BorrowObligationLiquidityOperationArgs {}
+export interface BorrowObligationLiquidityOperationArgs {
+  owner: string;
+  reserve: string;
+  amount: number;
+}
 
 export interface RepayObligationLiquidityOperationArgs {}
 
@@ -35,7 +39,7 @@ export interface IWithdrawElendMarketOperation {
 }
 
 export interface IBorrowElendMarketOperation {
-  buildBorrowTxn(args: BorrowObligationLiquidityOperationArgs): Transaction;
+  buildBorrowTxn(args: BorrowObligationLiquidityOperationArgs): Promise<Transaction>;
 }
 
 export interface IRepayElendMarketOperation {
@@ -51,6 +55,7 @@ export interface IElendMarketRewardOperation {
 
 // Query Operations
 export interface IElendMarketQueryOperation {
+  fetchObligationOwnerCapObject(owner: string): Promise<ObligationOwnerCap | null>;
   fetchMarket(marketId: string): Promise<Market | null>;
   fetchReserve(reserveId: string): Promise<Reserve | null>;
   fetchObligation(obligationId: string): Promise<Obligation | null>;
