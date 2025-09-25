@@ -3,15 +3,13 @@ import { isNil } from 'lodash';
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 
-import { SuiPriceServiceConnection, SuiPythClient } from '@pythnetwork/pyth-sui-js';
-import { ObjectId } from '@pythnetwork/pyth-sui-js/lib/client';
+import { SuiPythClient } from '@pythnetwork/pyth-sui-js';
 
 import { SUI_SYSTEM_CLOCK } from '../../common/constant';
 import { ElendMarketContract } from '../../core/function-loader';
 import { ElendMarketConfig, NetworkConfig } from '../../interfaces/config';
 import { IElendMarketContract } from '../../interfaces/functions';
 import { BorrowObligationLiquidityOperationArgs, IBorrowElendMarketOperation, IElendMarketQueryOperation } from '../../interfaces/operations';
-import { ObligationOwnerCap } from '../../types/object';
 import { getTokenTypeForReserve } from '../../utils/common';
 import { ElendMarketQueryOperation } from '../query/query';
 import { refreshReserves } from './common';
