@@ -1,16 +1,18 @@
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 
-import { Market, Obligation, Reserve, RewardConfig, UserReward } from '../types/object';
+import { Market, MarketRegistry, Obligation, Reserve, RewardConfig, UserReward } from '../types/object';
 import { NetworkConfig } from './config';
 
 // Lending Operations
+export interface InitObligationArgs {
+  owner: string;
+}
+
 export interface DepositReserveLiquidityAndObligationCollateralOperationArgs {
   owner: string;
   reserve: string;
   amount: number;
-  networkConfig: NetworkConfig;
-  suiClient: SuiClient;
 }
 
 export interface WithdrawCTokensAndRedeemLiquidityOperationArgs {}
@@ -20,7 +22,8 @@ export interface BorrowObligationLiquidityOperationArgs {}
 export interface RepayObligationLiquidityOperationArgs {}
 
 export interface IDepositElendMarketOperation {
-  buildDepositTxn(args: DepositReserveLiquidityAndObligationCollateralOperationArgs): Transaction;
+  buildInitObligationTxn(args: InitObligationArgs): Promise<Transaction>;
+  buildDepositTxn(args: DepositReserveLiquidityAndObligationCollateralOperationArgs): Promise<Transaction>;
 }
 
 export interface IWithdrawElendMarketOperation {
@@ -44,11 +47,11 @@ export interface IElendMarketRewardOperation {
 
 // Query Operations
 export interface IElendMarketQueryOperation {
-  fetchMarket(marketId: string): Market;
-  fetchReserve(reserveId: string): Reserve;
-  fetchObligation(obligationId: string): Obligation;
-  fetchRewardConfigs(reserveId: string, option: number, rewardTokenType?: string): RewardConfig[];
-  fetchUserReward(reserveId: string, obligationId: string, owner: string): UserReward;
+  fetchMarket(marketId: string): Promise<Market | null>;
+  fetchReserve(reserveId: string): Promise<Reserve | null>;
+  fetchObligation(obligationId: string): Promise<Obligation | null>;
+  fetchRewardConfigs(reserveId: string, option: number, rewardTokenType?: string): Promise<RewardConfig[]>;
+  fetchUserReward(reserveId: string, obligationId: string, owner: string): Promise<UserReward | null>;
 }
 
 // Calculation Operations

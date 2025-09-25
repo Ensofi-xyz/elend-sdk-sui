@@ -19,20 +19,20 @@ export interface IElendMarketContract {
   claimReward(tx: Transaction, typeArgs: [string, string], args: ClaimRewardArgs): void;
 }
 
-interface InitObligationArgs {
+export interface InitObligationArgs {
   version: TransactionObjectInput;
   owner: TransactionObjectInput;
   clock: TransactionObjectInput;
 }
 
-interface RefreshReserveArgs {
+export interface RefreshReserveArgs {
   version: TransactionObjectInput;
   reserve: TransactionObjectInput;
   priceInfoObject: TransactionObjectInput;
   clock: TransactionObjectInput;
 }
 
-interface RefreshObligation {
+export interface RefreshObligation {
   version: TransactionObjectInput;
   obligation: TransactionObjectInput;
   reserveT1: TransactionObjectInput;
@@ -41,7 +41,7 @@ interface RefreshObligation {
   clock: TransactionObjectInput;
 }
 
-interface DepositReserveLiquidityAndMintCTokensArgs {
+export interface DepositReserveLiquidityAndMintCTokensArgs {
   version: TransactionObjectInput;
   reserve: TransactionObjectInput;
   coin: TransactionObjectInput;
@@ -49,7 +49,7 @@ interface DepositReserveLiquidityAndMintCTokensArgs {
   clock: TransactionObjectInput;
 }
 
-interface DepositCTokensIntoObligationArgs {
+export interface DepositCTokensIntoObligationArgs {
   obligationOwnerCap: TransactionObjectInput;
   version: TransactionObjectInput;
   reserve: TransactionObjectInput;
@@ -58,7 +58,7 @@ interface DepositCTokensIntoObligationArgs {
   clock: TransactionObjectInput;
 }
 
-interface WithdrawCTokensAndRedeemLiquidityArgs {
+export interface WithdrawCTokensAndRedeemLiquidityArgs {
   obligationOwnerCap: TransactionObjectInput;
   version: TransactionObjectInput;
   reserve: TransactionObjectInput;
@@ -67,7 +67,7 @@ interface WithdrawCTokensAndRedeemLiquidityArgs {
   clock: TransactionObjectInput;
 }
 
-interface BorrowObligationLiquidityArgs {
+export interface BorrowObligationLiquidityArgs {
   obligationOwnerCap: TransactionObjectInput;
   version: TransactionObjectInput;
   reserve: TransactionObjectInput;
@@ -76,7 +76,7 @@ interface BorrowObligationLiquidityArgs {
   clock: TransactionObjectInput;
 }
 
-interface RepayObligationLiquidityArgs {
+export interface RepayObligationLiquidityArgs {
   obligationOwnerCap: TransactionObjectInput;
   version: TransactionObjectInput;
   reserve: TransactionObjectInput;
@@ -86,28 +86,28 @@ interface RepayObligationLiquidityArgs {
   clock: TransactionObjectInput;
 }
 
-interface UpdateRewardConfigArgs {
+export interface UpdateRewardConfigArgs {
   version: TransactionObjectInput;
   reserve: TransactionObjectInput;
   option: number | TransactionArgument;
   clock: TransactionObjectInput;
 }
 
-interface InitUserRewardArgs {
+export interface InitUserRewardArgs {
   version: TransactionObjectInput;
   obligation: TransactionObjectInput;
   reserve: TransactionObjectInput;
   option: number | TransactionArgument;
 }
 
-interface UpdateUserRewardArgs {
+export interface UpdateUserRewardArgs {
   version: TransactionObjectInput;
   obligation: TransactionObjectInput;
   reserve: TransactionObjectInput;
   option: number | TransactionArgument;
 }
 
-interface ClaimRewardArgs {
+export interface ClaimRewardArgs {
   version: TransactionObjectInput;
   tokenRewardState: TransactionObjectInput;
   obligation: TransactionObjectInput;

@@ -5,6 +5,11 @@ interface ConfigObject {
 }
 
 export interface ElendMarketConfig {
+  package: string;
+  pythState: string;
+  wormholeState: string;
+  pythPriceFeedId: Record<string, string>;
+  tokenType: Record<string, string>;
   marketType: Record<string, string>;
   rewardTokenType: Record<string, string>;
   marketRegistry: ConfigObject;
@@ -16,6 +21,7 @@ export interface ElendMarketConfig {
 
 export interface NetworkConfig {
   rpcUrl: string;
+  pythHermesUrl: string;
   packages: {
     [version: string]: ElendMarketConfig;
   };
