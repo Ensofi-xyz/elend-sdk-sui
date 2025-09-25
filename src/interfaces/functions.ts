@@ -63,7 +63,7 @@ export interface WithdrawCTokensAndRedeemLiquidityArgs {
   version: TransactionObjectInput;
   reserve: TransactionObjectInput;
   obligation: TransactionObjectInput;
-  collateralAmount: bigint | TransactionArgument;
+  collateralAmount: bigint;
   clock: TransactionObjectInput;
 }
 
