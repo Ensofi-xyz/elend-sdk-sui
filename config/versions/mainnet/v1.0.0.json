@@ -1,0 +1,59 @@
+{
+  "version": "v1.1.0",
+  "packageId": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926",
+  "objects": {
+    "pythState": "0x243759059f4c3111179da5878c12f68d612c21a8d54d85edc86164bb18be1c7c",
+    "wormholeState": "0x31358d198147da50db32eda2562951d53973a0c0ad5ed738e9b17d88b213d790",
+    "pythPriceFeedId": {
+      "SUI": "0x50c67b3fd225db8912a424dd4baed60ffdde625ed2feaaf283724f9608fea266",
+      "USDC": "0x41f3625971ca2ed2263e78573fe5ce23e13d2558ed3f2e47ab0f84fb9e7ae722",
+      "USDT": "0x1fc18861232290221461220bd4e2acd1dcdfbc89c84092c93c18bdc7756c1588"
+    },
+    "tokenType": {
+      "SUI": "0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI",
+      "USDC": "0x841154f2e1b919e55832559d5a90ba2be60cc0f72a9b570f75240ab1110302ec::usdc::USDC",
+      "USDT": "0x841154f2e1b919e55832559d5a90ba2be60cc0f72a9b570f75240ab1110302ec::usdt::USDT"
+    },
+    "marketType": {
+      "MAIN_POOL": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::elend_market::MAIN_POOL"
+    },
+    "rewardTokenType": {
+      "EUSD": ""
+    },
+    "marketRegistry": {
+      "id": "0xf35ca2639c18eddbf0be7f493224b4e5ea1dbbe8524054e572e07e633fb71231",
+      "package": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926",
+      "type": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::market_registry::MarketRegistry"
+    },
+    "lendingMarkets": {
+      "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::elend_market::MAIN_POOL": {
+        "id": "0xdad8d8ca5d273464e19a6d40083f1b955d11dd47bdc6f4e62d9c3df855194c9d",
+        "package": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926",
+        "type": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::market::Market<0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::elend_market::MAIN_POOL>"
+      }
+    },
+    "version": {
+      "id": "0xbb67ce66bef7bfe09eb0cc2127b9ae24eb2767f3079bb3949a577ebaa2e11f35",
+      "package": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926",
+      "type": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::version::Version"
+    },
+    "reserves": {
+      "0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI": {
+        "id": "0xada20c93464a88cf430480ae6da2fcdc0521bc804b1a108c86465edcd7188d77",
+        "package": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926",
+        "type": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::reserve::Reserve<0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::elend_market::MAIN_POOL, 0x2::sui::SUI>"
+      },
+      "0x841154f2e1b919e55832559d5a90ba2be60cc0f72a9b570f75240ab1110302ec::usdc::USDC": {
+        "id": "0xa50848b8ea74455f810fc882fd1c309a07fde5ed6022488d3fb97cfa1c790c00",
+        "package": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926",
+        "type": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::reserve::Reserve<0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::elend_market::MAIN_POOL, 0x841154f2e1b919e55832559d5a90ba2be60cc0f72a9b570f75240ab1110302ec::usdc::USDC>"
+      },
+      "0x841154f2e1b919e55832559d5a90ba2be60cc0f72a9b570f75240ab1110302ec::usdt::USDT": {
+        "id": "0xd64ead233edf9bf1d871e26e295e72b446746b41cd3ec372e3139391c9a9e92a",
+        "package": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926",
+        "type": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::reserve::Reserve<0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::elend_market::MAIN_POOL, 0x841154f2e1b919e55832559d5a90ba2be60cc0f72a9b570f75240ab1110302ec::usdt::USDT>"
+      }
+    },
+    "tokenRewardState": ""
+  }
+}

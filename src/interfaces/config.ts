@@ -21,6 +21,7 @@ export interface ElendMarketConfig {
 
 export interface NetworkConfig {
   rpcUrl: string;
+  wsRpcUrl: string;
   pythHermesUrl: string;
   packages: {
     [version: string]: ElendMarketConfig;

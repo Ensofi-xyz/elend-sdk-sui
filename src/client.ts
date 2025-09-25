@@ -1,5 +1,9 @@
-import { SuiClient } from '@mysten/sui/client';
+import { isNil } from 'lodash';
 
+import { SuiClient } from '@mysten/sui/client';
+import { Transaction } from '@mysten/sui/transactions';
+
+import { ConfigLoader } from './core/config-loader';
 import { NetworkConfig } from './interfaces/config';
 import {
   IBorrowElendMarketOperation,
@@ -7,42 +11,191 @@ import {
   IElendMarketObligationCalculationOperation,
   IElendMarketQueryOperation,
   IElendMarketReserveCalculationOperation,
+  IElendMarketRewardCalculationOperation,
   IElendMarketRewardOperation,
   IRepayElendMarketOperation,
   IWithdrawElendMarketOperation,
 } from './interfaces/operations';
-import { Reserve } from './types/object';
+import { ElendMarketObligationCalculationOperation } from './operations/calculation/obligation-calculation';
+import { ElendMarketReserveCalculationOperation } from './operations/calculation/reserve-calculation';
+import { ElendMarketRewardCalculationOperation } from './operations/calculation/reward-calculation';
+import { BorrowElendMarketOperation } from './operations/lending/borrow';
+import { DepositElendMarketOperation } from './operations/lending/deposit';
+import { RepayElendMarketOperation } from './operations/lending/repay';
+import { WithdrawElendMarketOperation } from './operations/lending/withdraw';
+import { ElendMarketQueryOperation } from './operations/query/query';
+import { ElendMarketRewardOperation } from './operations/reward/reward';
+import { Network } from './types/common';
+import { Obligation, Reserve } from './types/object';
+import { getSuiClientInstance } from './utils/sui-client';
 
 export class ElendClient {
   public readonly networkConfig: NetworkConfig;
   public readonly suiClient: SuiClient;
 
   public obligationOwner: string | null;
-  public associateReservesObligation: Map<string, Reserve>;
+  public obligation: Obligation | null;
+  public reserves: Map<string, Reserve>;
 
-  depositOperation: IDepositElendMarketOperation;
-  borrowOperation: IBorrowElendMarketOperation;
-  withdrawOperation: IWithdrawElendMarketOperation;
-  repayOperation: IRepayElendMarketOperation;
+  private readonly depositOperation: IDepositElendMarketOperation;
+  private readonly borrowOperation: IBorrowElendMarketOperation;
+  private readonly withdrawOperation: IWithdrawElendMarketOperation;
+  private readonly repayOperation: IRepayElendMarketOperation;
 
-  rewardOperation: IElendMarketRewardOperation;
-  queryOperation: IElendMarketQueryOperation;
+  private readonly rewardOperation: IElendMarketRewardOperation;
+  private readonly queryOperation: IElendMarketQueryOperation;
 
-  reserveCalculationOperation: IElendMarketReserveCalculationOperation;
-  obligationCalculationOperation: IElendMarketObligationCalculationOperation;
-  rewardCalculationOperation: IElendMarketRewardOperation;
+  private readonly reserveCalculationOperation: IElendMarketReserveCalculationOperation;
+  private readonly obligationCalculationOperation: IElendMarketObligationCalculationOperation;
+  private readonly rewardCalculationOperation: IElendMarketRewardCalculationOperation;
 
-  constructor() {}
+  private constructor(networkConfig: NetworkConfig, suiClient: SuiClient) {
+    this.networkConfig = networkConfig;
+    this.suiClient = suiClient;
 
-  refreshObligation(): Promise<void> {}
+    this.obligationOwner = null;
+    this.obligation = null;
+    this.reserves = new Map<string, Reserve>();
 
-  refreshReserves(): Promise<void> {}
+    this.depositOperation = new DepositElendMarketOperation(networkConfig, suiClient);
+    this.borrowOperation = new BorrowElendMarketOperation(networkConfig, suiClient);
+    this.withdrawOperation = new WithdrawElendMarketOperation(networkConfig, suiClient);
+    this.repayOperation = new RepayElendMarketOperation(networkConfig, suiClient);
 
-  deposit(): Promise<void> {}
+    this.rewardOperation = new ElendMarketRewardOperation(networkConfig, suiClient);
+    this.queryOperation = new ElendMarketQueryOperation(networkConfig, suiClient);
 
-  borrow(): Promise<void> {}
+    this.reserveCalculationOperation = new ElendMarketReserveCalculationOperation();
+    this.obligationCalculationOperation = new ElendMarketObligationCalculationOperation();
+    this.rewardCalculationOperation = new ElendMarketRewardCalculationOperation();
+  }
 
-  withdraw(): Promise<void> {}
+  async create(
+    network: Network,
+    options?: {
+      obligationOwner?: string;
+      suiClient?: SuiClient;
+      isLoadReserves: boolean;
+    }
+  ): Promise<ElendClient> {
+    const networkConfig = ConfigLoader.loadNetworkConfig(network);
+    const suiClient = isNil(options?.suiClient) ? getSuiClientInstance(networkConfig.rpcUrl, networkConfig.wsRpcUrl) : options.suiClient;
+    const elendClient = new ElendClient(networkConfig, suiClient);
 
-  repay(): Promise<void> {}
+    if (!isNil(options?.obligationOwner)) {
+      await this.loadObligation(options.obligationOwner);
+    }
+
+    if (!isNil(options?.isLoadReserves) && options.isLoadReserves) {
+      await this.loadReserves();
+    }
+
+    return elendClient;
+  }
+
+  async loadObligation(obligationOwner: string): Promise<void> {
+    this.obligationOwner = obligationOwner;
+    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(obligationOwner);
+    if (isNil(obligationOwnerCap)) return;
+    const obligationId = obligationOwnerCap.obligation;
+    const obligation = await this.queryOperation.fetchObligation(obligationId);
+    this.obligation = obligation;
+  }
+
+  async loadReserves() {
+    const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
+    for (const [tokenType, reserveConfigObject] of Object.entries(packageInfo.reserves)) {
+      const reserve = await this.queryOperation.fetchReserve(reserveConfigObject.id);
+      if (isNil(reserve)) continue;
+      this.reserves.set(tokenType, reserve);
+    }
+  }
+
+  async reloadObligation(): Promise<void> {
+    if (isNil(this.obligationOwner)) {
+      throw Error('Not load obligation owner yet');
+    }
+    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
+    if (isNil(obligationOwnerCap)) return;
+    const obligationId = obligationOwnerCap.obligation;
+    const obligation = await this.queryOperation.fetchObligation(obligationId);
+    this.obligation = obligation;
+  }
+
+  async reloadReserves(): Promise<void> {
+    await this.loadReserves();
+  }
+
+  async initObligation(): Promise<Transaction> {
+    if (isNil(this.obligationOwner)) {
+      throw Error('Not load obligation owner yet');
+    }
+
+    return this.depositOperation.buildInitObligationTxn({
+      owner: this.obligationOwner,
+    });
+  }
+
+  async deposit(reserve: string, liquidityAmount: number): Promise<Transaction> {
+    if (isNil(this.obligationOwner)) {
+      throw Error('Have not load obligation owner yet');
+    }
+    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
+    if (isNil(obligationOwnerCap)) {
+      throw Error('Have not init obligation yet');
+    }
+
+    return this.depositOperation.buildDepositTxn({
+      owner: this.obligationOwner,
+      reserve,
+      amount: liquidityAmount,
+    });
+  }
+
+  async borrow(reserve: string, liquidityAmount: number): Promise<Transaction> {
+    if (isNil(this.obligationOwner)) {
+      throw Error('Have not load obligation owner yet');
+    }
+
+    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
+    if (isNil(obligationOwnerCap)) {
+      throw Error('Have not init obligation yet');
+    }
+
+    return this.borrowOperation.buildBorrowTxn({
+      owner: this.obligationOwner,
+      reserve,
+      amount: liquidityAmount,
+    });
+  }
+
+  async withdraw(reserve: string, collateralAmount: number): Promise<Transaction> {
+    if (isNil(this.obligationOwner)) {
+      throw Error('Have not load obligation owner yet');
+    }
+
+    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
+    if (isNil(obligationOwnerCap)) {
+      throw Error('Have not init obligation yet');
+    }
+
+    return this.withdrawOperation.buildWithdrawTxn({
+      owner: this.obligationOwner,
+      reserve,
+      collateralAmount,
+    });
+  }
+
+  async repay(reserve: string, liquidityAmount: number): Promise<Transaction> {
+    if (isNil(this.obligationOwner)) {
+      throw Error('Have not load obligation owner yet');
+    }
+
+    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
+    if (isNil(obligationOwnerCap)) {
+      throw Error('Have not init obligation yet');
+    }
+
+    return this.repayOperation.buildRepayTxn({});
+  }
 }

@@ -27,7 +27,7 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
 
   constructor(networkConfig: NetworkConfig, suiClient: SuiClient) {
     this.contract = new ElendMarketContract(networkConfig);
-    this.query = new ElendMarketQueryOperation(suiClient, networkConfig);
+    this.query = new ElendMarketQueryOperation(networkConfig, suiClient);
     this.networkConfig = networkConfig;
     this.pythClient = new SuiPythClient(
       suiClient,

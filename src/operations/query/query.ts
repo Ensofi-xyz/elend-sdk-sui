@@ -8,7 +8,7 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
   private suiClient: SuiClient;
   private networkConfig: NetworkConfig;
 
-  constructor(client: SuiClient, networkConfig: NetworkConfig) {
+  constructor(networkConfig: NetworkConfig, client: SuiClient) {
     this.suiClient = client;
     this.networkConfig = networkConfig;
   }

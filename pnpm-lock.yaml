@@ -17,6 +17,9 @@ importers:
       '@pythnetwork/pyth-sui-js':
         specifier: ^2.2.0
         version: 2.2.0(typescript@5.9.2)
+      fs:
+        specifier: 0.0.1-security
+        version: 0.0.1-security
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -30,6 +33,9 @@ importers:
       '@types/lodash':
         specifier: ^4.17.20
         version: 4.17.20
+      '@types/node':
+        specifier: ^24.5.2
+        version: 24.5.2
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -357,6 +363,9 @@ packages:
   form-data@4.0.4:
     resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
     engines: {node: '>= 6'}
+
+  fs@0.0.1-security:
+    resolution: {integrity: sha512-3XY9e1pP0CVEUCdj5BmfIZxRBTSDycnbqhIOGec9QYtmVH2fbLpj86CFWkrNOkt/Fvty4KZG5lTglL9j/gJ87w==}
 
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
@@ -924,6 +933,8 @@ snapshots:
       es-set-tostringtag: 2.1.0
       hasown: 2.0.2
       mime-types: 2.1.35
+
+  fs@0.0.1-security: {}
 
   function-bind@1.1.2: {}
 

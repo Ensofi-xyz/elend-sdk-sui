@@ -1,6 +1,8 @@
 import { IElendMarketReserveCalculationOperation } from '../../interfaces/operations';
 
 export class ElendMarketReserveCalculationOperation implements IElendMarketReserveCalculationOperation {
+  constructor() {}
+
   getTotalSuppliedUSDValueOnMarket(): void {
     throw new Error('Method not implemented.');
   }

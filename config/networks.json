@@ -1,0 +1,22 @@
+{
+  "mainnet": {
+    "network": "mainnet",
+    "rpcUrl": "https://fullnode.mainnet.sui.io:443",
+    "wsRpcUrl": "",
+    "pythHermesUrl": "https://hermes.pyth.network",
+    "packagesPath": {
+      "v1.0.0": "config/versions/mainnet/v1.0.0.json"
+    },
+    "latestVersion": "v1.0.0"
+  },
+  "testnet": {
+    "network": "testnet",
+    "rpcUrl": "https://fullnode.testnet.sui.io:443",
+    "wsRpcUrl": "",
+    "pythHermesUrl": "https://hermes-beta.pyth.network",
+    "packagesPath": {
+      "v1.0.0": "config/versions/testnet/v1.0.0.json"
+    },
+    "latestVersion": "v1.0.0"
+  }
+}
