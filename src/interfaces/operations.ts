@@ -15,7 +15,11 @@ export interface DepositReserveLiquidityAndObligationCollateralOperationArgs {
   amount: number;
 }
 
-export interface WithdrawCTokensAndRedeemLiquidityOperationArgs {}
+export interface WithdrawCTokensAndRedeemLiquidityOperationArgs {
+  owner: string;
+  reserve: string;
+  collateralAmount: number;
+}
 
 export interface BorrowObligationLiquidityOperationArgs {}
 
@@ -27,7 +31,7 @@ export interface IDepositElendMarketOperation {
 }
 
 export interface IWithdrawElendMarketOperation {
-  buildWithdrawTxn(args: WithdrawCTokensAndRedeemLiquidityOperationArgs): Transaction;
+  buildWithdrawTxn(args: WithdrawCTokensAndRedeemLiquidityOperationArgs): Promise<Transaction>;
 }
 
 export interface IBorrowElendMarketOperation {
