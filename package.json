@@ -13,7 +13,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky",
     "deposit": "ts-node test/deposit.ts",
-    "borrow": "ts-node test/borrow.ts"
+    "borrow": "ts-node test/borrow.ts",
+    "withdraw": "ts-node test/withdraw.ts"
   },
   "repository": {
     "type": "git",
