@@ -99,7 +99,12 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
       throw new Error(`Token type not found for reserve: ${reserve}`);
     }
 
-    const repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [amount]);
+    const totalAmount = await this.suiClient.getBalance({
+      owner,
+      coinType: tokenType,
+    });
+    console.log('🚀 ~ RepayElendMarketOperation ~ handleRepayOperation ~ totalAmount:', totalAmount);
+    const repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(totalAmount.totalBalance)]);
 
     this.contract.repayObligationLiquidity(tx, [packageInfo.marketType['MAIN_POOL'], tokenType], {
       version: packageInfo.version.id,

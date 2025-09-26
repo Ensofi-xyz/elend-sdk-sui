@@ -12,25 +12,21 @@ const rpcUrl = 'https://fullnode.testnet.sui.io:443';
 const wsRpcUrl = 'https://fullnode.testnet.sui.io:443';
 
 const signer = getSignerByPrivateKey('suiprivkey1qzwd7tkdp4u2s7j9g5s624hud7d3ltq6q6xp9k6pq4s9jehu4zsnylljw8k');
-const borrowReserve = '0xa50848b8ea74455f810fc882fd1c309a07fde5ed6022488d3fb97cfa1c790c00'; //USDC
-const borrowAmount = 1000000; // 5 USDC
+const repayReserve = '0xa50848b8ea74455f810fc882fd1c309a07fde5ed6022488d3fb97cfa1c790c00'; //USDC
+const repayAmount = 1 * 10 ** 6;
 
-const borrow = async () => {
+const repay = async () => {
   const suiClient = getSuiClientInstance(rpcUrl, wsRpcUrl);
   const elendClient = await ElendClient.create(Network.Testnet, {
     obligationOwner: signer.toSuiAddress(),
     suiClient,
     isLoadReserves: true,
   });
-  const tx = await elendClient.borrow(borrowReserve, borrowAmount);
+  console.log('obligationId: ', elendClient.obligation);
+  const tx = await elendClient.repay(repayReserve, repayAmount);
 
-  // const simulate = await suiClient.devInspectTransactionBlock({
-  //   transactionBlock: tx,
-  //   sender: signer.toSuiAddress(),
-  // })
-  // console.log(simulate);
-  const borrowRes = await waitSignAndExecuteTransactionIX(suiClient, tx, signer);
-  console.log('borrow res: ', borrowRes);
+  const withdrawRes = await waitSignAndExecuteTransactionIX(suiClient, tx, signer);
+  console.log('repay res: ', withdrawRes);
 };
 
-borrow();
+repay();

@@ -122,7 +122,7 @@ export class ElendMarketContract implements IElendMarketContract {
   }
 
   repayObligationLiquidity(tx: Transaction, typeArgs: [string, string], args: RepayObligationLiquidityArgs): void {
-    const { obligationOwnerCap, version, reserve, obligation, repayAmount, clock } = args;
+    const { obligationOwnerCap, version, reserve, obligation, repayCoin, repayAmount, clock } = args;
 
     tx.moveCall({
       target: `${this.packageId}::lending_market::repay_obligation_liquidity`,
@@ -132,6 +132,7 @@ export class ElendMarketContract implements IElendMarketContract {
         tx.object(version),
         tx.object(reserve),
         tx.object(obligation),
+        tx.object(repayCoin),
         tx.pure.u64(repayAmount),
         tx.object(clock),
       ],
