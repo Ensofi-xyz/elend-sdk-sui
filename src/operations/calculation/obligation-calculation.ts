@@ -1,6 +1,8 @@
 import { IElendMarketObligationCalculationOperation } from '../../interfaces/operations';
 
 export class ElendMarketObligationCalculationOperation implements IElendMarketObligationCalculationOperation {
+  constructor() {}
+
   getTotalSuppliedUSDValueObligation(): void {
     throw new Error('Method not implemented.');
   }

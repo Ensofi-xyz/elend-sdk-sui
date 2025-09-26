@@ -72,8 +72,8 @@ export interface TokenInfo {
 }
 
 export interface WithdrawalCap {
-  configCapacity: any; // TODO: Update I64 type mapping
-  currentTotal: any; // TODO: Update I64 type mapping
+  configCapacity: bigint;
+  currentTotal: bigint;
   lastIntervalStartTimestamp: bigint;
   configIntervalLengthSeconds: bigint;
 }
@@ -112,10 +112,10 @@ export interface Obligation {
   highestBorrowFactorBps: number;
   allowedBorrowValue: Decimal;
   unhealthyBorrowValue: Decimal;
-  depositsTokenType: Map<string, string>;
-  borrowsTokenType: Map<string, string>;
-  depositsTier: Map<string, number>;
-  borrowsTier: Map<string, number>;
+  depositsTokenType: string; // Id of this depositsTokenType table
+  borrowsTokenType: string; // Id of this borrowsTokenType table
+  depositsTier: string; // Id of this depositsTier table
+  borrowsTier: string; //Id of this borrowsTier table
   numOfObsoleteReserves: number;
   hasDebt: boolean;
   lastUpdate: LastUpdate;

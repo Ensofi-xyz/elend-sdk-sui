@@ -5,6 +5,8 @@ import { Transaction } from '@mysten/sui/transactions';
 
 import { wait } from './common';
 
+const SUI_COIN_TYPE = '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI';
+
 export const mergeAllCoin = async (coins: CoinStruct[], tx: Transaction) => {
   if (coins.length == 0) {
     console.log('No coins to merge');
@@ -35,6 +37,7 @@ export const getCoinToSplit = async (
     });
     cursor = !isNil(paginatedCoins.nextCursor) ? paginatedCoins.nextCursor : null;
 
+    coinType = coinType == SUI_COIN_TYPE ? '0x2::sui::SUI' : coinType;
     for (const coin of paginatedCoins.data) {
       if (coin.coinType === coinType && Number(coin.balance) > amount) {
         return coin.coinObjectId;
