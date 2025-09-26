@@ -1,0 +1,16 @@
+{
+  "mainnet": {
+    "network": "mainnet",
+    "rpcUrl": "https://fullnode.mainnet.sui.io:443",
+    "wsRpcUrl": "https://fullnode.mainnet.sui.io:443",
+    "pythHermesUrl": "https://hermes.pyth.network",
+    "latestVersion": "v1.0.0"
+  },
+  "testnet": {
+    "network": "testnet",
+    "rpcUrl": "https://fullnode.testnet.sui.io:443",
+    "wsRpcUrl": "https://fullnode.testnet.sui.io:443",
+    "pythHermesUrl": "https://hermes-beta.pyth.network",
+    "latestVersion": "v1.0.0"
+  }
+}

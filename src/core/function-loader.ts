@@ -22,7 +22,7 @@ export class ElendMarketContract implements IElendMarketContract {
 
   constructor(private networkConfig: NetworkConfig) {
     const config = this.networkConfig.packages[this.networkConfig.latestVersion];
-    this.packageId = config.version.package;
+    this.packageId = config.upgradedPackage;
   }
 
   initObligation(tx: Transaction, typeArgs: string, args: InitObligationArgs): TransactionResult {

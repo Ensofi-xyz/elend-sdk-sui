@@ -1,6 +1,8 @@
 import { IElendMarketRewardCalculationOperation } from '../../interfaces/operations';
 
 export class ElendMarketRewardCalculationOperation implements IElendMarketRewardCalculationOperation {
+  constructor() {}
+
   getTotalIncentiveRewardStatisticObligation(): void {
     throw new Error('Method not implemented.');
   }
