@@ -179,6 +179,10 @@ export class ElendClient {
       throw Error('Have not load obligation owner yet');
     }
 
-    return this.repayOperation.buildRepayTxn({});
+    return this.repayOperation.buildRepayTxn({
+      amount: liquidityAmount,
+      owner: this.obligationOwner,
+      reserve,
+    });
   }
 }
