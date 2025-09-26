@@ -179,11 +179,6 @@ export class ElendClient {
       throw Error('Have not load obligation owner yet');
     }
 
-    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
-    if (isNil(obligationOwnerCap)) {
-      throw Error('Have not init obligation yet');
-    }
-
     return this.repayOperation.buildRepayTxn({});
   }
 }
