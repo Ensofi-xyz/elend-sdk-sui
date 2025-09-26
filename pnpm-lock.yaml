@@ -30,6 +30,9 @@ importers:
       '@types/lodash':
         specifier: ^4.17.20
         version: 4.17.20
+      '@types/node':
+        specifier: ^24.5.2
+        version: 24.5.2
       husky:
         specifier: ^9.1.7
         version: 9.1.7

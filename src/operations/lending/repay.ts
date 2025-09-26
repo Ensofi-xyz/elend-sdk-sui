@@ -1,13 +1,18 @@
-import { SuiClient } from '@mysten/sui/dist/cjs/client';
-import { Transaction } from '@mysten/sui/dist/cjs/transactions';
+import { isNil } from 'lodash';
+
+import { SuiClient } from '@mysten/sui/client';
+import { Transaction } from '@mysten/sui/transactions';
 
 import { SuiPythClient } from '@pythnetwork/pyth-sui-js';
 
+import { SUI_SYSTEM_CLOCK } from '../../common/constant';
 import { ElendMarketContract } from '../../core';
-import { NetworkConfig } from '../../interfaces/config';
+import { ElendMarketConfig, NetworkConfig } from '../../interfaces/config';
 import { IElendMarketContract } from '../../interfaces/functions';
 import { IElendMarketQueryOperation, IRepayElendMarketOperation, RepayObligationLiquidityOperationArgs } from '../../interfaces/operations';
+import { getTokenTypeForReserve, splitCoin } from '../../utils';
 import { ElendMarketQueryOperation } from '../query/query';
+import { refreshReserves } from './common';
 
 export class RepayElendMarketOperation implements IRepayElendMarketOperation {
   private contract: IElendMarketContract;
@@ -28,7 +33,82 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
     this.suiClient = suiClient;
   }
 
-  buildRepayTxn(args: RepayObligationLiquidityOperationArgs): Transaction {
-    throw new Error('Method not implemented.');
+  async buildRepayTxn(args: RepayObligationLiquidityOperationArgs): Promise<Transaction> {
+    const { owner, reserve, amount } = args;
+    const tx = new Transaction();
+
+    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner);
+    if (isNil(obligationOwnerCap)) {
+      throw new Error('Must Init Obligation First');
+    }
+    const obligationId = obligationOwnerCap.obligation;
+    const obligationData = await this.query.fetchObligation(obligationId);
+    if (isNil(obligationData)) throw Error('Not found obligation to deposit');
+
+    const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
+    const reserves = packageInfo.reserves;
+
+    await refreshReserves(tx, {
+      obligationData,
+      reserve,
+      pythClient: this.pythClient,
+      networkConfig: this.networkConfig,
+      contract: this.contract,
+    });
+
+    this.contract.refreshObligation(
+      tx,
+      [packageInfo.marketType['MAIN_POOL'], Object.keys(reserves)[0], Object.keys(reserves)[1], Object.keys(reserves)[2]],
+      {
+        version: packageInfo.version.id,
+        obligation: obligationId,
+        reserveT1: reserves[Object.keys(reserves)[0]].id,
+        reserveT2: reserves[Object.keys(reserves)[1]].id,
+        reserveT3: reserves[Object.keys(reserves)[2]].id,
+        clock: SUI_SYSTEM_CLOCK,
+      }
+    );
+
+    await this.handleRepayOperation(tx, {
+      owner,
+      reserve,
+      amount,
+      obligationOwnerCap: obligationOwnerCap.id,
+      obligationId,
+      packageInfo,
+    });
+
+    return tx;
+  }
+
+  private async handleRepayOperation(
+    tx: Transaction,
+    args: {
+      owner: string;
+      reserve: string;
+      amount: number;
+      obligationOwnerCap: string;
+      obligationId: string;
+      packageInfo: ElendMarketConfig;
+    }
+  ): Promise<void> {
+    const { owner, reserve, amount, obligationOwnerCap, obligationId, packageInfo } = args;
+
+    const tokenType = getTokenTypeForReserve(reserve, packageInfo);
+    if (!tokenType) {
+      throw new Error(`Token type not found for reserve: ${reserve}`);
+    }
+
+    const repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [amount]);
+
+    this.contract.repayObligationLiquidity(tx, [packageInfo.marketType['MAIN_POOL'], tokenType], {
+      version: packageInfo.version.id,
+      reserve: reserve,
+      obligation: obligationId,
+      obligationOwnerCap: obligationOwnerCap,
+      repayCoin,
+      repayAmount: BigInt(amount),
+      clock: SUI_SYSTEM_CLOCK,
+    });
   }
 }

@@ -27,7 +27,11 @@ export interface BorrowObligationLiquidityOperationArgs {
   amount: number;
 }
 
-export interface RepayObligationLiquidityOperationArgs {}
+export interface RepayObligationLiquidityOperationArgs {
+  owner: string;
+  reserve: string;
+  amount: number;
+}
 
 export interface IDepositElendMarketOperation {
   buildInitObligationTxn(args: InitObligationArgs): Promise<Transaction>;
@@ -43,7 +47,7 @@ export interface IBorrowElendMarketOperation {
 }
 
 export interface IRepayElendMarketOperation {
-  buildRepayTxn(args: RepayObligationLiquidityOperationArgs): Transaction;
+  buildRepayTxn(args: RepayObligationLiquidityOperationArgs): Promise<Transaction>;
 }
 
 // Reward Operations
