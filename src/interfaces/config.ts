@@ -6,6 +6,7 @@ interface ConfigObject {
 
 export interface ElendMarketConfig {
   package: string;
+  upgradedPackage: string;
   pythState: string;
   wormholeState: string;
   pythPriceFeedId: Record<string, string>;

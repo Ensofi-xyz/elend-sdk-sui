@@ -26,13 +26,14 @@ import { WithdrawElendMarketOperation } from './operations/lending/withdraw';
 import { ElendMarketQueryOperation } from './operations/query/query';
 import { ElendMarketRewardOperation } from './operations/reward/reward';
 import { Network } from './types/common';
-import { Obligation, Reserve } from './types/object';
+import { Market, Obligation, Reserve } from './types/object';
 import { getSuiClientInstance } from './utils/sui-client';
 
 export class ElendClient {
   public readonly networkConfig: NetworkConfig;
   public readonly suiClient: SuiClient;
 
+  public markets: Market[];
   public obligationOwner: string | null;
   public obligation: Obligation | null;
   public reserves: Map<string, Reserve>;
@@ -53,6 +54,7 @@ export class ElendClient {
     this.networkConfig = networkConfig;
     this.suiClient = suiClient;
 
+    this.markets = [];
     this.obligationOwner = null;
     this.obligation = null;
     this.reserves = new Map<string, Reserve>();
@@ -70,7 +72,7 @@ export class ElendClient {
     this.rewardCalculationOperation = new ElendMarketRewardCalculationOperation();
   }
 
-  async create(
+  static async create(
     network: Network,
     options?: {
       obligationOwner?: string;
@@ -83,11 +85,11 @@ export class ElendClient {
     const elendClient = new ElendClient(networkConfig, suiClient);
 
     if (!isNil(options?.obligationOwner)) {
-      await this.loadObligation(options.obligationOwner);
+      await elendClient.loadObligation(options.obligationOwner);
     }
 
     if (!isNil(options?.isLoadReserves) && options.isLoadReserves) {
-      await this.loadReserves();
+      await elendClient.loadReserves();
     }
 
     return elendClient;
@@ -140,10 +142,6 @@ export class ElendClient {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
-    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
-    if (isNil(obligationOwnerCap)) {
-      throw Error('Have not init obligation yet');
-    }
 
     return this.depositOperation.buildDepositTxn({
       owner: this.obligationOwner,
@@ -157,11 +155,6 @@ export class ElendClient {
       throw Error('Have not load obligation owner yet');
     }
 
-    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
-    if (isNil(obligationOwnerCap)) {
-      throw Error('Have not init obligation yet');
-    }
-
     return this.borrowOperation.buildBorrowTxn({
       owner: this.obligationOwner,
       reserve,
@@ -172,11 +165,6 @@ export class ElendClient {
   async withdraw(reserve: string, collateralAmount: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
-    }
-
-    const obligationOwnerCap = await this.queryOperation.fetchObligationOwnerCapObject(this.obligationOwner);
-    if (isNil(obligationOwnerCap)) {
-      throw Error('Have not init obligation yet');
     }
 
     return this.withdrawOperation.buildWithdrawTxn({

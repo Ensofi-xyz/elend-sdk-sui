@@ -10,6 +10,10 @@ export const getTokenTypeForReserve = (reserveId: string, packageConfig: ElendMa
   return null;
 };
 
+export const i64ToBigInt = (magnitude: bigint, negative: boolean): bigint => {
+  return negative ? -magnitude : magnitude;
+};
+
 export const wait = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
