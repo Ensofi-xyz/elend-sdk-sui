@@ -13,7 +13,7 @@ const wsRpcUrl = 'https://fullnode.testnet.sui.io:443';
 
 const signer = getSignerByPrivateKey('suiprivkey1qpf275dj6muyampyc5emgyrslt9whguk2mvurn3am9x7yr5937yzkjaafxy');
 const withdrawReserve = '0xa50848b8ea74455f810fc882fd1c309a07fde5ed6022488d3fb97cfa1c790c00'; //USDC
-const withdrawAmount = 10 * 10 ** 6;
+const withdrawAmount = 1 * 10 ** 6;
 
 const withdraw = async () => {
   const suiClient = getSuiClientInstance(rpcUrl, wsRpcUrl);

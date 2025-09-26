@@ -14,7 +14,8 @@
     "prepare": "husky",
     "deposit": "ts-node test/deposit.ts",
     "borrow": "ts-node test/borrow.ts",
-    "withdraw": "ts-node test/withdraw.ts"
+    "withdraw": "ts-node test/withdraw.ts",
+    "repay": "ts-node test/repay.ts"
   },
   "repository": {
     "type": "git",

@@ -104,7 +104,8 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
       coinType: tokenType,
     });
     console.log('🚀 ~ RepayElendMarketOperation ~ handleRepayOperation ~ totalAmount:', totalAmount);
-    const repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(totalAmount.totalBalance)]);
+    //TODO SUI: const repayCoin = tx.splitCoins(tx.gas, [Number(amount) + (0.3 * Math.pow(10, 9))]);
+    const repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(amount) + 0.3 * Math.pow(10, 9)]);
 
     this.contract.repayObligationLiquidity(tx, [packageInfo.marketType['MAIN_POOL'], tokenType], {
       version: packageInfo.version.id,
@@ -115,5 +116,7 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
       repayAmount: BigInt(amount),
       clock: SUI_SYSTEM_CLOCK,
     });
+
+    tx.transferObjects([repayCoin], owner);
   }
 }

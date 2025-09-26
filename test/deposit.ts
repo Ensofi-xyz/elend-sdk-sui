@@ -12,8 +12,8 @@ const rpcUrl = 'https://fullnode.testnet.sui.io:443';
 const wsRpcUrl = 'https://fullnode.testnet.sui.io:443';
 
 const signer = getSignerByPrivateKey('suiprivkey1qzwd7tkdp4u2s7j9g5s624hud7d3ltq6q6xp9k6pq4s9jehu4zsnylljw8k');
-const depositReserve = '0xada20c93464a88cf430480ae6da2fcdc0521bc804b1a108c86465edcd7188d77'; //SUI
-const depositAmount = 1 * 10 ** 9;
+const depositReserve = '0x44b6ce281bad4e096850bc7c5883cd9e50cd8d5118fedfdfa8bbd991d54ab3f8';
+const depositAmount = 50 * 10 ** 6;
 
 const deposit = async () => {
   const suiClient = getSuiClientInstance(rpcUrl, wsRpcUrl);
@@ -29,6 +29,11 @@ const deposit = async () => {
   }
   const tx = await elendClient.deposit(depositReserve, depositAmount);
 
+  // const simulate = await suiClient.devInspectTransactionBlock({
+  //   transactionBlock: tx,
+  //   sender: signer.toSuiAddress(),
+  // })
+  // console.log(simulate);
   const depositRes = await waitSignAndExecuteTransactionIX(suiClient, tx, signer);
   console.log('deposit res: ', depositRes);
 };
