@@ -122,7 +122,20 @@ export class ElendMarketContract implements IElendMarketContract {
   }
 
   repayObligationLiquidity(tx: Transaction, typeArgs: [string, string], args: RepayObligationLiquidityArgs): void {
-    throw new Error('repayObligationLiquidity: Implementation pending - TODO');
+    const { obligationOwnerCap, version, reserve, obligation, repayAmount, clock } = args;
+
+    tx.moveCall({
+      target: `${this.packageId}::lending_market::repay_obligation_liquidity`,
+      typeArguments: typeArgs,
+      arguments: [
+        tx.object(obligationOwnerCap),
+        tx.object(version),
+        tx.object(reserve),
+        tx.object(obligation),
+        tx.pure.u64(repayAmount),
+        tx.object(clock),
+      ],
+    });
   }
 
   updateRewardConfig(tx: Transaction, typeArgs: [string, string], args: UpdateRewardConfigArgs): void {

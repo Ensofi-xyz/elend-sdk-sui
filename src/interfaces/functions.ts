@@ -82,7 +82,7 @@ export interface RepayObligationLiquidityArgs {
   reserve: TransactionObjectInput;
   obligation: TransactionObjectInput;
   repayCoin: TransactionObjectInput;
-  repayAmount: bigint | TransactionArgument;
+  repayAmount: bigint;
   clock: TransactionObjectInput;
 }
 
