@@ -14,10 +14,10 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
     this.networkConfig = networkConfig;
   }
 
-  async fetchObligationOwnerCapObject(owner: string): Promise<ObligationOwnerCap | null> {
+  async fetchObligationOwnerCapObject(owner: string, marketType: string): Promise<ObligationOwnerCap | null> {
     const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
 
-    const obligationOwnerCapStructType = `${packageInfo.package}::obligation::ObligationOwnerCap<${packageInfo.marketType.MAIN_POOL}>`;
+    const obligationOwnerCapStructType = `${packageInfo.package}::obligation::ObligationOwnerCap<${marketType}>`;
     const response = await this.suiClient.getOwnedObjects({
       owner: owner,
       options: {

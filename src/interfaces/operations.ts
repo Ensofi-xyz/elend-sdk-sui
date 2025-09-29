@@ -59,7 +59,7 @@ export interface IElendMarketRewardOperation {
 
 // Query Operations
 export interface IElendMarketQueryOperation {
-  fetchObligationOwnerCapObject(owner: string): Promise<ObligationOwnerCap | null>;
+  fetchObligationOwnerCapObject(owner: string, marketTypes: string): Promise<ObligationOwnerCap | null>;
   fetchMarket(marketId: string): Promise<Market | null>;
   fetchReserve(reserveId: string): Promise<Reserve | null>;
   fetchObligation(obligationId: string): Promise<Obligation | null>;
