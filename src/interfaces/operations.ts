@@ -1,8 +1,11 @@
-import { SuiClient } from '@mysten/sui/client';
+import { Decimal as DecimalJs } from 'decimal.js';
+
 import { Transaction } from '@mysten/sui/transactions';
 
+import { DetailBorrowApyRes, DetailBorrowedRes, DetailSuppliedRes, DetailSupplyApyRes } from '../types/client';
+import { UserActionType } from '../types/common';
 import { Market, MarketRegistry, Obligation, ObligationOwnerCap, Reserve, RewardConfig, UserReward } from '../types/object';
-import { NetworkConfig } from './config';
+import { Decimal } from '../utils';
 
 // Lending Operations
 export interface InitObligationArgs {
@@ -74,24 +77,67 @@ export interface IElendMarketQueryOperation {
 
 // Calculation Operations
 export interface IElendMarketReserveCalculationOperation {
-  getTotalSuppliedUSDValueOnMarket(): void;
-  getTotalBorrowedUSDValueOnMarket(): void;
-  getDetailSuppliedOnMarket(): void;
-  getDetailBorrowedOnMarket(): void;
-  getDetailSupplyApy(): void;
-  getDetailBorrowApy(): void;
-  totalSupplyAPYWithNewAvailableSupplyAmount(): void;
-  totalBorrowAPYWithNewBorrowedAmount(): void;
+  getTotalSuppliedUSDValueOnMarket(reserves: Reserve[]): DecimalJs;
+  getTotalBorrowedUSDValueOnMarket(reserves: Reserve[]): DecimalJs;
+  getDetailSuppliedOnMarket(reserves: Reserve[]): DetailSuppliedRes[];
+  getDetailBorrowedOnMarket(reserves: Reserve[]): DetailBorrowedRes[];
+  getDetailSupplyApy(reserve: Reserve, currentTimestampMs: number): DetailSupplyApyRes;
+  getDetailBorrowApy(reserve: Reserve, currentTimestampMs: number): DetailBorrowApyRes;
+  totalSupplyAPYWithNewAvailableSupplyAmount(
+    reserve: Reserve,
+    newAvailableAmount: bigint,
+    currentTimestampMs: number,
+    userAction: UserActionType
+  ): DecimalJs;
+  totalBorrowAPYWithNewBorrowedAmount(
+    reserve: Reserve,
+    newAvailableLiquidity: bigint,
+    newBorrowedAmount: Decimal,
+    currentTimestampMs: number,
+    userAction: UserActionType
+  ): DecimalJs;
 }
 
 export interface IElendMarketObligationCalculationOperation {
-  getTotalSuppliedUSDValueObligation(): void;
-  getTotalBorrowedUSDValueObligation(): void;
-  getDetailSuppliedOnMarketObligation(): void;
-  getDetailBorrowedOnMarketObligation(): void;
-  calculateCurrentHealthRatioObligation(): void;
-  calculateRemainingBorrowAmount(): void;
-  calculateAllowedWithdrawAmount(): void;
+  getTotalSuppliedUSDValueObligation(
+    obligation: Obligation,
+    associateReserves: Map<string, Reserve>,
+    reserveTokenPrice: Map<string, DecimalJs>
+  ): DecimalJs;
+  getTotalBorrowedUSDValueObligation(
+    obligation: Obligation,
+    associateReserves: Map<string, Reserve>,
+    reserveTokenPrice: Map<string, DecimalJs>
+  ): DecimalJs;
+  getDetailSuppliedOnMarketObligation(
+    obligation: Obligation,
+    associateReserves: Map<string, Reserve>,
+    reserveTokenPrice: Map<string, DecimalJs>,
+    reserves?: Reserve[]
+  ): DetailSuppliedRes[];
+  getDetailBorrowedOnMarketObligation(
+    obligation: Obligation,
+    associateReserves: Map<string, Reserve>,
+    reserveTokenPrice: Map<string, DecimalJs>,
+    reserves?: Reserve[]
+  ): DetailBorrowedRes[];
+  calculateCurrentHealthRatioObligation(
+    obligation: Obligation,
+    associateReserves: Map<string, Reserve>,
+    reserveTokenPrice: Map<string, DecimalJs>
+  ): DecimalJs;
+  calculateRemainingBorrowAmount(
+    obligation: Obligation,
+    associateReserves: Map<string, Reserve>,
+    reserveTokenPrice: Map<string, DecimalJs>,
+    borrowReserve: string
+  ): DecimalJs;
+  calculateAllowedWithdrawAmount(
+    obligation: Obligation,
+    associateReserves: Map<string, Reserve>,
+    reserveTokenPrice: Map<string, DecimalJs>,
+    withdrawReserve: string
+  ): DecimalJs;
 }
 
 export interface IElendMarketRewardCalculationOperation {

@@ -1,4 +1,5 @@
 // decimal.ts
+import { Decimal as DecimalJs } from 'decimal.js';
 
 export class Decimal {
   static readonly WAD: bigint = 10n ** 18n;
@@ -45,6 +46,10 @@ export class Decimal {
 
   toU128(): bigint {
     return this.value / Decimal.WAD;
+  }
+
+  toDecimalJs(): DecimalJs {
+    return new DecimalJs(this.value / Decimal.WAD);
   }
 
   // --- arithmetic ---

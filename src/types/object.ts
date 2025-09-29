@@ -121,6 +121,8 @@ export interface Obligation {
   lastUpdate: LastUpdate;
   locking: boolean;
   liquidatingAssetReserve: number;
+  obligationCollateral: Map<string, ObligationCollateral>;
+  obligationLiquidity: Map<string, ObligationLiquidity>;
 }
 
 export interface RewardConfig {}
