@@ -38,10 +38,10 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
   }
 
   async buildWithdrawTxn(args: WithdrawCTokensAndRedeemLiquidityOperationArgs): Promise<Transaction> {
-    const { owner, reserve, collateralAmount } = args;
+    const { owner, reserve, collateralAmount, marketType } = args;
     const tx = new Transaction();
 
-    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner);
+    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner, marketType);
     if (isNil(obligationOwnerCap)) throw new Error('Obligation Not Init');
 
     const obligationId = obligationOwnerCap.obligation;

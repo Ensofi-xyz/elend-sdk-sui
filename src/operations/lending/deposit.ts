@@ -41,10 +41,10 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
   }
 
   async buildInitObligationTxn(args: InitObligationArgs): Promise<Transaction> {
-    const { owner } = args;
+    const { owner, marketType } = args;
     const tx = new Transaction();
 
-    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner);
+    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner, marketType);
     if (!isNil(obligationOwnerCap)) throw new Error('Obligation Already Init');
 
     const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
@@ -61,12 +61,12 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
   }
 
   async buildDepositTxn(args: DepositReserveLiquidityAndObligationCollateralOperationArgs): Promise<Transaction> {
-    const { amount, owner, reserve } = args;
+    const { amount, owner, reserve, marketType } = args;
     const tx = new Transaction();
 
     const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
 
-    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner);
+    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner, marketType);
     if (isNil(obligationOwnerCap)) {
       throw new Error('Must Init Obligation First');
     }

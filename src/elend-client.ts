@@ -192,17 +192,18 @@ export class ElendClient {
     return result;
   }
 
-  async initObligation(): Promise<Transaction> {
+  async initObligation(marketType: string): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Not load obligation owner yet');
     }
 
     return this.depositOperation.buildInitObligationTxn({
       owner: this.obligationOwner,
+      marketType,
     });
   }
 
-  async deposit(reserve: string, liquidityAmount: number): Promise<Transaction> {
+  async deposit(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
@@ -211,10 +212,11 @@ export class ElendClient {
       owner: this.obligationOwner,
       reserve,
       amount: liquidityAmount,
+      marketType,
     });
   }
 
-  async borrow(reserve: string, liquidityAmount: number): Promise<Transaction> {
+  async borrow(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
@@ -223,10 +225,11 @@ export class ElendClient {
       owner: this.obligationOwner,
       reserve,
       amount: liquidityAmount,
+      marketType,
     });
   }
 
-  async withdraw(reserve: string, collateralAmount: number): Promise<Transaction> {
+  async withdraw(reserve: string, marketType: string, collateralAmount: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
@@ -235,10 +238,11 @@ export class ElendClient {
       owner: this.obligationOwner,
       reserve,
       collateralAmount,
+      marketType,
     });
   }
 
-  async repay(reserve: string, liquidityAmount: number): Promise<Transaction> {
+  async repay(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
@@ -247,6 +251,7 @@ export class ElendClient {
       amount: liquidityAmount,
       owner: this.obligationOwner,
       reserve,
+      marketType,
     });
   }
 }

@@ -34,10 +34,10 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
   }
 
   async buildRepayTxn(args: RepayObligationLiquidityOperationArgs): Promise<Transaction> {
-    const { owner, reserve, amount } = args;
+    const { owner, reserve, amount, marketType } = args;
     const tx = new Transaction();
 
-    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner);
+    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner, marketType);
     if (isNil(obligationOwnerCap)) {
       throw new Error('Must Init Obligation First');
     }

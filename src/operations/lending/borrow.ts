@@ -34,10 +34,10 @@ export class BorrowElendMarketOperation implements IBorrowElendMarketOperation {
   }
 
   async buildBorrowTxn(args: BorrowObligationLiquidityOperationArgs): Promise<Transaction> {
-    const { amount, owner, reserve } = args;
+    const { amount, owner, reserve, marketType } = args;
     const tx = new Transaction();
 
-    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner);
+    const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner, marketType);
 
     if (isNil(obligationOwnerCap)) {
       throw new Error('Must Init Obligation First');
