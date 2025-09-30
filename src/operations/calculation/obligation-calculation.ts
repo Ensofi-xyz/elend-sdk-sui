@@ -175,7 +175,7 @@ export class ElendMarketObligationCalculationOperation implements IElendMarketOb
 
     const totalAllowedBorrowValue = this.estimateAllowedBorrowValue(obligation, associateReserves, reserveTokenPrice);
 
-    const totalBorrowFactorDebtValue = this.estimateTotalBorrowFactorDebtValue();
+    const totalBorrowFactorDebtValue = this.estimateTotalBorrowFactorDebtValue(obligation, associateReserves, reserveTokenPrice);
 
     const remainingBorrowValue = totalAllowedBorrowValue.sub(totalBorrowFactorDebtValue);
     const remainingBorrowAmount = remainingBorrowValue.div(marketPrice).mul(new DecimalJs(Math.pow(10, reserve.liquidity.mintDecimal)));
@@ -187,9 +187,51 @@ export class ElendMarketObligationCalculationOperation implements IElendMarketOb
     obligation: Obligation,
     associateReserves: Map<string, Reserve>,
     reserveTokenPrice: Map<string, DecimalJs>,
-    borrowReserve: string
+    reserve: string,
+    permissiveWithdrawMax: boolean
   ): DecimalJs {
-    throw new Error('Method not implemented.');
+    let highestAllowedBorrowValue: DecimalJs;
+    let withdrawCollateralLtv: DecimalJs;
+    const withdrawReserve = associateReserves.get(reserve);
+    if (!withdrawReserve) throw new Error('Associate Reserves have not loaded yet');
+
+    const withdrawObligationCollateral = obligation.deposits?.filter(depositReserve => (depositReserve = reserve))[0];
+
+    if (!withdrawObligationCollateral || !withdrawReserve) return new DecimalJs(0);
+
+    const marketPrice = reserveTokenPrice?.get(reserve) ? reserveTokenPrice.get(reserve) : withdrawReserve.liquidity.marketPrice.toDecimalJs();
+
+    const availableLiquidityReserve = new DecimalJs(withdrawReserve.liquidity.availableAmount);
+
+    const obligationCollateral = obligation.obligationCollateral.get(reserve);
+    if (!obligationCollateral) {
+      return new DecimalJs(0);
+    }
+    const depositedObligationCollateral = new DecimalJs(obligationCollateral.depositedAmount);
+    const depositedObligationCollateralToLiquidity = this.collateralToLiquidity(withdrawReserve, depositedObligationCollateral);
+
+    if (permissiveWithdrawMax) {
+      highestAllowedBorrowValue = this.estimateUnhealthyBorrowValue(obligation, associateReserves, reserveTokenPrice);
+      withdrawCollateralLtv = new DecimalJs(withdrawReserve.config.liquidationThresholdBps / 10_000);
+    } else {
+      highestAllowedBorrowValue = this.estimateAllowedBorrowValue(obligation, associateReserves, reserveTokenPrice);
+      withdrawCollateralLtv = new DecimalJs(withdrawReserve.config.loanToValueBps / 10_000);
+    }
+
+    const totalBorrowFactorDebtValue = this.estimateTotalBorrowFactorDebtValue(obligation, associateReserves, reserveTokenPrice);
+
+    if (highestAllowedBorrowValue.lessThanOrEqualTo(totalBorrowFactorDebtValue)) return new DecimalJs(0);
+
+    if (withdrawCollateralLtv.eq(new DecimalJs(0))) {
+      return new DecimalJs(obligationCollateral.depositedAmount).mul(marketPrice ?? new DecimalJs(0));
+    }
+
+    const allowedWithdrawAmount = DecimalJs.max(highestAllowedBorrowValue.sub(totalBorrowFactorDebtValue), new DecimalJs(0))
+      .div(withdrawCollateralLtv)
+      .div(marketPrice ?? new DecimalJs(0))
+      .mul(new DecimalJs(Math.pow(10, withdrawReserve.liquidity.mintDecimal)));
+
+    return DecimalJs.min(availableLiquidityReserve, depositedObligationCollateralToLiquidity, allowedWithdrawAmount);
   }
 
   private collateralToLiquidity(reserve: Reserve, collateralAmount: DecimalJs): DecimalJs {
@@ -229,9 +271,70 @@ export class ElendMarketObligationCalculationOperation implements IElendMarketOb
           return sum;
         }
         const depositedValue = this.collateralToLiquidity(depositedReserve, new DecimalJs(obligationCollateral.depositedAmount))
-          .mul(marketPrice)
+          .mul(marketPrice ?? new DecimalJs(0))
           .div(new DecimalJs(Math.pow(10, depositedReserve.liquidity.mintDecimal)))
           .mul(ltv);
+        return sum.add(depositedValue);
+      }, new DecimalJs(0)) || new DecimalJs(0)
+    );
+  }
+
+  private estimateTotalBorrowFactorDebtValue(
+    obligation: Obligation,
+    associateReserves: Map<string, Reserve>,
+    reserveTokenPrice: Map<string, DecimalJs>
+  ): DecimalJs {
+    return obligation.borrows.reduce((sum, borrowRerserve) => {
+      const borrowedReserve = associateReserves.get(borrowRerserve);
+
+      const borrowObligation = obligation.obligationLiquidity.get(borrowRerserve);
+
+      if (!borrowedReserve || !borrowObligation) {
+        return sum;
+      }
+
+      const compoundInterest = borrowedReserve.liquidity.cumulativeBorrowRate.toDecimalJs().div(borrowObligation.cumulativeBorrowRate.toDecimalJs());
+
+      const marketPrice = reserveTokenPrice?.get(borrowRerserve)
+        ? reserveTokenPrice.get(borrowRerserve)
+        : borrowedReserve.liquidity.marketPrice?.toDecimalJs?.();
+
+      const borrowFactor = new DecimalJs(borrowedReserve.config.borrowFactorBps / 10_000);
+      const estimateBorrowedAmount = borrowObligation.borrowedAmount.toDecimalJs().mul(compoundInterest);
+      const borrowFactorAdjustedValue = estimateBorrowedAmount
+        .mul(borrowFactor)
+        .mul(marketPrice ?? new DecimalJs(0))
+        .div(new DecimalJs(Math.pow(10, borrowedReserve.liquidity.mintDecimal)));
+      return sum.add(borrowFactorAdjustedValue);
+    }, new DecimalJs(0));
+  }
+
+  private estimateUnhealthyBorrowValue(
+    obligation: Obligation,
+    associateReserves: Map<string, Reserve>,
+    reserveTokenPrice: Map<string, DecimalJs>
+  ): DecimalJs {
+    return (
+      obligation.deposits?.reduce((sum, depositReserve) => {
+        const depositedReserve = associateReserves.get(depositReserve);
+
+        if (!depositedReserve) {
+          return sum;
+        }
+        const liquidationThresholdPct = new DecimalJs(depositedReserve.config.liquidationThresholdBps / 10_000);
+
+        const marketPrice = reserveTokenPrice?.get(depositReserve)
+          ? reserveTokenPrice.get(depositReserve)
+          : depositedReserve.liquidity.marketPrice.toDecimalJs();
+
+        const obligationCollateral = obligation.obligationCollateral.get(depositReserve);
+        if (!obligationCollateral) {
+          return sum;
+        }
+        const depositedValue = new DecimalJs(obligationCollateral.depositedAmount)
+          .mul(marketPrice ?? new DecimalJs(0))
+          .div(new DecimalJs(Math.pow(10, depositedReserve.liquidity.mintDecimal)))
+          .mul(liquidationThresholdPct);
         return sum.add(depositedValue);
       }, new DecimalJs(0)) || new DecimalJs(0)
     );
