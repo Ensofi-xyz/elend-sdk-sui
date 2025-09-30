@@ -212,10 +212,80 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
     }
   }
 
-  fetchRewardConfigs(reserveId: string, option: number, rewardTokenType?: string): Promise<RewardConfig[]> {
-    throw new Error('Method not implemented.');
+  async fetchRewardConfigs(reserveId: string, marketType: string, option: number, rewardTokenType?: string): Promise<RewardConfig[]> {
+    const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
+    const rewardConfigDfs = await this.suiClient.getDynamicFields({
+      parentId: reserveId,
+    });
+
+    const result = [];
+    for (const rewardConfigDf of rewardConfigDfs.data) {
+      if (
+        rewardConfigDf.objectType == `vector<${packageInfo.package}::reward_config::RewardConfig<${marketType}>>` &&
+        (rewardConfigDf.name.value as any).option == option
+      ) {
+        const rewardConfigRes = await this.suiClient.getObject({
+          id: rewardConfigDf.objectId,
+          options: {
+            showContent: true,
+          },
+        });
+
+        if (rewardConfigRes.error) {
+          console.log('error', rewardConfigRes.error);
+          throw new Error('Failed to fetch reward config');
+        }
+
+        if (rewardConfigRes.data?.content) {
+          const data = (rewardConfigRes.data?.content as any).fields.value;
+          for (const rewardConfig of data) {
+            result.push({
+              reserve: rewardConfig.fields.reserve,
+              rewardTokenType: rewardConfig.fields.reward_token_type,
+              option: rewardConfig.fields.option,
+              totalFunds: rewardConfig.fields.totalFunds,
+              totalDistributed: new Decimal(rewardConfig.fields.total_distributed.value),
+              startedAt: BigInt(rewardConfig.fields.started_at),
+              endAt: BigInt(rewardConfig.fields.started_at.end_at),
+              initialGlobalRewardIndex: new Decimal(rewardConfig.fields.initial_global_reward_index),
+              lastGlobalRewardIndex: new Decimal(rewardConfig.fields.last_global_reward_index),
+              lastUpdatedAt: BigInt(rewardConfig.fields.last_updated_at),
+            });
+          }
+        }
+      }
+    }
+
+    return result;
   }
-  fetchUserReward(reserveId: string, obligationId: string, owner: string): Promise<UserReward> {
-    throw new Error('Method not implemented.');
+
+  async fetchUserReward(reserveId: string, rewardTokenType: string, option: number, obligationId: string, owner: string): Promise<UserReward | null> {
+    const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
+    const userRewardKey = {
+      owner,
+      reserve: reserveId,
+      token_type: rewardTokenType,
+      option,
+    };
+
+    const userRewardRes = await this.suiClient.getDynamicFieldObject({
+      parentId: obligationId,
+      name: {
+        type: `${packageInfo.package}::user_reward::UserRewardKey`,
+        value: userRewardKey,
+      },
+    });
+
+    if (userRewardRes.error) {
+      console.log('error', userRewardRes.error);
+      throw new Error('Failed to fetch user reward');
+    }
+
+    if (userRewardRes.data?.content) {
+      const data = (userRewardRes.data?.content as any).fields;
+      return {} as UserReward;
+    } else {
+      return null;
+    }
   }
 }

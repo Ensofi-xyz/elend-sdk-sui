@@ -10,6 +10,7 @@ import { ElendMarketContract } from '../../core';
 import { ElendMarketConfig, NetworkConfig } from '../../interfaces/config';
 import { IElendMarketContract } from '../../interfaces/functions';
 import { IElendMarketQueryOperation, IRepayElendMarketOperation, RepayObligationLiquidityOperationArgs } from '../../interfaces/operations';
+import { RewardOption } from '../../types/common';
 import { getTokenTypeForReserve, splitCoin } from '../../utils';
 import { ElendMarketQueryOperation } from '../query/query';
 import { refreshReserves } from './common';
@@ -68,6 +69,28 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
         clock: SUI_SYSTEM_CLOCK,
       }
     );
+
+    const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, RewardOption.Borrow);
+    const tokenType = getTokenTypeForReserve(reserve, packageInfo);
+    if (!tokenType) {
+      throw new Error(`Token type not found for reserve: ${reserve}`);
+    }
+
+    if (rewardConfigs.length > 0) {
+      this.contract.updateRewardConfig(tx, [marketType, tokenType], {
+        version: packageInfo.version.id,
+        reserve,
+        option: RewardOption.Borrow,
+        clock: SUI_SYSTEM_CLOCK,
+      });
+    }
+
+    this.contract.updateUserReward(tx, [marketType, tokenType], {
+      version: packageInfo.version.id,
+      obligation: obligationId,
+      reserve,
+      option: RewardOption.Deposit,
+    });
 
     await this.handleRepayOperation(tx, {
       owner,

@@ -16,6 +16,7 @@ import {
   IElendMarketQueryOperation,
   InitObligationArgs,
 } from '../../interfaces/operations';
+import { RewardOption } from '../../types/common';
 import { getTokenTypeForReserve } from '../../utils/common';
 import { splitCoin } from '../../utils/split-coin';
 import { ElendMarketQueryOperation } from '../query/query';
@@ -73,8 +74,6 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
     const obligationId = obligationOwnerCap.obligation;
     const obligationData = await this.query.fetchObligation(obligationId);
     if (isNil(obligationData)) throw Error('Not found obligation to deposit');
-    // TODO - get reward config
-
     // - Refresh reserves
     const reserves = packageInfo.reserves;
 
@@ -87,18 +86,49 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
     });
 
     // - Refresh obligation
-    this.contract.refreshObligation(
-      tx,
-      [packageInfo.marketType['MAIN_POOL'], Object.keys(reserves)[0], Object.keys(reserves)[1], Object.keys(reserves)[2]],
-      {
-        version: packageInfo.version.id,
-        obligation: obligationId,
-        reserveT1: reserves[Object.keys(reserves)[0]].id,
-        reserveT2: reserves[Object.keys(reserves)[1]].id,
-        reserveT3: reserves[Object.keys(reserves)[2]].id,
-        clock: SUI_SYSTEM_CLOCK,
+    this.contract.refreshObligation(tx, [marketType, Object.keys(reserves)[0], Object.keys(reserves)[1], Object.keys(reserves)[2]], {
+      version: packageInfo.version.id,
+      obligation: obligationId,
+      reserveT1: reserves[Object.keys(reserves)[0]].id,
+      reserveT2: reserves[Object.keys(reserves)[1]].id,
+      reserveT3: reserves[Object.keys(reserves)[2]].id,
+      clock: SUI_SYSTEM_CLOCK,
+    });
+
+    const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, RewardOption.Deposit);
+    for (const rewardConfig of rewardConfigs) {
+      const rewardTokenType = rewardConfig.rewardTokenType;
+      const userReward = await this.query.fetchUserReward(reserve, rewardTokenType, RewardOption.Deposit, obligationId, owner);
+      if (!userReward) {
+        this.contract.initUserReward(tx, [marketType, rewardTokenType], {
+          version: packageInfo.version.id,
+          obligation: obligationId,
+          reserve,
+          option: RewardOption.Deposit,
+        });
       }
-    );
+    }
+
+    const tokenType = getTokenTypeForReserve(reserve, packageInfo);
+    if (!tokenType) {
+      throw new Error(`Token type not found for reserve: ${reserve}`);
+    }
+
+    if (rewardConfigs.length > 0) {
+      this.contract.updateRewardConfig(tx, [marketType, tokenType], {
+        version: packageInfo.version.id,
+        reserve,
+        option: RewardOption.Deposit,
+        clock: SUI_SYSTEM_CLOCK,
+      });
+    }
+
+    this.contract.updateUserReward(tx, [marketType, tokenType], {
+      version: packageInfo.version.id,
+      obligation: obligationId,
+      reserve,
+      option: RewardOption.Deposit,
+    });
 
     // - Handle deposit operation
     await this.handleDepositOperation(tx, {

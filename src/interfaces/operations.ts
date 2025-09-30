@@ -71,8 +71,8 @@ export interface IElendMarketQueryOperation {
   fetchMarket(marketId: string): Promise<Market | null>;
   fetchReserve(reserveId: string): Promise<Reserve | null>;
   fetchObligation(obligationId: string): Promise<Obligation | null>;
-  fetchRewardConfigs(reserveId: string, option: number, rewardTokenType?: string): Promise<RewardConfig[]>;
-  fetchUserReward(reserveId: string, obligationId: string, owner: string): Promise<UserReward | null>;
+  fetchRewardConfigs(reserveId: string, marketType: string, option: number, rewardTokenType?: string): Promise<RewardConfig[]>;
+  fetchUserReward(reserveId: string, rewardTokenType: string, option: number, obligationId: string, owner: string): Promise<UserReward | null>;
 }
 
 // Calculation Operations

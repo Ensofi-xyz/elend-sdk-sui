@@ -125,6 +125,26 @@ export interface Obligation {
   obligationLiquidity: Map<string, ObligationLiquidity>;
 }
 
-export interface RewardConfig {}
+export interface RewardConfig {
+  reserve: string;
+  rewardTokenType: string;
+  option: number;
+  totalFunds: bigint;
+  totalDistributed: Decimal;
+  startedAt: bigint;
+  endAt: bigint;
+  initialGlobalRewardIndex: Decimal;
+  lastGlobalRewardIndex: Decimal;
+  lastUpdatedAt: bigint;
+}
 
-export interface UserReward {}
+export interface UserReward {
+  id: string;
+  owner: string;
+  reserve: string;
+  option: number;
+  tokenType: string;
+  userRewardIndex: Decimal;
+  earnedAmount: Decimal;
+  claimedAmount: Decimal;
+}

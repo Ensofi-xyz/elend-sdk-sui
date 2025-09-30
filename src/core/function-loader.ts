@@ -140,18 +140,38 @@ export class ElendMarketContract implements IElendMarketContract {
   }
 
   updateRewardConfig(tx: Transaction, typeArgs: [string, string], args: UpdateRewardConfigArgs): void {
-    throw new Error('updateRewardConfig: Implementation pending - TODO');
+    const { version, reserve, option, clock } = args;
+    tx.moveCall({
+      target: `${this.packageId}::lending_market::update_reward_config`,
+      typeArguments: typeArgs,
+      arguments: [tx.object(version), tx.object(reserve), tx.pure.u8(option), tx.object(clock)],
+    });
   }
 
   initUserReward(tx: Transaction, typeArgs: [string, string], args: InitUserRewardArgs): void {
-    throw new Error('initUserReward: Implementation pending - TODO');
+    const { version, obligation, reserve, option } = args;
+    tx.moveCall({
+      target: `${this.packageId}::lending_market::init_user_reward`,
+      typeArguments: typeArgs,
+      arguments: [tx.object(version), tx.object(obligation), tx.pure.address(reserve), tx.pure.u8(option)],
+    });
   }
 
   updateUserReward(tx: Transaction, typeArgs: [string, string], args: UpdateUserRewardArgs): void {
-    throw new Error('updateUserReward: Implementation pending - TODO');
+    const { version, obligation, reserve, option } = args;
+    tx.moveCall({
+      target: `${this.packageId}::lending_market::update_user_reward`,
+      typeArguments: typeArgs,
+      arguments: [tx.object(version), tx.object(obligation), tx.object(reserve), tx.pure.u8(option)],
+    });
   }
 
   claimReward(tx: Transaction, typeArgs: [string, string], args: ClaimRewardArgs): void {
-    throw new Error('claimReward: Implementation pending - TODO');
+    const { version, tokenRewardState, obligation, reserve, option } = args;
+    tx.moveCall({
+      target: `${this.packageId}::lending_market::claim_reward`,
+      typeArguments: typeArgs,
+      arguments: [tx.object(version), tx.object(tokenRewardState), tx.object(obligation), tx.pure.address(reserve), tx.pure.u8(option)],
+    });
   }
 }

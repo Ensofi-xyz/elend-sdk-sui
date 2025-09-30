@@ -9,3 +9,8 @@ export enum UserActionType {
   Borrow = 2,
   Repay = 3,
 }
+
+export enum RewardOption {
+  Deposit = 0,
+  Borrow = 1,
+}

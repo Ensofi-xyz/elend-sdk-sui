@@ -1,7 +1,7 @@
 {
   "version": "v1.0.0",
   "packageId": "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198",
-  "upgradedPackageId": "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198",
+  "upgradedPackageId": "0x8ba37c39c3ac938023f3f41c0476545d8e53f808141ae16e80d2886b5b74de6a",
   "objects": {
     "pythState": "0x243759059f4c3111179da5878c12f68d612c21a8d54d85edc86164bb18be1c7c",
     "wormholeState": "0x31358d198147da50db32eda2562951d53973a0c0ad5ed738e9b17d88b213d790",

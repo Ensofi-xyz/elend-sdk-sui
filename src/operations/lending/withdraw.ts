@@ -14,6 +14,7 @@ import {
   IWithdrawElendMarketOperation,
   WithdrawCTokensAndRedeemLiquidityOperationArgs,
 } from '../../interfaces/operations';
+import { RewardOption } from '../../types/common';
 import { getTokenTypeForReserve } from '../../utils/common';
 import { ElendMarketQueryOperation } from '../query/query';
 import { refreshReserves } from './common';
@@ -72,6 +73,28 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
         clock: SUI_SYSTEM_CLOCK,
       }
     );
+
+    const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, RewardOption.Deposit);
+    const tokenType = getTokenTypeForReserve(reserve, packageInfo);
+    if (!tokenType) {
+      throw new Error(`Token type not found for reserve: ${reserve}`);
+    }
+
+    if (rewardConfigs.length > 0) {
+      this.contract.updateRewardConfig(tx, [marketType, tokenType], {
+        version: packageInfo.version.id,
+        reserve,
+        option: RewardOption.Deposit,
+        clock: SUI_SYSTEM_CLOCK,
+      });
+    }
+
+    this.contract.updateUserReward(tx, [marketType, tokenType], {
+      version: packageInfo.version.id,
+      obligation: obligationId,
+      reserve,
+      option: RewardOption.Deposit,
+    });
 
     // - handle withdraw operation
     await this.handleWithdrawOperation(tx, {

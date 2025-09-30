@@ -89,28 +89,28 @@ export interface RepayObligationLiquidityArgs {
 export interface UpdateRewardConfigArgs {
   version: TransactionObjectInput;
   reserve: TransactionObjectInput;
-  option: number | TransactionArgument;
+  option: number;
   clock: TransactionObjectInput;
 }
 
 export interface InitUserRewardArgs {
   version: TransactionObjectInput;
   obligation: TransactionObjectInput;
-  reserve: TransactionObjectInput;
-  option: number | TransactionArgument;
+  reserve: string;
+  option: number;
 }
 
 export interface UpdateUserRewardArgs {
   version: TransactionObjectInput;
   obligation: TransactionObjectInput;
   reserve: TransactionObjectInput;
-  option: number | TransactionArgument;
+  option: number;
 }
 
 export interface ClaimRewardArgs {
   version: TransactionObjectInput;
   tokenRewardState: TransactionObjectInput;
   obligation: TransactionObjectInput;
-  reserve: TransactionObjectInput;
-  option: number | TransactionArgument;
+  reserve: string;
+  option: number;
 }

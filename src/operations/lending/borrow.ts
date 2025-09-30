@@ -10,6 +10,7 @@ import { ElendMarketContract } from '../../core/function-loader';
 import { ElendMarketConfig, NetworkConfig } from '../../interfaces/config';
 import { IElendMarketContract } from '../../interfaces/functions';
 import { BorrowObligationLiquidityOperationArgs, IBorrowElendMarketOperation, IElendMarketQueryOperation } from '../../interfaces/operations';
+import { RewardOption } from '../../types/common';
 import { getTokenTypeForReserve } from '../../utils/common';
 import { ElendMarketQueryOperation } from '../query/query';
 import { refreshReserves } from './common';
@@ -69,6 +70,41 @@ export class BorrowElendMarketOperation implements IBorrowElendMarketOperation {
         clock: SUI_SYSTEM_CLOCK,
       }
     );
+
+    const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, RewardOption.Borrow);
+    for (const rewardConfig of rewardConfigs) {
+      const rewardTokenType = rewardConfig.rewardTokenType;
+      const userReward = await this.query.fetchUserReward(reserve, rewardTokenType, RewardOption.Borrow, obligationId, owner);
+      if (!userReward) {
+        this.contract.initUserReward(tx, [marketType, rewardTokenType], {
+          version: packageInfo.version.id,
+          obligation: obligationId,
+          reserve,
+          option: RewardOption.Borrow,
+        });
+      }
+    }
+
+    const tokenType = getTokenTypeForReserve(reserve, packageInfo);
+    if (!tokenType) {
+      throw new Error(`Token type not found for reserve: ${reserve}`);
+    }
+
+    if (rewardConfigs.length > 0) {
+      this.contract.updateRewardConfig(tx, [marketType, tokenType], {
+        version: packageInfo.version.id,
+        reserve,
+        option: RewardOption.Borrow,
+        clock: SUI_SYSTEM_CLOCK,
+      });
+    }
+
+    this.contract.updateUserReward(tx, [marketType, tokenType], {
+      version: packageInfo.version.id,
+      obligation: obligationId,
+      reserve,
+      option: RewardOption.Deposit,
+    });
 
     await this.handleBorrowOperation(tx, {
       owner,
