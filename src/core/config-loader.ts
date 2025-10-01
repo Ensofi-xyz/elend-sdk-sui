@@ -1,9 +1,8 @@
 import networkConfigs from '../../config/networks.json';
-import { NetworkConfig } from '../interfaces/config';
-import { Network } from '../types/common';
-
 import mainnetConfig from '../../config/versions/mainnet/v1.0.0.json';
 import testnetConfig from '../../config/versions/testnet/v1.0.1.json';
+import { NetworkConfig } from '../interfaces/config';
+import { Network } from '../types/common';
 
 interface INetworkConfigJsonData {
   network: string;
