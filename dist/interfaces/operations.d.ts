@@ -46,9 +46,13 @@ export interface IRepayElendMarketOperation {
     buildRepayTxn(args: RepayObligationLiquidityOperationArgs): Promise<Transaction>;
 }
 export interface ClaimRewardOperationArgs {
+    owner: string;
+    reserve: string;
+    marketType: string;
+    option: number;
 }
 export interface IElendMarketRewardOperation {
-    buildClaimRewardTxn(args: ClaimRewardOperationArgs): Transaction;
+    buildClaimRewardTxn(args: ClaimRewardOperationArgs): Promise<Transaction>;
 }
 export interface IElendMarketQueryOperation {
     fetchObligationOwnerCapObject(owner: string, marketTypes: string): Promise<ObligationOwnerCap | null>;

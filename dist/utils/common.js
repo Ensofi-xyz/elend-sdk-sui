@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.wait = exports.i64ToBigInt = exports.getTokenTypeForReserve = exports.SLOTS_PER_YEAR = exports.SLOTS_PER_DAY = exports.SLOTS_PER_HOUR = exports.SLOTS_PER_MINUTE = exports.SLOTS_PER_SECOND = void 0;
+exports.wait = exports.add0xPrefix = exports.remove0xPrefix = exports.i64ToBigInt = exports.getTokenTypeForReserve = exports.SLOTS_PER_YEAR = exports.SLOTS_PER_DAY = exports.SLOTS_PER_HOUR = exports.SLOTS_PER_MINUTE = exports.SLOTS_PER_SECOND = void 0;
 exports.calculateAPYFromAPR = calculateAPYFromAPR;
 exports.retry = retry;
 const decimal_js_1 = require("decimal.js");
@@ -23,6 +23,14 @@ const i64ToBigInt = (magnitude, negative) => {
     return negative ? -magnitude : magnitude;
 };
 exports.i64ToBigInt = i64ToBigInt;
+const remove0xPrefix = (input) => {
+    return input.startsWith('0x') ? input.slice(2) : input;
+};
+exports.remove0xPrefix = remove0xPrefix;
+const add0xPrefix = (input) => {
+    return input.startsWith('0x') ? input : '0x' + input;
+};
+exports.add0xPrefix = add0xPrefix;
 const wait = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };

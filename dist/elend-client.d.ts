@@ -38,4 +38,5 @@ export declare class ElendClient {
     borrow(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction>;
     withdraw(reserve: string, marketType: string, collateralAmount: number): Promise<Transaction>;
     repay(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction>;
+    claim_reward(reserve: string, marketType: string, option: number): Promise<Transaction>;
 }

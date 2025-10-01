@@ -180,6 +180,8 @@ class ElendMarketQueryOperation {
                 },
                 locking: data.locking,
                 liquidatingAssetReserve: data.liquidating_asset_reserve,
+                obligationCollateral: new Map(),
+                obligationLiquidity: new Map(),
             };
         }
         else {
@@ -213,11 +215,11 @@ class ElendMarketQueryOperation {
                             rewardTokenType: rewardConfig.fields.reward_token_type,
                             option: rewardConfig.fields.option,
                             totalFunds: rewardConfig.fields.totalFunds,
-                            totalDistributed: new utils_1.Decimal(rewardConfig.fields.total_distributed.value),
+                            totalDistributed: new utils_1.Decimal(rewardConfig.fields.total_distributed.fields.value),
                             startedAt: BigInt(rewardConfig.fields.started_at),
                             endAt: BigInt(rewardConfig.fields.end_at),
-                            initialGlobalRewardIndex: new utils_1.Decimal(rewardConfig.fields.initial_global_reward_index),
-                            lastGlobalRewardIndex: new utils_1.Decimal(rewardConfig.fields.last_global_reward_index),
+                            initialGlobalRewardIndex: new utils_1.Decimal(rewardConfig.fields.initial_global_reward_index.fields.value),
+                            lastGlobalRewardIndex: new utils_1.Decimal(rewardConfig.fields.last_global_reward_index.fields.value),
                             lastUpdatedAt: BigInt(rewardConfig.fields.last_updated_at),
                         });
                     }
@@ -231,7 +233,7 @@ class ElendMarketQueryOperation {
         const userRewardKey = {
             owner,
             reserve: reserveId,
-            token_type: rewardTokenType,
+            token_type: (0, utils_1.remove0xPrefix)(rewardTokenType),
             option,
         };
         const userRewardRes = await this.suiClient.getDynamicFieldObject({
@@ -247,7 +249,16 @@ class ElendMarketQueryOperation {
         }
         if (userRewardRes.data?.content) {
             const data = (userRewardRes.data?.content).fields;
-            return {};
+            return {
+                id: data.id.id,
+                owner: data.owner,
+                reserve: data.reserve,
+                option: data.option,
+                tokenType: data.tokenType,
+                userRewardIndex: new utils_1.Decimal(data.user_reward_index.fields.value),
+                earnedAmount: new utils_1.Decimal(data.earned_amount.fields.value),
+                claimedAmount: new utils_1.Decimal(data.claimed_amount.fields.value),
+            };
         }
         else {
             return null;

@@ -190,6 +190,17 @@ class ElendClient {
             marketType,
         });
     }
+    async claim_reward(reserve, marketType, option) {
+        if ((0, lodash_1.isNil)(this.obligationOwner)) {
+            throw Error('Have not load obligation owner yet');
+        }
+        return this.rewardOperation.buildClaimRewardTxn({
+            owner: this.obligationOwner,
+            reserve,
+            marketType,
+            option,
+        });
+    }
 }
 exports.ElendClient = ElendClient;
 //# sourceMappingURL=elend-client.js.map

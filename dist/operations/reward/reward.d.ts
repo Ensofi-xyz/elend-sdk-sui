@@ -9,5 +9,5 @@ export declare class ElendMarketRewardOperation implements IElendMarketRewardOpe
     private pythClient;
     private suiClient;
     constructor(networkConfig: NetworkConfig, suiClient: SuiClient);
-    buildClaimRewardTxn(args: ClaimRewardOperationArgs): Transaction;
+    buildClaimRewardTxn(args: ClaimRewardOperationArgs): Promise<Transaction>;
 }
