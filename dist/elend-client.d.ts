@@ -1,0 +1,41 @@
+import { SuiClient } from '@mysten/sui/client';
+import { Transaction } from '@mysten/sui/transactions';
+import { NetworkConfig } from './interfaces/config';
+import { MarketClientRes, ReserveClientRes } from './types/client';
+import { Network } from './types/common';
+import { Obligation, Reserve } from './types/object';
+export declare class ElendClient {
+    readonly networkConfig: NetworkConfig;
+    readonly suiClient: SuiClient;
+    markets: MarketClientRes[];
+    obligationOwner: string | null;
+    obligations: Map<string, Obligation>;
+    reserves: Map<string, Reserve[]>;
+    private readonly depositOperation;
+    private readonly borrowOperation;
+    private readonly withdrawOperation;
+    private readonly repayOperation;
+    private readonly rewardOperation;
+    private readonly queryOperation;
+    private readonly reserveCalculationOperation;
+    private readonly obligationCalculationOperation;
+    private readonly rewardCalculationOperation;
+    constructor(networkConfig: NetworkConfig, suiClient: SuiClient);
+    static create(network: Network, options?: {
+        isLoadData: boolean;
+        obligationOwner?: string;
+        suiClient?: SuiClient;
+    }): Promise<ElendClient>;
+    loadMarket(): Promise<void>;
+    loadObligation(obligationOwner: string): Promise<void>;
+    loadReserves(): Promise<void>;
+    reloadObligation(): Promise<void>;
+    reloadReserves(): Promise<void>;
+    getMarkets(): Promise<MarketClientRes[]>;
+    getReserves(marketTypeInput?: string): Map<string, ReserveClientRes[]>;
+    initObligation(marketType: string): Promise<Transaction>;
+    deposit(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction>;
+    borrow(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction>;
+    withdraw(reserve: string, marketType: string, collateralAmount: number): Promise<Transaction>;
+    repay(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction>;
+}

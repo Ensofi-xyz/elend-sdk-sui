@@ -1,0 +1,11 @@
+import { ElendMarketConfig } from '../interfaces/config';
+export declare const SLOTS_PER_SECOND = 2;
+export declare const SLOTS_PER_MINUTE: number;
+export declare const SLOTS_PER_HOUR: number;
+export declare const SLOTS_PER_DAY: number;
+export declare const SLOTS_PER_YEAR: number;
+export declare const getTokenTypeForReserve: (reserveId: string, packageConfig: ElendMarketConfig) => string | null;
+export declare const i64ToBigInt: (magnitude: bigint, negative: boolean) => bigint;
+export declare const wait: (ms: number) => Promise<void>;
+export declare function calculateAPYFromAPR(apr: number): number;
+export declare function retry<T>(fn: () => Promise<T>, delay: number, maxRetries: number): Promise<T>;
