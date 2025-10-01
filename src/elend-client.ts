@@ -254,4 +254,17 @@ export class ElendClient {
       marketType,
     });
   }
+
+  async claim_reward(reserve: string, marketType: string, option: number): Promise<Transaction> {
+    if (isNil(this.obligationOwner)) {
+      throw Error('Have not load obligation owner yet');
+    };
+
+    return this.rewardOperation.buildClaimRewardTxn({
+      owner: this.obligationOwner,
+      reserve,
+      marketType,
+      option,
+    });
+  }
 }

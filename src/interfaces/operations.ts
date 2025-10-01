@@ -59,10 +59,15 @@ export interface IRepayElendMarketOperation {
 }
 
 // Reward Operations
-export interface ClaimRewardOperationArgs {}
+export interface ClaimRewardOperationArgs {
+  owner: string;
+  reserve: string;
+  marketType: string;
+  option: number;
+}
 
 export interface IElendMarketRewardOperation {
-  buildClaimRewardTxn(args: ClaimRewardOperationArgs): Transaction;
+  buildClaimRewardTxn(args: ClaimRewardOperationArgs): Promise<Transaction>;
 }
 
 // Query Operations
