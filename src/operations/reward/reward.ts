@@ -49,7 +49,7 @@ export class ElendMarketRewardOperation implements IElendMarketRewardOperation {
     // - Refresh reserves
     const reserves = packageInfo.reserves;
 
-    const priceFeedObjectReserveDeposit = await refreshReserves(tx, {
+    await refreshReserves(tx, {
       obligationData,
       reserve,
       pythClient: this.pythClient,
