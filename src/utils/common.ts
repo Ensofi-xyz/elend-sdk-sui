@@ -22,6 +22,10 @@ export const i64ToBigInt = (magnitude: bigint, negative: boolean): bigint => {
   return negative ? -magnitude : magnitude;
 };
 
+export const remove0xPrefix = (input: string): string => {
+  return input.startsWith('0x') ? input.slice(2) : input;
+};
+
 export const wait = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
