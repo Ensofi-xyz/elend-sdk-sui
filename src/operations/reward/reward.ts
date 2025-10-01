@@ -1,7 +1,7 @@
 import { isNil } from 'lodash';
 
-import { SuiClient } from '@mysten/sui/dist/cjs/client';
-import { Transaction } from '@mysten/sui/dist/cjs/transactions';
+import { SuiClient } from '@mysten/sui/client';
+import { Transaction } from '@mysten/sui/transactions';
 
 import { SuiPythClient } from '@pythnetwork/pyth-sui-js';
 

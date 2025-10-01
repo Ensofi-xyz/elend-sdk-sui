@@ -1,5 +1,5 @@
-import { SuiClient } from '@mysten/sui/dist/cjs/client';
-import { Transaction } from '@mysten/sui/dist/cjs/transactions';
+import { SuiClient } from '@mysten/sui/client';
+import { Transaction } from '@mysten/sui/transactions';
 import { NetworkConfig } from '../../interfaces/config';
 import { ClaimRewardOperationArgs, IElendMarketRewardOperation } from '../../interfaces/operations';
 export declare class ElendMarketRewardOperation implements IElendMarketRewardOperation {

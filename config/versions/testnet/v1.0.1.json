@@ -55,6 +55,10 @@
         "type": "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::reserve::Reserve<0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::elend_market::MAIN_POOL, 0x841154f2e1b919e55832559d5a90ba2be60cc0f72a9b570f75240ab1110302ec::usdt::USDT>"
       }
     },
-    "tokenRewardState": ""
+    "tokenRewardState": {
+      "id": "0x1420ff8d49cd77cdb56b9eba90e0175192e47d75132a85e0b6f4b902b56d4e48",
+      "package": "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198",
+      "type": "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::reserve::Reserve<0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::elend_market::MAIN_POOL, 0x841154f2e1b919e55832559d5a90ba2be60cc0f72a9b570f75240ab1110302ec::usdt::USDT>"
+    }
   }
 }

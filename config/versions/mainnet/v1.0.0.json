@@ -1,6 +1,7 @@
 {
   "version": "v1.1.0",
   "packageId": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926",
+  "upgradedPackageId": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926",
   "objects": {
     "pythState": "0x243759059f4c3111179da5878c12f68d612c21a8d54d85edc86164bb18be1c7c",
     "wormholeState": "0x31358d198147da50db32eda2562951d53973a0c0ad5ed738e9b17d88b213d790",
@@ -54,6 +55,10 @@
         "type": "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::reserve::Reserve<0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::elend_market::MAIN_POOL, 0x841154f2e1b919e55832559d5a90ba2be60cc0f72a9b570f75240ab1110302ec::usdt::USDT>"
       }
     },
-    "tokenRewardState": ""
+    "tokenRewardState": {
+      "id": "0x1420ff8d49cd77cdb56b9eba90e0175192e47d75132a85e0b6f4b902b56d4e48",
+      "package": "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198",
+      "type": "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::reserve::Reserve<0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::elend_market::MAIN_POOL, 0x841154f2e1b919e55832559d5a90ba2be60cc0f72a9b570f75240ab1110302ec::usdt::USDT>"
+    }
   }
 }

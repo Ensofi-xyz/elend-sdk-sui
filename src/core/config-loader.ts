@@ -1,9 +1,9 @@
-import * as fs from 'fs';
-import * as path from 'path';
-
 import networkConfigs from '../../config/networks.json';
 import { NetworkConfig } from '../interfaces/config';
 import { Network } from '../types/common';
+
+import mainnetConfig from '../../config/versions/mainnet/v1.0.0.json';
+import testnetConfig from '../../config/versions/testnet/v1.0.1.json';
 
 interface INetworkConfigJsonData {
   network: string;
@@ -16,10 +16,7 @@ interface INetworkConfigJsonData {
 export class ConfigLoader {
   static loadNetworkConfig(network: Network): NetworkConfig {
     let networkConfig = networkConfigs[network] as INetworkConfigJsonData;
-    let packageConfigPath = path.resolve(process.cwd(), `config/versions/${network}/${networkConfig.latestVersion}.json`);
-    let packageConfigRaw = fs.readFileSync(packageConfigPath, 'utf-8');
-    let packageConfigData = JSON.parse(packageConfigRaw);
-
+    let packageConfigData = network == Network.Mainnet ? mainnetConfig : testnetConfig;
     return {
       rpcUrl: networkConfig.rpcUrl,
       wsRpcUrl: networkConfig.wsRpcUrl,
