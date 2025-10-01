@@ -3,6 +3,3 @@
 
 echo "🌊 format code...."
 pnpm format
-
-echo "📦 Add all changes"
-git add .
