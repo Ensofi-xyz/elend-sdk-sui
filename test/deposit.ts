@@ -11,7 +11,7 @@ import { getSignerByPrivateKey, getSuiClientInstance } from '../src/utils/sui-cl
 const rpcUrl = 'https://fullnode.testnet.sui.io:443';
 const wsRpcUrl = 'https://fullnode.testnet.sui.io:443';
 
-const signer = getSignerByPrivateKey('suiprivkey1qzwd7tkdp4u2s7j9g5s624hud7d3ltq6q6xp9k6pq4s9jehu4zsnylljw8k');
+const signer = getSignerByPrivateKey('suiprivkey1qpf275dj6muyampyc5emgyrslt9whguk2mvurn3am9x7yr5937yzkjaafxy');
 const depositReserve = '0x2d15ad1c4674211f70a4ee9e9219f5a353ddbfb06842d702344225e7dc7a98d5';
 const depositAmount = 1 * 10 ** 9;
 const marketType = '0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::elend_market::MAIN_POOL';

@@ -3,7 +3,7 @@ import { SuiClient } from '@mysten/sui/client';
 import { NetworkConfig } from '../../interfaces/config';
 import { IElendMarketQueryOperation } from '../../interfaces/operations';
 import { Market, MarketRegistry, Obligation, ObligationOwnerCap, Reserve, RewardConfig, UserReward } from '../../types/object';
-import { Decimal, i64ToBigInt } from '../../utils';
+import { Decimal, i64ToBigInt, remove0xPrefix } from '../../utils';
 
 export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
   private suiClient: SuiClient;
@@ -244,11 +244,11 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
               rewardTokenType: rewardConfig.fields.reward_token_type,
               option: rewardConfig.fields.option,
               totalFunds: rewardConfig.fields.totalFunds,
-              totalDistributed: new Decimal(rewardConfig.fields.total_distributed.value),
+              totalDistributed: new Decimal(rewardConfig.fields.total_distributed.fields.value),
               startedAt: BigInt(rewardConfig.fields.started_at),
               endAt: BigInt(rewardConfig.fields.end_at),
-              initialGlobalRewardIndex: new Decimal(rewardConfig.fields.initial_global_reward_index),
-              lastGlobalRewardIndex: new Decimal(rewardConfig.fields.last_global_reward_index),
+              initialGlobalRewardIndex: new Decimal(rewardConfig.fields.initial_global_reward_index.fields.value),
+              lastGlobalRewardIndex: new Decimal(rewardConfig.fields.last_global_reward_index.fields.value),
               lastUpdatedAt: BigInt(rewardConfig.fields.last_updated_at),
             });
           }
@@ -264,7 +264,7 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
     const userRewardKey = {
       owner,
       reserve: reserveId,
-      token_type: rewardTokenType,
+      token_type: remove0xPrefix(rewardTokenType),
       option,
     };
 
@@ -283,7 +283,16 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
 
     if (userRewardRes.data?.content) {
       const data = (userRewardRes.data?.content as any).fields;
-      return {} as UserReward;
+      return {
+        id: data.id.id,
+        owner: data.owner,
+        reserve: data.reserve,
+        option: data.option,
+        tokenType: data.tokenType,
+        userRewardIndex: new Decimal(data.user_reward_index.fields.value),
+        earnedAmount: new Decimal(data.earned_amount.fields.value),
+        claimedAmount: new Decimal(data.claimed_amount.fields.value),
+      } as UserReward;
     } else {
       return null;
     }
