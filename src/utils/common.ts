@@ -27,9 +27,8 @@ export const remove0xPrefix = (input: string): string => {
 };
 
 export const add0xPrefix = (input: string): string => {
-  return input.startsWith("0x") ? input : "0x" + input;
-}
-
+  return input.startsWith('0x') ? input : '0x' + input;
+};
 
 export const wait = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));

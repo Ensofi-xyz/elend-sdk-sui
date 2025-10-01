@@ -2,7 +2,16 @@ import { SuiClient } from '@mysten/sui/client';
 
 import { NetworkConfig } from '../../interfaces/config';
 import { IElendMarketQueryOperation } from '../../interfaces/operations';
-import { Market, Obligation, ObligationCollateral, ObligationLiquidity, ObligationOwnerCap, Reserve, RewardConfig, UserReward } from '../../types/object';
+import {
+  Market,
+  Obligation,
+  ObligationCollateral,
+  ObligationLiquidity,
+  ObligationOwnerCap,
+  Reserve,
+  RewardConfig,
+  UserReward,
+} from '../../types/object';
 import { Decimal, i64ToBigInt, remove0xPrefix } from '../../utils';
 
 export class ElendMarketQueryOperation implements IElendMarketQueryOperation {

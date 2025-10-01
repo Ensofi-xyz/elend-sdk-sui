@@ -1,17 +1,18 @@
+import { isNil } from 'lodash';
+
 import { SuiClient } from '@mysten/sui/dist/cjs/client';
 import { Transaction } from '@mysten/sui/dist/cjs/transactions';
 
 import { SuiPythClient } from '@pythnetwork/pyth-sui-js';
 
+import { SUI_SYSTEM_CLOCK } from '../../common/constant';
 import { ElendMarketContract } from '../../core';
 import { NetworkConfig } from '../../interfaces/config';
 import { IElendMarketContract } from '../../interfaces/functions';
 import { ClaimRewardOperationArgs, IElendMarketQueryOperation, IElendMarketRewardOperation } from '../../interfaces/operations';
-import { ElendMarketQueryOperation } from '../query/query';
-import { isNil } from 'lodash';
-import { refreshReserves } from '../lending/common';
-import { SUI_SYSTEM_CLOCK } from '../../common/constant';
 import { add0xPrefix, getTokenTypeForReserve } from '../../utils';
+import { refreshReserves } from '../lending/common';
+import { ElendMarketQueryOperation } from '../query/query';
 
 export class ElendMarketRewardOperation implements IElendMarketRewardOperation {
   private contract: IElendMarketContract;
@@ -92,7 +93,7 @@ export class ElendMarketRewardOperation implements IElendMarketRewardOperation {
         tokenRewardState: packageInfo.tokenRewardState.id,
         obligation: obligationId,
         reserve,
-        option
+        option,
       });
     }
 
