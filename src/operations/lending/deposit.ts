@@ -98,8 +98,8 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
     const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, RewardOption.Deposit);
     for (const rewardConfig of rewardConfigs) {
       const rewardTokenType = rewardConfig.rewardTokenType;
-      const userReward = await this.query.fetchUserReward(reserve, rewardTokenType, RewardOption.Deposit, obligationId, owner);
-      if (!userReward) {
+      // const userReward = await this.query.fetchUserReward(reserve, rewardTokenType, RewardOption.Deposit, obligationId, owner);
+      if (true) {
         this.contract.initUserReward(tx, [marketType, rewardTokenType], {
           version: packageInfo.version.id,
           obligation: obligationId,

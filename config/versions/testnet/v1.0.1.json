@@ -27,7 +27,7 @@
       "type": "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::market_registry::MarketRegistry"
     },
     "lendingMarkets": {
-      "0xe23b7dac9ee13b070568fcbf27111d68f9f95fa2caf4845f272100cddafd5926::elend_market::MAIN_POOL": {
+      "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::elend_market::MAIN_POOL": {
         "id": "0x4da044f2045d23a299f05f97df98c5b47b2baafeeaa48cc0126c3db6fd631e1a",
         "package": "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198",
         "type": "0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::market::Market<0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::elend_market::MAIN_POOL>"

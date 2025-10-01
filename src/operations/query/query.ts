@@ -246,7 +246,7 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
               totalFunds: rewardConfig.fields.totalFunds,
               totalDistributed: new Decimal(rewardConfig.fields.total_distributed.value),
               startedAt: BigInt(rewardConfig.fields.started_at),
-              endAt: BigInt(rewardConfig.fields.started_at.end_at),
+              endAt: BigInt(rewardConfig.fields.end_at),
               initialGlobalRewardIndex: new Decimal(rewardConfig.fields.initial_global_reward_index),
               lastGlobalRewardIndex: new Decimal(rewardConfig.fields.last_global_reward_index),
               lastUpdatedAt: BigInt(rewardConfig.fields.last_updated_at),
