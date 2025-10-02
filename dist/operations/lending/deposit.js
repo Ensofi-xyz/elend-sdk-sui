@@ -26,8 +26,10 @@ class DepositElendMarketOperation {
         if (!(0, lodash_1.isNil)(obligationOwnerCap))
             throw new Error('Obligation Already Init');
         const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
+        const market = packageInfo.lendingMarkets[marketType];
         const obligationOwnerCapResult = this.contract.initObligation(tx, packageInfo.marketType['MAIN_POOL'], {
             version: packageInfo.version.id,
+            market: market.id,
             owner,
             clock: constant_1.SUI_SYSTEM_CLOCK,
         });
@@ -88,13 +90,13 @@ class DepositElendMarketOperation {
                 option: common_1.RewardOption.Deposit,
                 clock: constant_1.SUI_SYSTEM_CLOCK,
             });
+            this.contract.updateUserReward(tx, [marketType, tokenType], {
+                version: packageInfo.version.id,
+                obligation: obligationId,
+                reserve,
+                option: common_1.RewardOption.Deposit,
+            });
         }
-        this.contract.updateUserReward(tx, [marketType, tokenType], {
-            version: packageInfo.version.id,
-            obligation: obligationId,
-            reserve,
-            option: common_1.RewardOption.Deposit,
-        });
         // - Handle deposit operation
         await this.handleDepositOperation(tx, {
             owner,

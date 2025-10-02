@@ -36,7 +36,7 @@ class Decimal {
         return this.value / Decimal.WAD;
     }
     toDecimalJs() {
-        return new decimal_js_1.Decimal(this.value / Decimal.WAD);
+        return new decimal_js_1.Decimal(BigInt(this.value) / BigInt(Decimal.WAD));
     }
     // --- arithmetic ---
     add(b) {

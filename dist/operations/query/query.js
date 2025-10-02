@@ -144,6 +144,7 @@ class ElendMarketQueryOperation {
         }
     }
     async fetchObligation(obligationId) {
+        const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
         const response = await this.suiClient.getObject({
             id: obligationId,
             options: {
@@ -156,6 +157,58 @@ class ElendMarketQueryOperation {
         }
         if (response.data?.content) {
             const data = (response.data?.content)['fields'];
+            const obligationCollateral = new Map();
+            for (const deposit of data.deposits) {
+                const obligationCollateralKey = {
+                    reserve: deposit,
+                };
+                const oblgationCollateralData = await this.suiClient.getDynamicFieldObject({
+                    parentId: obligationId,
+                    name: {
+                        type: `${packageInfo.package}::obligation::ObligationCollateralKey`,
+                        value: obligationCollateralKey,
+                    },
+                });
+                if (oblgationCollateralData.error) {
+                    console.log(oblgationCollateralData.error);
+                    continue;
+                }
+                if (oblgationCollateralData.data?.content) {
+                    const data = (oblgationCollateralData.data?.content).fields;
+                    obligationCollateral.set(deposit, {
+                        id: data.id.id,
+                        depositedAmount: Number(data.deposited_amount),
+                        marketValue: new utils_1.Decimal(data.market_value.fields.value),
+                    });
+                }
+            }
+            const obligationLiquidity = new Map();
+            for (const borrow of data.borrows) {
+                const obligationLiquidityKey = {
+                    reserve: borrow,
+                };
+                const oblgationLiquidityData = await this.suiClient.getDynamicFieldObject({
+                    parentId: obligationId,
+                    name: {
+                        type: `${packageInfo.package}::obligation::ObligationLiquidityKey`,
+                        value: obligationLiquidityKey,
+                    },
+                });
+                if (oblgationLiquidityData.error) {
+                    console.log(oblgationLiquidityData.error);
+                    continue;
+                }
+                if (oblgationLiquidityData.data?.content) {
+                    const data = (oblgationLiquidityData.data?.content).fields;
+                    obligationLiquidity.set(borrow, {
+                        id: data.id.id,
+                        borrowedAmount: new utils_1.Decimal(data.borrowed_amount.fields.value),
+                        cumulativeBorrowRate: new utils_1.Decimal(data.cumulative_borrow_rate.fields.value),
+                        marketValue: new utils_1.Decimal(data.market_value.fields.value),
+                        borrowFactorAdjustedMarketValue: new utils_1.Decimal(data.borrow_factor_adjusted_market_value.fields.value),
+                    });
+                }
+            }
             return {
                 id: data.id.id,
                 owner: data.owner,
@@ -180,8 +233,8 @@ class ElendMarketQueryOperation {
                 },
                 locking: data.locking,
                 liquidatingAssetReserve: data.liquidating_asset_reserve,
-                obligationCollateral: new Map(),
-                obligationLiquidity: new Map(),
+                obligationCollateral,
+                obligationLiquidity,
             };
         }
         else {
@@ -245,7 +298,7 @@ class ElendMarketQueryOperation {
         });
         if (userRewardRes.error) {
             console.log('error', userRewardRes.error);
-            throw new Error('Failed to fetch user reward');
+            return null;
         }
         if (userRewardRes.data?.content) {
             const data = (userRewardRes.data?.content).fields;

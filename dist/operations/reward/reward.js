@@ -31,7 +31,7 @@ class ElendMarketRewardOperation {
             throw Error('Not found obligation to deposit');
         // - Refresh reserves
         const reserves = packageInfo.reserves;
-        const priceFeedObjectReserveDeposit = await (0, common_1.refreshReserves)(tx, {
+        await (0, common_1.refreshReserves)(tx, {
             obligationData,
             reserve,
             pythClient: this.pythClient,

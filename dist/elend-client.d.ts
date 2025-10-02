@@ -1,9 +1,11 @@
+import { Decimal as DecimalJs } from 'decimal.js';
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import { NetworkConfig } from './interfaces/config';
-import { MarketClientRes, ReserveClientRes } from './types/client';
-import { Network } from './types/common';
+import { DetailBorrowApyRes, DetailBorrowedRes, DetailIncentiveRewardRes, DetailSuppliedRes, DetailSupplyApyRes, MarketClientRes, ReserveClientRes } from './types/client';
+import { Network, UserActionType } from './types/common';
 import { Obligation, Reserve } from './types/object';
+import { Decimal as DecimalFraction } from './utils/decimal';
 export declare class ElendClient {
     readonly networkConfig: NetworkConfig;
     readonly suiClient: SuiClient;
@@ -34,9 +36,27 @@ export declare class ElendClient {
     getMarkets(): Promise<MarketClientRes[]>;
     getReserves(marketTypeInput?: string): Map<string, ReserveClientRes[]>;
     initObligation(marketType: string): Promise<Transaction>;
-    deposit(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction>;
-    borrow(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction>;
-    withdraw(reserve: string, marketType: string, collateralAmount: number): Promise<Transaction>;
-    repay(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction>;
-    claim_reward(reserve: string, marketType: string, option: number): Promise<Transaction>;
+    deposit(reserve: string, liquidityAmount: number): Promise<Transaction>;
+    borrow(reserve: string, liquidityAmount: number): Promise<Transaction>;
+    withdraw(reserve: string, collateralAmount: number): Promise<Transaction>;
+    repay(reserve: string, liquidityAmount: number): Promise<Transaction>;
+    claim_reward(reserve: string, option: number): Promise<Transaction>;
+    getTotalSuppliedUSDValueOnMarket(marketType: string, reserveIds?: string[]): DecimalJs;
+    getTotalBorrowedUSDValueOnMarket(marketType: string, reserveIds?: string[]): DecimalJs;
+    getDetailSuppliedOnMarket(marketType: string, reserveIds?: string[]): DetailSuppliedRes[];
+    getDetailBorrowedOnMarket(marketType: string, reserveIds?: string[]): DetailBorrowedRes[];
+    getDetailSupplyApy(reserveId: string): Promise<DetailSupplyApyRes>;
+    getDetailBorrowApy(reserveId: string): Promise<DetailBorrowApyRes>;
+    totalSupplyAPYWithNewAvailableSupplyAmount(reserveId: string, newAvailableAmount: bigint, userAction: UserActionType): Promise<DecimalJs>;
+    totalBorrowAPYWithNewBorrowedAmount(reserveId: string, newAvailableLiquidity: bigint, newBorrowedAmount: DecimalFraction, userAction: UserActionType): Promise<DecimalJs>;
+    getTotalSuppliedUSDValueObligation(marketType: string): DecimalJs;
+    getTotalBorrowedUSDValueObligation(marketType: string): DecimalJs;
+    getDetailSuppliedOnMarketObligation(marketType: string, reserveIds?: string[]): DetailSuppliedRes[];
+    getDetailBorrowedOnMarketObligation(marketType: string, reserveIds?: string[]): DetailBorrowedRes[];
+    calculateCurrentHealthRatioObligation(marketType: string): DecimalJs;
+    calculateRemainingBorrowAmount(borrowReserve: string): DecimalJs;
+    calculateAllowedWithdrawAmount(withdrawReserve: string): DecimalJs;
+    getTotalIncentiveRewardStatisticObligation(marketType: string, reservesIds?: string[]): Promise<DetailIncentiveRewardRes[]>;
+    private getAssociateReserveObligationData;
+    private getMarketTypeOfReserve;
 }

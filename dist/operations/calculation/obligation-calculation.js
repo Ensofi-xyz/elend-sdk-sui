@@ -3,7 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ElendMarketObligationCalculationOperation = void 0;
 const decimal_js_1 = require("decimal.js");
 class ElendMarketObligationCalculationOperation {
-    constructor() { }
+    constructor(queryOperation) {
+        this.queryOperation = queryOperation;
+    }
     getTotalSuppliedUSDValueObligation(obligation, associateReserves, reserveTokenPrice) {
         return (obligation.deposits ?? []).reduce((acc, depositReserve) => {
             const reserve = associateReserves.get(depositReserve);

@@ -15,6 +15,7 @@ export interface IElendMarketContract {
 }
 export interface InitObligationArgs {
     version: TransactionObjectInput;
+    market: TransactionObjectInput;
     owner: TransactionObjectInput;
     clock: TransactionObjectInput;
 }

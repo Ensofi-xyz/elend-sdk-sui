@@ -1,4 +1,5 @@
 import { Decimal as DecimalJs } from 'decimal.js';
+import { RewardOption } from './common';
 export interface MarketClientRes {
     id: string;
     name: string;
@@ -31,7 +32,7 @@ export interface DetailSupplyApyRes {
     totalApy: DecimalJs;
     breakdownApy: {
         supplyApy: DecimalJs;
-        rewardIncentiveApy: DecimalJs;
+        rewardIncentiveApy: Map<string, DecimalJs>;
         lstInterest: number;
     };
 }
@@ -39,21 +40,14 @@ export interface DetailBorrowApyRes {
     totalApy: DecimalJs;
     breakdownApy: {
         borrowApy: DecimalJs;
-        rewardIncentiveApy: DecimalJs;
+        rewardIncentiveApy: Map<string, DecimalJs>;
     };
 }
-export interface DetailSupplyApyRes {
-    totalApy: DecimalJs;
-    breakdownApy: {
-        supplyApy: DecimalJs;
-        rewardIncentiveApy: DecimalJs;
-        lstInterest: number;
-    };
-}
-export interface DetailBorrowApyRes {
-    totalApy: DecimalJs;
-    breakdownApy: {
-        borrowApy: DecimalJs;
-        rewardIncentiveApy: DecimalJs;
-    };
+export interface DetailIncentiveRewardRes {
+    reserve: string;
+    rewardTokenInfo: TokenInfoRes;
+    option: RewardOption;
+    earnedReward: DecimalJs;
+    pendingReward: DecimalJs;
+    claimedReward: DecimalJs;
 }

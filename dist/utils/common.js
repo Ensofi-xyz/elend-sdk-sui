@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.wait = exports.add0xPrefix = exports.remove0xPrefix = exports.i64ToBigInt = exports.getTokenTypeForReserve = exports.SLOTS_PER_YEAR = exports.SLOTS_PER_DAY = exports.SLOTS_PER_HOUR = exports.SLOTS_PER_MINUTE = exports.SLOTS_PER_SECOND = void 0;
+exports.wait = exports.add0xPrefix = exports.remove0xPrefix = exports.i64ToBigInt = exports.getTokenTypeForReserve = exports.MILLISECONDS_PER_YEAR = exports.MILLISECONDS_PER_DAY = exports.MILLISECONDS_PER_HOUR = exports.MILLISECONDS_PER_MINUTE = exports.MILLISECONDS_PER_SECOND = void 0;
 exports.calculateAPYFromAPR = calculateAPYFromAPR;
 exports.retry = retry;
 const decimal_js_1 = require("decimal.js");
-exports.SLOTS_PER_SECOND = 2;
-exports.SLOTS_PER_MINUTE = exports.SLOTS_PER_SECOND * 60;
-exports.SLOTS_PER_HOUR = exports.SLOTS_PER_MINUTE * 60;
-exports.SLOTS_PER_DAY = exports.SLOTS_PER_HOUR * 24;
-exports.SLOTS_PER_YEAR = exports.SLOTS_PER_DAY * 365;
+exports.MILLISECONDS_PER_SECOND = 1000;
+exports.MILLISECONDS_PER_MINUTE = exports.MILLISECONDS_PER_SECOND * 60; // 60,000
+exports.MILLISECONDS_PER_HOUR = exports.MILLISECONDS_PER_MINUTE * 60; // 3,600,000
+exports.MILLISECONDS_PER_DAY = exports.MILLISECONDS_PER_HOUR * 24; // 86,400,000
+exports.MILLISECONDS_PER_YEAR = exports.MILLISECONDS_PER_DAY * 365;
 const getTokenTypeForReserve = (reserveId, packageConfig) => {
     const reserves = packageConfig.reserves;
     for (const [tokenType, reserveInfo] of Object.entries(reserves)) {
@@ -36,7 +36,7 @@ const wait = (ms) => {
 };
 exports.wait = wait;
 function calculateAPYFromAPR(apr) {
-    const apy = new decimal_js_1.Decimal(1).plus(new decimal_js_1.Decimal(apr).dividedBy(exports.SLOTS_PER_YEAR)).toNumber() ** exports.SLOTS_PER_YEAR - 1;
+    const apy = new decimal_js_1.Decimal(1).plus(new decimal_js_1.Decimal(apr).dividedBy(exports.MILLISECONDS_PER_YEAR)).toNumber() ** exports.MILLISECONDS_PER_YEAR - 1;
     return apy;
 }
 async function retry(fn, delay, maxRetries) {

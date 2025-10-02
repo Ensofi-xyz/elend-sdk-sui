@@ -1,7 +1,12 @@
+import { Decimal as DecimalJs } from 'decimal.js';
 import { IElendMarketRewardCalculationOperation } from '../../interfaces/operations';
+import { DetailIncentiveRewardRes, Obligation, Reserve, UserActionType } from '../../types';
+import { ElendMarketQueryOperation } from '../query/query';
 export declare class ElendMarketRewardCalculationOperation implements IElendMarketRewardCalculationOperation {
-    constructor();
-    getTotalIncentiveRewardStatisticObligation(): void;
-    calculateIncentiveRewardApyInterest(): void;
-    estimateIncentiveRewardNewApyInterest(): void;
+    private readonly queryOperation;
+    constructor(queryOperation: ElendMarketQueryOperation);
+    getTotalIncentiveRewardStatisticObligation(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveMarketType: Map<string, string>, reserveTokenPrice: Map<string, DecimalJs>, reserves?: string[]): Promise<DetailIncentiveRewardRes[]>;
+    calculateIncentiveRewardApyInterest(reserve: Reserve, marketType: string, option: number): Promise<Map<string, DecimalJs>>;
+    estimateIncentiveRewardNewApyInterest(reserve: Reserve, marketType: string, option: number, amount: number, userAction: UserActionType): Promise<Map<string, DecimalJs>>;
+    private estimatePendingReward;
 }

@@ -1,6 +1,6 @@
 import { Decimal as DecimalJs } from 'decimal.js';
 import { Transaction } from '@mysten/sui/transactions';
-import { DetailBorrowApyRes, DetailBorrowedRes, DetailSuppliedRes, DetailSupplyApyRes } from '../types/client';
+import { DetailBorrowApyRes, DetailBorrowedRes, DetailIncentiveRewardRes, DetailSuppliedRes, DetailSupplyApyRes } from '../types/client';
 import { UserActionType } from '../types/common';
 import { Market, Obligation, ObligationOwnerCap, Reserve, RewardConfig, UserReward } from '../types/object';
 import { Decimal } from '../utils';
@@ -67,10 +67,10 @@ export interface IElendMarketReserveCalculationOperation {
     getTotalBorrowedUSDValueOnMarket(reserves: Reserve[]): DecimalJs;
     getDetailSuppliedOnMarket(reserves: Reserve[]): DetailSuppliedRes[];
     getDetailBorrowedOnMarket(reserves: Reserve[]): DetailBorrowedRes[];
-    getDetailSupplyApy(reserve: Reserve, currentTimestampMs: number): DetailSupplyApyRes;
-    getDetailBorrowApy(reserve: Reserve, currentTimestampMs: number): DetailBorrowApyRes;
-    totalSupplyAPYWithNewAvailableSupplyAmount(reserve: Reserve, newAvailableAmount: bigint, currentTimestampMs: number, userAction: UserActionType): DecimalJs;
-    totalBorrowAPYWithNewBorrowedAmount(reserve: Reserve, newAvailableLiquidity: bigint, newBorrowedAmount: Decimal, currentTimestampMs: number, userAction: UserActionType): DecimalJs;
+    getDetailSupplyApy(reserve: Reserve, marketType: string, currentTimestampMs: number): Promise<DetailSupplyApyRes>;
+    getDetailBorrowApy(reserve: Reserve, marketType: string, currentTimestampMs: number): Promise<DetailBorrowApyRes>;
+    totalSupplyAPYWithNewAvailableSupplyAmount(reserve: Reserve, marketType: string, newAvailableAmount: bigint, currentTimestampMs: number, userAction: UserActionType): Promise<DecimalJs>;
+    totalBorrowAPYWithNewBorrowedAmount(reserve: Reserve, marketType: string, newAvailableLiquidity: bigint, newBorrowedAmount: Decimal, currentTimestampMs: number, userAction: UserActionType): Promise<DecimalJs>;
 }
 export interface IElendMarketObligationCalculationOperation {
     getTotalSuppliedUSDValueObligation(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveTokenPrice: Map<string, DecimalJs>): DecimalJs;
@@ -82,7 +82,7 @@ export interface IElendMarketObligationCalculationOperation {
     calculateAllowedWithdrawAmount(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveTokenPrice: Map<string, DecimalJs>, withdrawReserve: string, permissiveWithdrawMax: boolean): DecimalJs;
 }
 export interface IElendMarketRewardCalculationOperation {
-    getTotalIncentiveRewardStatisticObligation(): void;
-    calculateIncentiveRewardApyInterest(): void;
-    estimateIncentiveRewardNewApyInterest(): void;
+    getTotalIncentiveRewardStatisticObligation(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveMarketType: Map<string, string>, reserveTokenPrice: Map<string, DecimalJs>, reserves?: string[]): Promise<DetailIncentiveRewardRes[]>;
+    calculateIncentiveRewardApyInterest(reserve: Reserve, marketType: string, option: number): Promise<Map<string, DecimalJs>>;
+    estimateIncentiveRewardNewApyInterest(reserve: Reserve, marketType: string, option: number, amount: number, userAction: UserActionType): Promise<Map<string, DecimalJs>>;
 }
