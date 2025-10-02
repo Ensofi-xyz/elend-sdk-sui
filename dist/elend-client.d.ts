@@ -2,7 +2,7 @@ import { Decimal as DecimalJs } from 'decimal.js';
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import { NetworkConfig } from './interfaces/config';
-import { IElendMarketObligationCalculationOperation, IElendMarketReserveCalculationOperation, IElendMarketRewardCalculationOperation } from './interfaces/operations';
+import { IElendMarketObligationCalculationOperation, IElendMarketQueryOperation, IElendMarketReserveCalculationOperation, IElendMarketRewardCalculationOperation, IElendMarketRewardOperation } from './interfaces/operations';
 import { DetailBorrowApyRes, DetailBorrowedRes, DetailIncentiveRewardRes, DetailSuppliedRes, DetailSupplyApyRes, MarketClientRes, ReserveClientRes } from './types/client';
 import { Network, UserActionType } from './types/common';
 import { Obligation, Reserve } from './types/object';
@@ -18,8 +18,8 @@ export declare class ElendClient {
     private readonly borrowOperation;
     private readonly withdrawOperation;
     private readonly repayOperation;
-    private readonly rewardOperation;
-    private readonly queryOperation;
+    readonly rewardOperation: IElendMarketRewardOperation;
+    readonly queryOperation: IElendMarketQueryOperation;
     readonly reserveCalculationOperation: IElendMarketReserveCalculationOperation;
     readonly obligationCalculationOperation: IElendMarketObligationCalculationOperation;
     readonly rewardCalculationOperation: IElendMarketRewardCalculationOperation;
@@ -35,7 +35,7 @@ export declare class ElendClient {
     reloadObligation(): Promise<void>;
     reloadReserves(): Promise<void>;
     getMarkets(): Promise<MarketClientRes[]>;
-    getReserves(marketTypeInput?: string): Map<string, ReserveClientRes[]>;
+    getReserves(marketTypeInput?: string): Promise<Map<string, ReserveClientRes[]>>;
     initObligation(marketType: string): Promise<Transaction>;
     deposit(reserve: string, liquidityAmount: number): Promise<Transaction>;
     borrow(reserve: string, liquidityAmount: number): Promise<Transaction>;

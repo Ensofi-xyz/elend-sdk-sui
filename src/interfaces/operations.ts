@@ -103,6 +103,7 @@ export interface IElendMarketReserveCalculationOperation {
     currentTimestampMs: number,
     userAction: UserActionType
   ): Promise<DecimalJs>;
+  getTotalSupply(reserve: Reserve): DecimalJs;
 }
 
 export interface IElendMarketObligationCalculationOperation {
