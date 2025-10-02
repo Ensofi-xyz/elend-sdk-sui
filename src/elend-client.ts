@@ -1,3 +1,4 @@
+import { Decimal as DecimalJs } from 'decimal.js';
 import { isNil } from 'lodash';
 
 import { SuiClient } from '@mysten/sui/client';
@@ -28,9 +29,8 @@ import { ElendMarketRewardOperation } from './operations/reward/reward';
 import { DetailBorrowApyRes, DetailBorrowedRes, DetailSuppliedRes, DetailSupplyApyRes, MarketClientRes, ReserveClientRes } from './types/client';
 import { Network, UserActionType } from './types/common';
 import { Market, Obligation, Reserve } from './types/object';
-import { getSuiClientInstance } from './utils/sui-client';
-import { Decimal as DecimalJs } from 'decimal.js';
 import { Decimal as DecimalFraction } from './utils/decimal';
+import { getSuiClientInstance } from './utils/sui-client';
 
 export class ElendClient {
   public readonly networkConfig: NetworkConfig;
@@ -282,10 +282,7 @@ export class ElendClient {
     });
   }
 
-  getTotalSuppliedUSDValueOnMarket(
-    marketType: string,
-    reserveIds?: string[],
-  ): DecimalJs {
+  getTotalSuppliedUSDValueOnMarket(marketType: string, reserveIds?: string[]): DecimalJs {
     const reserves = this.reserves.get(marketType);
     if (!reserves) return DecimalJs(0);
     return this.reserveCalculationOperation.getTotalSuppliedUSDValueOnMarket(
@@ -293,10 +290,7 @@ export class ElendClient {
     );
   }
 
-  getTotalBorrowedUSDValueOnMarket(
-    marketType: string,
-    reserveIds?: string[],
-  ): DecimalJs {
+  getTotalBorrowedUSDValueOnMarket(marketType: string, reserveIds?: string[]): DecimalJs {
     const reserves = this.reserves.get(marketType);
     if (!reserves) return DecimalJs(0);
     return this.reserveCalculationOperation.getTotalBorrowedUSDValueOnMarket(
@@ -304,10 +298,7 @@ export class ElendClient {
     );
   }
 
-  getDetailSuppliedOnMarket(
-    marketType: string,
-    reserveIds?: string[],
-  ): DetailSuppliedRes[] {
+  getDetailSuppliedOnMarket(marketType: string, reserveIds?: string[]): DetailSuppliedRes[] {
     const reserves = this.reserves.get(marketType);
     if (!reserves) return [];
     return this.reserveCalculationOperation.getDetailSuppliedOnMarket(
@@ -315,10 +306,7 @@ export class ElendClient {
     );
   }
 
-  getDetailBorrowedOnMarket(
-    marketType: string,
-    reserveIds?: string[]
-  ): DetailBorrowedRes[] {
+  getDetailBorrowedOnMarket(marketType: string, reserveIds?: string[]): DetailBorrowedRes[] {
     const reserves = this.reserves.get(marketType);
     if (!reserves) return [];
     return this.reserveCalculationOperation.getDetailBorrowedOnMarket(
@@ -326,53 +314,32 @@ export class ElendClient {
     );
   }
 
-  getDetailSupplyApy(
-    reserveId: string,
-    marketType: string,
-  ): DetailSupplyApyRes {
+  getDetailSupplyApy(reserveId: string, marketType: string): DetailSupplyApyRes {
     const currentTimestampMs = new Date().getTime();
     const reserves = this.reserves.get(marketType);
     if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
     const reserve = reserves.find(reserve => reserve.id == reserveId);
     if (!reserve) throw new Error(`Not found reserve id ${reserveId}`);
-    return this.reserveCalculationOperation.getDetailSupplyApy(
-      reserve,
-      currentTimestampMs
-    );
+    return this.reserveCalculationOperation.getDetailSupplyApy(reserve, currentTimestampMs);
   }
 
-  getDetailBorrowApy(
-    reserveId: string,
-    marketType: string,
-  ): DetailBorrowApyRes {
+  getDetailBorrowApy(reserveId: string, marketType: string): DetailBorrowApyRes {
     const currentTimestampMs = new Date().getTime();
     const reserves = this.reserves.get(marketType);
     if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
     const reserve = reserves.find(reserve => reserve.id == reserveId);
     if (!reserve) throw new Error(`Not found reserve id ${reserveId}`);
-    return this.reserveCalculationOperation.getDetailBorrowApy(
-      reserve,
-      currentTimestampMs
-    );
+    return this.reserveCalculationOperation.getDetailBorrowApy(reserve, currentTimestampMs);
   }
 
-  totalSupplyAPYWithNewAvailableSupplyAmount(
-    reserveId: string,
-    newAvailableAmount: bigint,
-    userAction: UserActionType
-  ): DecimalJs {
+  totalSupplyAPYWithNewAvailableSupplyAmount(reserveId: string, newAvailableAmount: bigint, userAction: UserActionType): DecimalJs {
     const currentTimestampMs = new Date().getTime();
     const marketType = this.getMarketTypeOfReserve(reserveId);
     const reserves = this.reserves.get(marketType);
     if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
     const reserve = reserves.find(reserve => reserve.id == reserveId);
     if (!reserve) throw new Error(`Not found reserve id ${reserveId}`);
-    return this.reserveCalculationOperation.totalSupplyAPYWithNewAvailableSupplyAmount(
-      reserve,
-      newAvailableAmount,
-      currentTimestampMs,
-      userAction
-    );
+    return this.reserveCalculationOperation.totalSupplyAPYWithNewAvailableSupplyAmount(reserve, newAvailableAmount, currentTimestampMs, userAction);
   }
 
   totalBorrowAPYWithNewBorrowedAmount(
@@ -396,23 +363,21 @@ export class ElendClient {
     );
   }
 
-  getTotalSuppliedUSDValueObligation(
-    marketType: string
-  ): DecimalJs {
+  getTotalSuppliedUSDValueObligation(marketType: string): DecimalJs {
     const obligation = this.obligations.get(marketType);
     if (!obligation) return new DecimalJs(0);
 
-    const { associateReserve, reserveTokenPrice}= this.getAssociateReserveObligationData(obligation, marketType);
+    const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
 
     return this.obligationCalculationOperation.getTotalSuppliedUSDValueObligation(obligation, associateReserve, reserveTokenPrice);
   }
 
   private getAssociateReserveObligationData(
     obligation: Obligation,
-    marketType: string,
+    marketType: string
   ): {
-    associateReserve: Map<string, Reserve>, 
-    reserveTokenPrice: Map<string, DecimalJs> 
+    associateReserve: Map<string, Reserve>;
+    reserveTokenPrice: Map<string, DecimalJs>;
   } {
     const reserves = this.reserves.get(marketType);
     if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
@@ -420,24 +385,24 @@ export class ElendClient {
     const reserveTokenPrice = new Map<string, DecimalJs>();
 
     for (const deposit of obligation.deposits) {
-      const reserve = reserves.find(reserve => reserve.id == deposit)
+      const reserve = reserves.find(reserve => reserve.id == deposit);
       if (reserve) {
         associateReserve.set(reserve.id, reserve);
-        reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs())
+        reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs());
       }
     }
 
     for (const borrow of obligation.borrows) {
-      const reserve = reserves.find(reserve => reserve.id == borrow)
+      const reserve = reserves.find(reserve => reserve.id == borrow);
       if (reserve) {
         associateReserve.set(reserve.id, reserve);
-        reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs())
+        reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs());
       }
-    };
+    }
 
     return {
       associateReserve,
-      reserveTokenPrice
+      reserveTokenPrice,
     };
   }
 

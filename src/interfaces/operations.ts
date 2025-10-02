@@ -154,16 +154,12 @@ export interface IElendMarketRewardCalculationOperation {
     reserveTokenPrice: Map<string, DecimalJs>,
     reserves?: string[]
   ): Promise<DetailIncentiveRewardRes[]>;
-  calculateIncentiveRewardApyInterest(
-    reserve: Reserve,
-    marketType: string,
-    option: number,
-  ): Promise<Map<string, DecimalJs>>;
+  calculateIncentiveRewardApyInterest(reserve: Reserve, marketType: string, option: number): Promise<Map<string, DecimalJs>>;
   estimateIncentiveRewardNewApyInterest(
     reserve: Reserve,
     marketType: string,
     option: number,
     amount: number,
-    userAction: UserActionType,
-  ):Promise<Map<string, DecimalJs>>;
+    userAction: UserActionType
+  ): Promise<Map<string, DecimalJs>>;
 }

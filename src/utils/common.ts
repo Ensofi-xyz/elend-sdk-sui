@@ -4,10 +4,10 @@ import { ElendMarketConfig } from '../interfaces/config';
 
 export const MILLISECONDS_PER_SECOND = 1000;
 
-export const MILLISECONDS_PER_MINUTE = MILLISECONDS_PER_SECOND * 60;   // 60,000
-export const MILLISECONDS_PER_HOUR   = MILLISECONDS_PER_MINUTE * 60;   // 3,600,000
-export const MILLISECONDS_PER_DAY    = MILLISECONDS_PER_HOUR * 24;     // 86,400,000
-export const MILLISECONDS_PER_YEAR   = MILLISECONDS_PER_DAY * 365
+export const MILLISECONDS_PER_MINUTE = MILLISECONDS_PER_SECOND * 60; // 60,000
+export const MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * 60; // 3,600,000
+export const MILLISECONDS_PER_DAY = MILLISECONDS_PER_HOUR * 24; // 86,400,000
+export const MILLISECONDS_PER_YEAR = MILLISECONDS_PER_DAY * 365;
 
 export const getTokenTypeForReserve = (reserveId: string, packageConfig: ElendMarketConfig): string | null => {
   const reserves = packageConfig.reserves;
