@@ -86,21 +86,23 @@ export interface IElendMarketReserveCalculationOperation {
   getTotalBorrowedUSDValueOnMarket(reserves: Reserve[]): DecimalJs;
   getDetailSuppliedOnMarket(reserves: Reserve[]): DetailSuppliedRes[];
   getDetailBorrowedOnMarket(reserves: Reserve[]): DetailBorrowedRes[];
-  getDetailSupplyApy(reserve: Reserve, currentTimestampMs: number): DetailSupplyApyRes;
-  getDetailBorrowApy(reserve: Reserve, currentTimestampMs: number): DetailBorrowApyRes;
+  getDetailSupplyApy(reserve: Reserve, marketType: string, currentTimestampMs: number): Promise<DetailSupplyApyRes>;
+  getDetailBorrowApy(reserve: Reserve, marketType: string, currentTimestampMs: number): Promise<DetailBorrowApyRes>;
   totalSupplyAPYWithNewAvailableSupplyAmount(
     reserve: Reserve,
+    marketType: string,
     newAvailableAmount: bigint,
     currentTimestampMs: number,
     userAction: UserActionType
-  ): DecimalJs;
+  ): Promise<DecimalJs>;
   totalBorrowAPYWithNewBorrowedAmount(
     reserve: Reserve,
+    marketType: string,
     newAvailableLiquidity: bigint,
     newBorrowedAmount: Decimal,
     currentTimestampMs: number,
     userAction: UserActionType
-  ): DecimalJs;
+  ): Promise<DecimalJs>;
 }
 
 export interface IElendMarketObligationCalculationOperation {

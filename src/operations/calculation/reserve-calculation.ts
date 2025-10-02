@@ -3,11 +3,18 @@ import { Decimal as DecimalJs } from 'decimal.js';
 import { IElendMarketReserveCalculationOperation } from '../../interfaces/operations';
 import { Reserve } from '../../types';
 import { DetailBorrowApyRes, DetailBorrowedRes, DetailSuppliedRes, DetailSupplyApyRes } from '../../types/client';
-import { UserActionType } from '../../types/common';
+import { RewardOption, UserActionType } from '../../types/common';
 import { Decimal, MILLISECONDS_PER_YEAR, calculateAPYFromAPR } from '../../utils';
+import { ElendMarketQueryOperation } from '../query/query';
+import { ElendMarketRewardCalculationOperation } from './reward-calculation';
 
 export class ElendMarketReserveCalculationOperation implements IElendMarketReserveCalculationOperation {
-  constructor() {}
+  private readonly queryOperation: ElendMarketQueryOperation
+  constructor(
+    queryOperation: ElendMarketQueryOperation,
+  ) {
+    this.queryOperation = queryOperation;
+  }
 
   getTotalSuppliedUSDValueOnMarket(reserves: Reserve[]): DecimalJs {
     return reserves.reduce((acc, reserve) => {
@@ -64,56 +71,56 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
     });
   }
 
-  getDetailSupplyApy(reserve: Reserve, currentTimestampMs: number): DetailSupplyApyRes {
+  async getDetailSupplyApy(reserve: Reserve, marketType: string, currentTimestampMs: number): Promise<DetailSupplyApyRes> {
     const supplyApy = calculateAPYFromAPR(this.calculateSupplyAPR(reserve, currentTimestampMs));
-
-    // const elendReward = new ElendReward(this.chain, this.connection, this.cluster);
-    // const rewardConfig = this.rewards.get(reserveAddress.toBase58())?.get(RewardOption.Deposit);
-    // const rewardIncentiveApy = rewardConfig
-    //   ? await elendReward.calculateApyInterest(reserveAddress, RewardOption.Deposit, reserve, rewardConfig)
-    //   : new Decimal(0);
-
-    // const symbol = u8Array32ToString(reserve.config.tokenInfo.symbol);
-    // const lstInterest = symbol == 'USD*'
-    //   ? await this.getLSTInterestFromPerena(symbol) || 0
-    //   : await this.getLSTInterestFromSanctum(symbol) || 0;
-
+    const rewardCalculation = new ElendMarketRewardCalculationOperation(this.queryOperation);
+    const rewardIncentiveApys = await rewardCalculation.calculateIncentiveRewardApyInterest(
+      reserve,
+      marketType,
+      RewardOption.Deposit
+    );
+    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce(
+      (acc, apy) => acc.add(apy),
+      new DecimalJs(0)
+    );
     return {
-      // totalApy: new Decimal(supplyApy).add(rewardIncentiveApy).add(lstInterest),
-      totalApy: new DecimalJs(supplyApy),
+      totalApy: new DecimalJs(supplyApy).add(totalIncentiveApy).add(0),
       breakdownApy: {
         supplyApy: new DecimalJs(supplyApy),
-        rewardIncentiveApy: new DecimalJs(0),
+        rewardIncentiveApy: rewardIncentiveApys,
         lstInterest: 0,
       },
     };
   }
 
-  getDetailBorrowApy(reserve: Reserve, currentTimestampMs: number): DetailBorrowApyRes {
+  async getDetailBorrowApy(reserve: Reserve, marketType: string, currentTimestampMs: number): Promise<DetailBorrowApyRes> {
     const borrowApy = calculateAPYFromAPR(this.calculateBorrowAPR(reserve, currentTimestampMs));
-
-    // const elendReward = new ElendReward(this.chain, this.connection, this.cluster);
-    // const rewardConfig = this.rewards.get(reserveAddress.toBase58())?.get(RewardOption.Borrow);
-    // const rewardIncentiveApy = rewardConfig
-    //   ? await elendReward.calculateApyInterest(reserveAddress, RewardOption.Borrow, reserve, rewardConfig)
-    //   : new Decimal(0);
-
+    const rewardCalculation = new ElendMarketRewardCalculationOperation(this.queryOperation);
+    const rewardIncentiveApys = await rewardCalculation.calculateIncentiveRewardApyInterest(
+      reserve,
+      marketType,
+      RewardOption.Borrow
+    );
+    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce(
+      (acc, apy) => acc.add(apy),
+      new DecimalJs(0)
+    );
     return {
-      // totalApy: new DecimalJs(borrowApy).sub(rewardIncentiveApy),
-      totalApy: new DecimalJs(borrowApy),
+      totalApy: new DecimalJs(borrowApy).sub(totalIncentiveApy),
       breakdownApy: {
         borrowApy: new DecimalJs(borrowApy),
-        rewardIncentiveApy: new DecimalJs(0),
+        rewardIncentiveApy: rewardIncentiveApys,
       },
     };
   }
 
-  totalSupplyAPYWithNewAvailableSupplyAmount(
+  async totalSupplyAPYWithNewAvailableSupplyAmount(
     reserve: Reserve,
+    marketType: string,
     newAvailableAmount: bigint,
     currentTimestampMs: number,
     userAction: UserActionType
-  ): DecimalJs {
+  ): Promise<DecimalJs> {
     const reserveData = reserve;
     const actionAmount =
       userAction == UserActionType.Deposit
@@ -123,45 +130,51 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
 
     const supplyApy = calculateAPYFromAPR(this.calculateSupplyAPR(reserveData, currentTimestampMs));
 
-    // const elendReward = new ElendReward(this.chain, this.connection, this.cluster);
-    // const rewardConfig = this.rewards.get(reserveData.toBase58())?.get(RewardOption.Deposit);
-    // const rewardIncentiveApy = rewardConfig
-    //   ? await elendReward.estimateNewApyInterest(reserveData, RewardOption.Deposit, actionAmount, userAction, reserveData, rewardConfig)
-    //   : new Decimal(0);
-
-    // const symbol = u8Array32ToString(reserveData.config.tokenInfo.symbol);
-    // const lstInterest = symbol == 'USD*'
-    //   ? await this.getLSTInterestFromPerena(symbol) || 0
-    //   : await this.getLSTInterestFromSanctum(symbol) || 0;
-
-    // return new DecimalJs(supplyApy).add(rewardIncentiveApy).add(lstInterest);
-    return new DecimalJs(supplyApy);
+    const rewardCalculation = new ElendMarketRewardCalculationOperation(this.queryOperation);
+    const rewardIncentiveApys = await rewardCalculation.estimateIncentiveRewardNewApyInterest(
+      reserve,
+      marketType,
+      RewardOption.Deposit,
+      actionAmount,
+      userAction
+    );
+    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce(
+      (acc, apy) => acc.add(apy),
+      new DecimalJs(0)
+    );
+    return new DecimalJs(supplyApy).add(totalIncentiveApy);
   }
 
-  totalBorrowAPYWithNewBorrowedAmount(
+  async totalBorrowAPYWithNewBorrowedAmount(
     reserve: Reserve,
+    marketType: string,
     newAvailableLiquidity: bigint,
     newBorrowedAmount: Decimal,
     currentTimestampMs: number,
     userAction: UserActionType
-  ): DecimalJs {
+  ): Promise<DecimalJs> {
     const reserveData = reserve;
-    // const actionAmount = userAction == UserActionType.Borrow
-    //   ? new Fraction(newBorrowedAmountSf).toDecimal().sub(new Fraction(reserveData.liquidity.borrowedAmountSf).toDecimal()).toNumber()
-    //   : new Fraction(reserveData.liquidity.borrowedAmountSf).toDecimal().sub(new Fraction(newBorrowedAmountSf).toDecimal()).toNumber()
+    const actionAmount = userAction == UserActionType.Borrow
+      ? newBorrowedAmount.toDecimalJs().sub(reserveData.liquidity.borrowedAmount.toDecimalJs()).toNumber()
+      : reserveData.liquidity.borrowedAmount.toDecimalJs().sub(newBorrowedAmount.toDecimalJs()).toNumber()
     reserveData.liquidity.availableAmount = newAvailableLiquidity;
     reserveData.liquidity.borrowedAmount = newBorrowedAmount;
 
     const borrowApy = calculateAPYFromAPR(this.calculateBorrowAPR(reserveData, currentTimestampMs));
 
-    // const elendReward = new ElendReward(this.chain, this.connection, this.cluster);
-    // const rewardConfig = this.rewards.get(reserve.toBase58())?.get(RewardOption.Borrow);
-    // const rewardIncentiveApy = rewardConfig
-    //   ? await elendReward.estimateNewApyInterest(reserve, RewardOption.Borrow, actionAmount, userAction, reserveData, rewardConfig)
-    //   : new Decimal(0);
-
-    // return new Decimal(borrowApy).sub(rewardIncentiveApy);
-    return new DecimalJs(borrowApy);
+    const rewardCalculation = new ElendMarketRewardCalculationOperation(this.queryOperation);
+    const rewardIncentiveApys = await rewardCalculation.estimateIncentiveRewardNewApyInterest(
+      reserve,
+      marketType,
+      RewardOption.Borrow,
+      actionAmount,
+      userAction
+    );
+    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce(
+      (acc, apy) => acc.add(apy),
+      new DecimalJs(0)
+    );
+    return new DecimalJs(borrowApy).sub(totalIncentiveApy);
   }
 
   getTotalSupply(reserve: Reserve): DecimalJs {

@@ -8,16 +8,10 @@ import { ElendMarketObligationCalculationOperation } from './obligation-calculat
 import { ElendMarketReserveCalculationOperation } from './reserve-calculation';
 
 export class ElendMarketRewardCalculationOperation implements IElendMarketRewardCalculationOperation {
-  private readonly reserveCalculcation: ElendMarketReserveCalculationOperation;
-  private readonly obligationCalculation: ElendMarketObligationCalculationOperation;
   private readonly queryOperation: ElendMarketQueryOperation;
   constructor(
-    reserveCalculcation: ElendMarketReserveCalculationOperation,
-    obligationCalculation: ElendMarketObligationCalculationOperation,
     queryOperation: ElendMarketQueryOperation
   ) {
-    this.reserveCalculcation = reserveCalculcation;
-    this.obligationCalculation = obligationCalculation;
     this.queryOperation = queryOperation;
   }
 
@@ -108,6 +102,7 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
   async calculateIncentiveRewardApyInterest(reserve: Reserve, marketType: string, option: number): Promise<Map<string, DecimalJs>> {
     const rewardConfigs = await this.queryOperation.fetchRewardConfigs(reserve.id, marketType, option);
     const result = new Map<string, DecimalJs>();
+    const reserveCalculation = new ElendMarketReserveCalculationOperation(this.queryOperation);
     for (const rewardConfig of rewardConfigs) {
       const totalDuration = Number(rewardConfig.endAt - rewardConfig.startedAt);
       const currentTimestamp = new Date().getTime();
@@ -120,14 +115,14 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
       let totalEffective: DecimalJs = new DecimalJs(0);
       switch (rewardConfig.option) {
         case RewardOption.Deposit: // Supply - withdraw
-          totalEffective = this.reserveCalculcation.getTotalSupply(reserve);
+          totalEffective = reserveCalculation.getTotalSupply(reserve);
           break;
         case RewardOption.Borrow: //Borrow - repay
-          totalEffective = this.reserveCalculcation.getBorrowedAmount(reserve);
+          totalEffective = reserveCalculation.getBorrowedAmount(reserve);
           break;
       }
 
-      const marketPrice = this.reserveCalculcation.getReserveMarketPrice(reserve);
+      const marketPrice = reserveCalculation.getReserveMarketPrice(reserve);
       const totalEffectiveValue = totalEffective.div(new DecimalJs(Math.pow(10, reserve.liquidity.mintDecimal))).mul(marketPrice);
 
       const remainingRewardFunds = new DecimalJs(rewardConfig.totalFunds).div(new DecimalJs(totalDuration)).mul(new DecimalJs(remainingTimestamp));
@@ -148,6 +143,7 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
   ): Promise<Map<string, DecimalJs>> {
     const rewardConfigs = await this.queryOperation.fetchRewardConfigs(reserve.id, marketType, option);
     const result = new Map<string, DecimalJs>();
+    const reserveCalculation = new ElendMarketReserveCalculationOperation(this.queryOperation)
     for (const rewardConfig of rewardConfigs) {
       const totalDuration = rewardConfig.endAt - rewardConfig.startedAt;
       const currentTimestamp = new Date().getTime() / 1000;
@@ -160,20 +156,20 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
       let totalEffective: DecimalJs = new DecimalJs(0);
       switch (userAction) {
         case UserActionType.Deposit:
-          totalEffective = this.reserveCalculcation.getTotalSupply(reserve).add(new DecimalJs(amount));
+          totalEffective = reserveCalculation.getTotalSupply(reserve).add(new DecimalJs(amount));
           break;
         case UserActionType.Borrow:
-          totalEffective = this.reserveCalculcation.getBorrowedAmount(reserve).add(new DecimalJs(amount));
+          totalEffective = reserveCalculation.getBorrowedAmount(reserve).add(new DecimalJs(amount));
           break;
         case UserActionType.Withdraw:
-          totalEffective = this.reserveCalculcation.getTotalSupply(reserve).sub(new DecimalJs(amount));
+          totalEffective = reserveCalculation.getTotalSupply(reserve).sub(new DecimalJs(amount));
           break;
         case UserActionType.Repay:
-          totalEffective = this.reserveCalculcation.getBorrowedAmount(reserve).sub(new DecimalJs(amount));
+          totalEffective = reserveCalculation.getBorrowedAmount(reserve).sub(new DecimalJs(amount));
           break;
       }
 
-      const marketPrice = this.reserveCalculcation.getReserveMarketPrice(reserve);
+      const marketPrice = reserveCalculation.getReserveMarketPrice(reserve);
       const totalEffectiveValue = totalEffective.div(new DecimalJs(Math.pow(10, reserve.liquidity.mintDecimal))).mul(marketPrice);
 
       const remainingRewardFunds = new DecimalJs(rewardConfig.totalFunds).div(new DecimalJs(totalDuration)).mul(new DecimalJs(remainingTimestamp));
@@ -198,17 +194,19 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
     const currentTimestamp = new Date().getTime();
     const elapsedTime = Math.max(0, Math.min(currentTimestamp, Number(rewardConfig.endAt)) - Number(rewardConfig.lastUpdatedAt));
 
+    const reserveCalculation = new ElendMarketReserveCalculationOperation(this.queryOperation);
+    const obligationCalculation = new ElendMarketObligationCalculationOperation(this.queryOperation);
     switch (rewardConfig.option) {
       case RewardOption.Deposit: //supply
-        totalEffective = this.reserveCalculcation.getTotalSupply(reserve);
+        totalEffective = reserveCalculation.getTotalSupply(reserve);
         userEffective =
-          this.obligationCalculation.getDetailSuppliedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]
+          obligationCalculation.getDetailSuppliedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]
             ?.suppliedAmount || new DecimalJs(0);
         break;
       case RewardOption.Borrow: //borrow
-        totalEffective = this.reserveCalculcation.getBorrowedAmount(reserve);
+        totalEffective = reserveCalculation.getBorrowedAmount(reserve);
         userEffective =
-          this.obligationCalculation.getDetailBorrowedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]
+          obligationCalculation.getDetailBorrowedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]
             ?.borrowedAmount || new DecimalJs(0);
         break;
     }

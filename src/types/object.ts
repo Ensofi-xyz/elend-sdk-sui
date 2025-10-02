@@ -90,11 +90,13 @@ export interface ObligationOwnerCap {
 }
 
 export interface ObligationCollateral {
+  id: string;
   depositedAmount: number;
   marketValue: Decimal;
 }
 
 export interface ObligationLiquidity {
+  id: string;
   borrowedAmount: Decimal;
   cumulativeBorrowRate: Decimal;
   marketValue: Decimal;

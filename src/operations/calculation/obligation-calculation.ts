@@ -3,9 +3,15 @@ import { Decimal as DecimalJs } from 'decimal.js';
 import { IElendMarketObligationCalculationOperation } from '../../interfaces/operations';
 import { Obligation, Reserve } from '../../types';
 import { DetailBorrowedRes, DetailSuppliedRes } from '../../types/client';
+import { ElendMarketQueryOperation } from '../query/query';
 
 export class ElendMarketObligationCalculationOperation implements IElendMarketObligationCalculationOperation {
-  constructor() {}
+    private readonly queryOperation: ElendMarketQueryOperation
+    constructor(
+      queryOperation: ElendMarketQueryOperation,
+    ) {
+      this.queryOperation = queryOperation;
+    }
 
   getTotalSuppliedUSDValueObligation(
     obligation: Obligation,
@@ -95,6 +101,7 @@ export class ElendMarketObligationCalculationOperation implements IElendMarketOb
       };
     });
   }
+  
   getDetailBorrowedOnMarketObligation(
     obligation: Obligation,
     associateReserves: Map<string, Reserve>,

@@ -177,6 +177,7 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
   }
 
   async fetchObligation(obligationId: string): Promise<Obligation | null> {
+    const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
     const response = await this.suiClient.getObject({
       id: obligationId,
       options: {
@@ -191,6 +192,63 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
 
     if (response.data?.content) {
       const data = (response.data?.content as any)['fields'];
+      const obligationCollateral = new Map<string, ObligationCollateral>();
+      for (const deposit of data.deposits) {
+        const obligationCollateralKey = {
+          reserve: deposit
+        };
+
+        const oblgationCollateralData = await this.suiClient.getDynamicFieldObject({
+          parentId: obligationId,
+          name: {
+            type: `${packageInfo.package}::obligation::ObligationCollateralKey`,
+            value: obligationCollateralKey
+          }
+        });
+        if (oblgationCollateralData.error) {
+          console.log(oblgationCollateralData.error);
+          continue;
+        }
+
+        if (oblgationCollateralData.data?.content) {
+          const data = (oblgationCollateralData.data?.content as any).fields
+          obligationCollateral.set(deposit, {
+            id: data.id.id,
+            depositedAmount: Number(data.deposited_amount),
+            marketValue: new Decimal(data.market_value.fields.value),
+          })
+        }
+      };
+
+      const obligationLiquidity = new Map<string, ObligationLiquidity>();
+      for (const borrow of data.borrows) {
+        const obligationLiquidityKey = {
+          reserve: borrow
+        };
+
+        const oblgationLiquidityData = await this.suiClient.getDynamicFieldObject({
+          parentId: obligationId,
+          name: {
+            type: `${packageInfo.package}::obligation::ObligationLiquidityKey`,
+            value: obligationLiquidityKey
+          }
+        });
+        if (oblgationLiquidityData.error) {
+          console.log(oblgationLiquidityData.error);
+          continue;
+        }
+
+        if (oblgationLiquidityData.data?.content) {
+          const data = (oblgationLiquidityData.data?.content as any).fields
+          obligationLiquidity.set(borrow, {
+            id: data.id.id,
+            borrowedAmount: new Decimal(data.borrowed_amount.fields.value),
+            cumulativeBorrowRate: new Decimal(data.cumulative_borrow_rate.fields.value),
+            marketValue: new Decimal(data.market_value.fields.value),
+            borrowFactorAdjustedMarketValue: new Decimal(data.borrow_factor_adjusted_market_value.fields.value),
+          })
+        }
+      }
       return {
         id: data.id.id,
         owner: data.owner,
@@ -215,8 +273,8 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
         },
         locking: data.locking,
         liquidatingAssetReserve: data.liquidating_asset_reserve,
-        obligationCollateral: new Map<string, ObligationCollateral>(),
-        obligationLiquidity: new Map<string, ObligationLiquidity>(),
+        obligationCollateral,
+        obligationLiquidity,
       } as Obligation;
     } else {
       return null;

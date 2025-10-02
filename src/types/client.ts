@@ -39,7 +39,7 @@ export interface DetailSupplyApyRes {
   totalApy: DecimalJs;
   breakdownApy: {
     supplyApy: DecimalJs;
-    rewardIncentiveApy: DecimalJs;
+    rewardIncentiveApy: Map<string, DecimalJs>;
     lstInterest: number;
   };
 }
@@ -48,24 +48,7 @@ export interface DetailBorrowApyRes {
   totalApy: DecimalJs;
   breakdownApy: {
     borrowApy: DecimalJs;
-    rewardIncentiveApy: DecimalJs;
-  };
-}
-
-export interface DetailSupplyApyRes {
-  totalApy: DecimalJs;
-  breakdownApy: {
-    supplyApy: DecimalJs;
-    rewardIncentiveApy: DecimalJs;
-    lstInterest: number;
-  };
-}
-
-export interface DetailBorrowApyRes {
-  totalApy: DecimalJs;
-  breakdownApy: {
-    borrowApy: DecimalJs;
-    rewardIncentiveApy: DecimalJs;
+    rewardIncentiveApy: Map<string, DecimalJs>;
   };
 }
 
