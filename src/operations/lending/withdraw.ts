@@ -47,7 +47,7 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
 
     const obligationId = obligationOwnerCap.obligation;
     const obligationData = await this.query.fetchObligation(obligationId);
-    if (isNil(obligationData)) throw Error('Not found obligation to deposit');
+    if (isNil(obligationData)) throw Error('Not found obligation to withdraw');
     const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
 
     // - Refresh reserves
@@ -87,14 +87,14 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
         option: RewardOption.Deposit,
         clock: SUI_SYSTEM_CLOCK,
       });
-    }
 
-    this.contract.updateUserReward(tx, [marketType, tokenType], {
-      version: packageInfo.version.id,
-      obligation: obligationId,
-      reserve,
-      option: RewardOption.Deposit,
-    });
+      this.contract.updateUserReward(tx, [marketType, tokenType], {
+        version: packageInfo.version.id,
+        obligation: obligationId,
+        reserve,
+        option: RewardOption.Deposit,
+      });
+    }
 
     // - handle withdraw operation
     await this.handleWithdrawOperation(tx, {

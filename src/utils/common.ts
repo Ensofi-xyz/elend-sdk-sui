@@ -2,11 +2,12 @@ import { Decimal as DecimalJs } from 'decimal.js';
 
 import { ElendMarketConfig } from '../interfaces/config';
 
-export const SLOTS_PER_SECOND = 2;
-export const SLOTS_PER_MINUTE = SLOTS_PER_SECOND * 60;
-export const SLOTS_PER_HOUR = SLOTS_PER_MINUTE * 60;
-export const SLOTS_PER_DAY = SLOTS_PER_HOUR * 24;
-export const SLOTS_PER_YEAR = SLOTS_PER_DAY * 365;
+export const MILLISECONDS_PER_SECOND = 1000;
+
+export const MILLISECONDS_PER_MINUTE = MILLISECONDS_PER_SECOND * 60;   // 60,000
+export const MILLISECONDS_PER_HOUR   = MILLISECONDS_PER_MINUTE * 60;   // 3,600,000
+export const MILLISECONDS_PER_DAY    = MILLISECONDS_PER_HOUR * 24;     // 86,400,000
+export const MILLISECONDS_PER_YEAR   = MILLISECONDS_PER_DAY * 365
 
 export const getTokenTypeForReserve = (reserveId: string, packageConfig: ElendMarketConfig): string | null => {
   const reserves = packageConfig.reserves;
@@ -35,7 +36,7 @@ export const wait = (ms: number): Promise<void> => {
 };
 
 export function calculateAPYFromAPR(apr: number) {
-  const apy = new DecimalJs(1).plus(new DecimalJs(apr).dividedBy(SLOTS_PER_YEAR)).toNumber() ** SLOTS_PER_YEAR - 1;
+  const apy = new DecimalJs(1).plus(new DecimalJs(apr).dividedBy(MILLISECONDS_PER_YEAR)).toNumber() ** MILLISECONDS_PER_YEAR - 1;
   return apy;
 }
 

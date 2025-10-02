@@ -45,7 +45,7 @@ export class BorrowElendMarketOperation implements IBorrowElendMarketOperation {
     }
     const obligationId = obligationOwnerCap.obligation;
     const obligationData = await this.query.fetchObligation(obligationId);
-    if (isNil(obligationData)) throw Error('Not found obligation to deposit');
+    if (isNil(obligationData)) throw Error('Not found obligation to borrow');
 
     const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
     const reserves = packageInfo.reserves;
@@ -97,14 +97,14 @@ export class BorrowElendMarketOperation implements IBorrowElendMarketOperation {
         option: RewardOption.Borrow,
         clock: SUI_SYSTEM_CLOCK,
       });
-    }
 
-    this.contract.updateUserReward(tx, [marketType, tokenType], {
-      version: packageInfo.version.id,
-      obligation: obligationId,
-      reserve,
-      option: RewardOption.Deposit,
-    });
+      this.contract.updateUserReward(tx, [marketType, tokenType], {
+        version: packageInfo.version.id,
+        obligation: obligationId,
+        reserve,
+        option: RewardOption.Borrow,
+      });
+    }
 
     await this.handleBorrowOperation(tx, {
       owner,

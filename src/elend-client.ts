@@ -25,10 +25,12 @@ import { RepayElendMarketOperation } from './operations/lending/repay';
 import { WithdrawElendMarketOperation } from './operations/lending/withdraw';
 import { ElendMarketQueryOperation } from './operations/query/query';
 import { ElendMarketRewardOperation } from './operations/reward/reward';
-import { MarketClientRes, ReserveClientRes } from './types/client';
-import { Network } from './types/common';
+import { DetailBorrowApyRes, DetailBorrowedRes, DetailSuppliedRes, DetailSupplyApyRes, MarketClientRes, ReserveClientRes } from './types/client';
+import { Network, UserActionType } from './types/common';
 import { Market, Obligation, Reserve } from './types/object';
 import { getSuiClientInstance } from './utils/sui-client';
+import { Decimal as DecimalJs } from 'decimal.js';
+import { Decimal as DecimalFraction } from './utils/decimal';
 
 export class ElendClient {
   public readonly networkConfig: NetworkConfig;
@@ -66,11 +68,19 @@ export class ElendClient {
     this.repayOperation = new RepayElendMarketOperation(networkConfig, suiClient);
 
     this.rewardOperation = new ElendMarketRewardOperation(networkConfig, suiClient);
-    this.queryOperation = new ElendMarketQueryOperation(networkConfig, suiClient);
+    const queryOperation = new ElendMarketQueryOperation(networkConfig, suiClient);
+    this.queryOperation = queryOperation;
 
-    this.reserveCalculationOperation = new ElendMarketReserveCalculationOperation();
-    this.obligationCalculationOperation = new ElendMarketObligationCalculationOperation();
-    this.rewardCalculationOperation = new ElendMarketRewardCalculationOperation();
+    const reserveCalculationOperation = new ElendMarketReserveCalculationOperation();
+    this.reserveCalculationOperation = reserveCalculationOperation;
+    const obligationCalculationOperation = new ElendMarketObligationCalculationOperation();
+    this.obligationCalculationOperation = obligationCalculationOperation;
+
+    this.rewardCalculationOperation = new ElendMarketRewardCalculationOperation(
+      reserveCalculationOperation,
+      obligationCalculationOperation,
+      queryOperation
+    );
   }
 
   static async create(
@@ -216,11 +226,12 @@ export class ElendClient {
     });
   }
 
-  async borrow(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction> {
+  async borrow(reserve: string, liquidityAmount: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
 
+    const marketType = this.getMarketTypeOfReserve(reserve);
     return this.borrowOperation.buildBorrowTxn({
       owner: this.obligationOwner,
       reserve,
@@ -229,11 +240,12 @@ export class ElendClient {
     });
   }
 
-  async withdraw(reserve: string, marketType: string, collateralAmount: number): Promise<Transaction> {
+  async withdraw(reserve: string, collateralAmount: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
 
+    const marketType = this.getMarketTypeOfReserve(reserve);
     return this.withdrawOperation.buildWithdrawTxn({
       owner: this.obligationOwner,
       reserve,
@@ -242,11 +254,12 @@ export class ElendClient {
     });
   }
 
-  async repay(reserve: string, marketType: string, liquidityAmount: number): Promise<Transaction> {
+  async repay(reserve: string, liquidityAmount: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
 
+    const marketType = this.getMarketTypeOfReserve(reserve);
     return this.repayOperation.buildRepayTxn({
       amount: liquidityAmount,
       owner: this.obligationOwner,
@@ -255,16 +268,194 @@ export class ElendClient {
     });
   }
 
-  async claim_reward(reserve: string, marketType: string, option: number): Promise<Transaction> {
+  async claim_reward(reserve: string, option: number): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
 
+    const marketType = this.getMarketTypeOfReserve(reserve);
     return this.rewardOperation.buildClaimRewardTxn({
       owner: this.obligationOwner,
       reserve,
       marketType,
       option,
     });
+  }
+
+  getTotalSuppliedUSDValueOnMarket(
+    marketType: string,
+    reserveIds?: string[],
+  ): DecimalJs {
+    const reserves = this.reserves.get(marketType);
+    if (!reserves) return DecimalJs(0);
+    return this.reserveCalculationOperation.getTotalSuppliedUSDValueOnMarket(
+      reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves
+    );
+  }
+
+  getTotalBorrowedUSDValueOnMarket(
+    marketType: string,
+    reserveIds?: string[],
+  ): DecimalJs {
+    const reserves = this.reserves.get(marketType);
+    if (!reserves) return DecimalJs(0);
+    return this.reserveCalculationOperation.getTotalBorrowedUSDValueOnMarket(
+      reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves
+    );
+  }
+
+  getDetailSuppliedOnMarket(
+    marketType: string,
+    reserveIds?: string[],
+  ): DetailSuppliedRes[] {
+    const reserves = this.reserves.get(marketType);
+    if (!reserves) return [];
+    return this.reserveCalculationOperation.getDetailSuppliedOnMarket(
+      reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves
+    );
+  }
+
+  getDetailBorrowedOnMarket(
+    marketType: string,
+    reserveIds?: string[]
+  ): DetailBorrowedRes[] {
+    const reserves = this.reserves.get(marketType);
+    if (!reserves) return [];
+    return this.reserveCalculationOperation.getDetailBorrowedOnMarket(
+      reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves
+    );
+  }
+
+  getDetailSupplyApy(
+    reserveId: string,
+    marketType: string,
+  ): DetailSupplyApyRes {
+    const currentTimestampMs = new Date().getTime();
+    const reserves = this.reserves.get(marketType);
+    if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
+    const reserve = reserves.find(reserve => reserve.id == reserveId);
+    if (!reserve) throw new Error(`Not found reserve id ${reserveId}`);
+    return this.reserveCalculationOperation.getDetailSupplyApy(
+      reserve,
+      currentTimestampMs
+    );
+  }
+
+  getDetailBorrowApy(
+    reserveId: string,
+    marketType: string,
+  ): DetailBorrowApyRes {
+    const currentTimestampMs = new Date().getTime();
+    const reserves = this.reserves.get(marketType);
+    if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
+    const reserve = reserves.find(reserve => reserve.id == reserveId);
+    if (!reserve) throw new Error(`Not found reserve id ${reserveId}`);
+    return this.reserveCalculationOperation.getDetailBorrowApy(
+      reserve,
+      currentTimestampMs
+    );
+  }
+
+  totalSupplyAPYWithNewAvailableSupplyAmount(
+    reserveId: string,
+    newAvailableAmount: bigint,
+    userAction: UserActionType
+  ): DecimalJs {
+    const currentTimestampMs = new Date().getTime();
+    const marketType = this.getMarketTypeOfReserve(reserveId);
+    const reserves = this.reserves.get(marketType);
+    if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
+    const reserve = reserves.find(reserve => reserve.id == reserveId);
+    if (!reserve) throw new Error(`Not found reserve id ${reserveId}`);
+    return this.reserveCalculationOperation.totalSupplyAPYWithNewAvailableSupplyAmount(
+      reserve,
+      newAvailableAmount,
+      currentTimestampMs,
+      userAction
+    );
+  }
+
+  totalBorrowAPYWithNewBorrowedAmount(
+    reserveId: string,
+    newAvailableLiquidity: bigint,
+    newBorrowedAmount: DecimalFraction,
+    userAction: UserActionType
+  ): DecimalJs {
+    const currentTimestampMs = new Date().getTime();
+    const marketType = this.getMarketTypeOfReserve(reserveId);
+    const reserves = this.reserves.get(marketType);
+    if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
+    const reserve = reserves.find(reserve => reserve.id == reserveId);
+    if (!reserve) throw new Error(`Not found reserve id ${reserveId}`);
+    return this.reserveCalculationOperation.totalBorrowAPYWithNewBorrowedAmount(
+      reserve,
+      newAvailableLiquidity,
+      newBorrowedAmount,
+      currentTimestampMs,
+      userAction
+    );
+  }
+
+  getTotalSuppliedUSDValueObligation(
+    marketType: string
+  ): DecimalJs {
+    const obligation = this.obligations.get(marketType);
+    if (!obligation) return new DecimalJs(0);
+
+    const { associateReserve, reserveTokenPrice}= this.getAssociateReserveObligationData(obligation, marketType);
+
+    return this.obligationCalculationOperation.getTotalSuppliedUSDValueObligation(obligation, associateReserve, reserveTokenPrice);
+  }
+
+  private getAssociateReserveObligationData(
+    obligation: Obligation,
+    marketType: string,
+  ): {
+    associateReserve: Map<string, Reserve>, 
+    reserveTokenPrice: Map<string, DecimalJs> 
+  } {
+    const reserves = this.reserves.get(marketType);
+    if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
+    const associateReserve = new Map<string, Reserve>();
+    const reserveTokenPrice = new Map<string, DecimalJs>();
+
+    for (const deposit of obligation.deposits) {
+      const reserve = reserves.find(reserve => reserve.id == deposit)
+      if (reserve) {
+        associateReserve.set(reserve.id, reserve);
+        reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs())
+      }
+    }
+
+    for (const borrow of obligation.borrows) {
+      const reserve = reserves.find(reserve => reserve.id == borrow)
+      if (reserve) {
+        associateReserve.set(reserve.id, reserve);
+        reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs())
+      }
+    };
+
+    return {
+      associateReserve,
+      reserveTokenPrice
+    };
+  }
+
+  private getMarketTypeOfObligation(obligationId: string): string {
+    for (const [marketId, obligation] of this.obligations.entries()) {
+      if (obligation.id == obligationId) {
+        return marketId;
+      }
+    }
+    throw new Error(`Not found obligation market type of obligation id ${obligationId}`);
+  }
+
+  private getMarketTypeOfReserve(reserveId: string): string {
+    for (const [marketId, reserves] of this.reserves.entries()) {
+      if (reserves.some(r => r.id === reserveId)) {
+        return marketId;
+      }
+    }
+    throw new Error(`Not found reserve market type of reserve id ${reserveId}`);
   }
 }

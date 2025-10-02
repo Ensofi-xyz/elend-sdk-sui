@@ -26,12 +26,12 @@ export class ElendMarketContract implements IElendMarketContract {
   }
 
   initObligation(tx: Transaction, typeArgs: string, args: InitObligationArgs): TransactionResult {
-    const { version, owner, clock } = args;
+    const { version, market, owner, clock } = args;
 
     const result = tx.moveCall({
       target: `${this.packageId}::lending_market::init_obligation`,
       typeArguments: [typeArgs],
-      arguments: [tx.object(version), tx.pure.address(owner as string), tx.object(clock)],
+      arguments: [tx.object(version), tx.object(market), tx.pure.address(owner as string), tx.object(clock)],
     });
 
     return result;

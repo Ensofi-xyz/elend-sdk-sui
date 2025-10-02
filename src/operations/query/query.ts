@@ -289,7 +289,7 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
 
     if (userRewardRes.error) {
       console.log('error', userRewardRes.error);
-      throw new Error('Failed to fetch user reward');
+      return null;
     }
 
     if (userRewardRes.data?.content) {

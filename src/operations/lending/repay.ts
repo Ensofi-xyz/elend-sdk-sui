@@ -44,7 +44,7 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
     }
     const obligationId = obligationOwnerCap.obligation;
     const obligationData = await this.query.fetchObligation(obligationId);
-    if (isNil(obligationData)) throw Error('Not found obligation to deposit');
+    if (isNil(obligationData)) throw Error('Not found obligation to repay');
 
     const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
     const reserves = packageInfo.reserves;
@@ -83,14 +83,14 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
         option: RewardOption.Borrow,
         clock: SUI_SYSTEM_CLOCK,
       });
-    }
 
-    this.contract.updateUserReward(tx, [marketType, tokenType], {
-      version: packageInfo.version.id,
-      obligation: obligationId,
-      reserve,
-      option: RewardOption.Deposit,
-    });
+      this.contract.updateUserReward(tx, [marketType, tokenType], {
+        version: packageInfo.version.id,
+        obligation: obligationId,
+        reserve,
+        option: RewardOption.Borrow,
+      });
+    }
 
     await this.handleRepayOperation(tx, {
       owner,

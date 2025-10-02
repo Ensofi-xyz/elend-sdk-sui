@@ -50,8 +50,10 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
 
     const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
 
+    const market = packageInfo.lendingMarkets[marketType];
     const obligationOwnerCapResult = this.contract.initObligation(tx, packageInfo.marketType['MAIN_POOL'], {
       version: packageInfo.version.id,
+      market: market.id,
       owner,
       clock: SUI_SYSTEM_CLOCK,
     });
@@ -121,14 +123,14 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
         option: RewardOption.Deposit,
         clock: SUI_SYSTEM_CLOCK,
       });
-    }
 
-    this.contract.updateUserReward(tx, [marketType, tokenType], {
-      version: packageInfo.version.id,
-      obligation: obligationId,
-      reserve,
-      option: RewardOption.Deposit,
-    });
+      this.contract.updateUserReward(tx, [marketType, tokenType], {
+        version: packageInfo.version.id,
+        obligation: obligationId,
+        reserve,
+        option: RewardOption.Deposit,
+      });
+    }
 
     // - Handle deposit operation
     await this.handleDepositOperation(tx, {

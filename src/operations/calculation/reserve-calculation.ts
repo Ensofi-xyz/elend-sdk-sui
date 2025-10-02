@@ -4,7 +4,7 @@ import { IElendMarketReserveCalculationOperation } from '../../interfaces/operat
 import { Reserve } from '../../types';
 import { DetailBorrowApyRes, DetailBorrowedRes, DetailSuppliedRes, DetailSupplyApyRes } from '../../types/client';
 import { UserActionType } from '../../types/common';
-import { Decimal, SLOTS_PER_YEAR, calculateAPYFromAPR } from '../../utils';
+import { Decimal, MILLISECONDS_PER_YEAR, calculateAPYFromAPR } from '../../utils';
 
 export class ElendMarketReserveCalculationOperation implements IElendMarketReserveCalculationOperation {
   constructor() {}
@@ -301,7 +301,7 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
   }
 
   private approximateCompoundedInterest(rate: DecimalJs, elapsedSlots: number): DecimalJs {
-    const base = rate.div(SLOTS_PER_YEAR);
+    const base = rate.div(MILLISECONDS_PER_YEAR);
     switch (elapsedSlots) {
       case 0:
         return new DecimalJs(1);

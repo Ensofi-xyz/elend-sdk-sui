@@ -12,9 +12,9 @@ const rpcUrl = 'https://fullnode.testnet.sui.io:443';
 const wsRpcUrl = 'https://fullnode.testnet.sui.io:443';
 
 const signer = getSignerByPrivateKey('suiprivkey1qpf275dj6muyampyc5emgyrslt9whguk2mvurn3am9x7yr5937yzkjaafxy');
-const depositReserve = '0x2d15ad1c4674211f70a4ee9e9219f5a353ddbfb06842d702344225e7dc7a98d5';
-const depositAmount = 1 * 10 ** 9;
-const marketType = '0x65c854c8514a8ad9ff42da649f7171a6f764f8bd019400ca290f4d277ac6e198::elend_market::MAIN_POOL';
+const depositReserve = '0x02a4f312a6a1a3ad524b878773d5e218d781d2e5aa474f4283a702a8fa6d8e20';
+const depositAmount = 100 * 10 ** 6;
+const marketType = '0x1fe250637cb2d5a08f58288664f4f5f8d2eee0001529a4fb30c7449649c95559::elend_market::MAIN_POOL';
 
 const deposit = async () => {
   const suiClient = getSuiClientInstance(rpcUrl, wsRpcUrl);
@@ -23,6 +23,7 @@ const deposit = async () => {
     suiClient,
     isLoadData: true,
   });
+
   const obligation = elendClient.obligations.get(marketType);
   if (isNil(obligation)) {
     const tx = await elendClient.initObligation(marketType);
