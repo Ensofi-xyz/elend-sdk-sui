@@ -195,15 +195,15 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
       const obligationCollateral = new Map<string, ObligationCollateral>();
       for (const deposit of data.deposits) {
         const obligationCollateralKey = {
-          reserve: deposit
+          reserve: deposit,
         };
 
         const oblgationCollateralData = await this.suiClient.getDynamicFieldObject({
           parentId: obligationId,
           name: {
             type: `${packageInfo.package}::obligation::ObligationCollateralKey`,
-            value: obligationCollateralKey
-          }
+            value: obligationCollateralKey,
+          },
         });
         if (oblgationCollateralData.error) {
           console.log(oblgationCollateralData.error);
@@ -211,27 +211,27 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
         }
 
         if (oblgationCollateralData.data?.content) {
-          const data = (oblgationCollateralData.data?.content as any).fields
+          const data = (oblgationCollateralData.data?.content as any).fields;
           obligationCollateral.set(deposit, {
             id: data.id.id,
             depositedAmount: Number(data.deposited_amount),
             marketValue: new Decimal(data.market_value.fields.value),
-          })
+          });
         }
-      };
+      }
 
       const obligationLiquidity = new Map<string, ObligationLiquidity>();
       for (const borrow of data.borrows) {
         const obligationLiquidityKey = {
-          reserve: borrow
+          reserve: borrow,
         };
 
         const oblgationLiquidityData = await this.suiClient.getDynamicFieldObject({
           parentId: obligationId,
           name: {
             type: `${packageInfo.package}::obligation::ObligationLiquidityKey`,
-            value: obligationLiquidityKey
-          }
+            value: obligationLiquidityKey,
+          },
         });
         if (oblgationLiquidityData.error) {
           console.log(oblgationLiquidityData.error);
@@ -239,14 +239,14 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
         }
 
         if (oblgationLiquidityData.data?.content) {
-          const data = (oblgationLiquidityData.data?.content as any).fields
+          const data = (oblgationLiquidityData.data?.content as any).fields;
           obligationLiquidity.set(borrow, {
             id: data.id.id,
             borrowedAmount: new Decimal(data.borrowed_amount.fields.value),
             cumulativeBorrowRate: new Decimal(data.cumulative_borrow_rate.fields.value),
             marketValue: new Decimal(data.market_value.fields.value),
             borrowFactorAdjustedMarketValue: new Decimal(data.borrow_factor_adjusted_market_value.fields.value),
-          })
+          });
         }
       }
       return {

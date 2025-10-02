@@ -9,9 +9,7 @@ import { ElendMarketReserveCalculationOperation } from './reserve-calculation';
 
 export class ElendMarketRewardCalculationOperation implements IElendMarketRewardCalculationOperation {
   private readonly queryOperation: ElendMarketQueryOperation;
-  constructor(
-    queryOperation: ElendMarketQueryOperation
-  ) {
+  constructor(queryOperation: ElendMarketQueryOperation) {
     this.queryOperation = queryOperation;
   }
 
@@ -143,7 +141,7 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
   ): Promise<Map<string, DecimalJs>> {
     const rewardConfigs = await this.queryOperation.fetchRewardConfigs(reserve.id, marketType, option);
     const result = new Map<string, DecimalJs>();
-    const reserveCalculation = new ElendMarketReserveCalculationOperation(this.queryOperation)
+    const reserveCalculation = new ElendMarketReserveCalculationOperation(this.queryOperation);
     for (const rewardConfig of rewardConfigs) {
       const totalDuration = rewardConfig.endAt - rewardConfig.startedAt;
       const currentTimestamp = new Date().getTime() / 1000;
@@ -200,14 +198,14 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
       case RewardOption.Deposit: //supply
         totalEffective = reserveCalculation.getTotalSupply(reserve);
         userEffective =
-          obligationCalculation.getDetailSuppliedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]
-            ?.suppliedAmount || new DecimalJs(0);
+          obligationCalculation.getDetailSuppliedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]?.suppliedAmount ||
+          new DecimalJs(0);
         break;
       case RewardOption.Borrow: //borrow
         totalEffective = reserveCalculation.getBorrowedAmount(reserve);
         userEffective =
-          obligationCalculation.getDetailBorrowedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]
-            ?.borrowedAmount || new DecimalJs(0);
+          obligationCalculation.getDetailBorrowedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]?.borrowedAmount ||
+          new DecimalJs(0);
         break;
     }
 

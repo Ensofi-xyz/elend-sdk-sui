@@ -26,7 +26,15 @@ import { RepayElendMarketOperation } from './operations/lending/repay';
 import { WithdrawElendMarketOperation } from './operations/lending/withdraw';
 import { ElendMarketQueryOperation } from './operations/query/query';
 import { ElendMarketRewardOperation } from './operations/reward/reward';
-import { DetailBorrowApyRes, DetailBorrowedRes, DetailIncentiveRewardRes, DetailSuppliedRes, DetailSupplyApyRes, MarketClientRes, ReserveClientRes } from './types/client';
+import {
+  DetailBorrowApyRes,
+  DetailBorrowedRes,
+  DetailIncentiveRewardRes,
+  DetailSuppliedRes,
+  DetailSupplyApyRes,
+  MarketClientRes,
+  ReserveClientRes,
+} from './types/client';
 import { Network, UserActionType } from './types/common';
 import { Market, Obligation, Reserve } from './types/object';
 import { Decimal as DecimalFraction } from './utils/decimal';
@@ -71,16 +79,10 @@ export class ElendClient {
     const queryOperation = new ElendMarketQueryOperation(networkConfig, suiClient);
     this.queryOperation = queryOperation;
 
-    this.reserveCalculationOperation = new ElendMarketReserveCalculationOperation(
-      queryOperation
-    );
-    this.obligationCalculationOperation = new ElendMarketObligationCalculationOperation(
-      queryOperation
-    );
+    this.reserveCalculationOperation = new ElendMarketReserveCalculationOperation(queryOperation);
+    this.obligationCalculationOperation = new ElendMarketObligationCalculationOperation(queryOperation);
 
-    this.rewardCalculationOperation = new ElendMarketRewardCalculationOperation(
-      queryOperation
-    );
+    this.rewardCalculationOperation = new ElendMarketRewardCalculationOperation(queryOperation);
   }
 
   static async create(
@@ -315,7 +317,7 @@ export class ElendClient {
     );
   }
 
-  async getDetailSupplyApy(reserveId: string,): Promise<DetailSupplyApyRes> {
+  async getDetailSupplyApy(reserveId: string): Promise<DetailSupplyApyRes> {
     const currentTimestampMs = new Date().getTime();
     const marketType = this.getMarketTypeOfReserve(reserveId);
     const reserves = this.reserves.get(marketType);
@@ -342,7 +344,13 @@ export class ElendClient {
     if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
     const reserve = reserves.find(reserve => reserve.id == reserveId);
     if (!reserve) throw new Error(`Not found reserve id ${reserveId}`);
-    return this.reserveCalculationOperation.totalSupplyAPYWithNewAvailableSupplyAmount(reserve, marketType, newAvailableAmount, currentTimestampMs, userAction);
+    return this.reserveCalculationOperation.totalSupplyAPYWithNewAvailableSupplyAmount(
+      reserve,
+      marketType,
+      newAvailableAmount,
+      currentTimestampMs,
+      userAction
+    );
   }
 
   async totalBorrowAPYWithNewBorrowedAmount(
@@ -350,7 +358,7 @@ export class ElendClient {
     newAvailableLiquidity: bigint,
     newBorrowedAmount: DecimalFraction,
     userAction: UserActionType
-  ): Promise<DecimalJs>{
+  ): Promise<DecimalJs> {
     const currentTimestampMs = new Date().getTime();
     const marketType = this.getMarketTypeOfReserve(reserveId);
     const reserves = this.reserves.get(marketType);
@@ -385,10 +393,7 @@ export class ElendClient {
     return this.obligationCalculationOperation.getTotalBorrowedUSDValueObligation(obligation, associateReserve, reserveTokenPrice);
   }
 
-  getDetailSuppliedOnMarketObligation(
-    marketType: string,
-    reserveIds?: string[], 
-  ): DetailSuppliedRes[] {
+  getDetailSuppliedOnMarketObligation(marketType: string, reserveIds?: string[]): DetailSuppliedRes[] {
     const obligation = this.obligations.get(marketType);
     if (!obligation) return [];
     const reserves = this.reserves.get(marketType);
@@ -402,10 +407,7 @@ export class ElendClient {
     );
   }
 
-  getDetailBorrowedOnMarketObligation(
-    marketType: string,
-    reserveIds?: string[],
-  ): DetailBorrowedRes[] {
+  getDetailBorrowedOnMarketObligation(marketType: string, reserveIds?: string[]): DetailBorrowedRes[] {
     const obligation = this.obligations.get(marketType);
     if (!obligation) return [];
     const reserves = this.reserves.get(marketType);
@@ -418,16 +420,12 @@ export class ElendClient {
       reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves
     );
   }
-  
+
   calculateCurrentHealthRatioObligation(marketType: string): DecimalJs {
     const obligation = this.obligations.get(marketType);
     if (!obligation) return new DecimalJs(0);
     const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-    return this.obligationCalculationOperation.calculateCurrentHealthRatioObligation(
-      obligation,
-      associateReserve,
-      reserveTokenPrice,
-    );
+    return this.obligationCalculationOperation.calculateCurrentHealthRatioObligation(obligation, associateReserve, reserveTokenPrice);
   }
 
   calculateRemainingBorrowAmount(borrowReserve: string): DecimalJs {
@@ -435,13 +433,8 @@ export class ElendClient {
     const obligation = this.obligations.get(marketType);
     if (!obligation) return new DecimalJs(0);
     const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-    
-    return this.obligationCalculationOperation.calculateRemainingBorrowAmount(
-      obligation,
-      associateReserve,
-      reserveTokenPrice,
-      borrowReserve
-    );
+
+    return this.obligationCalculationOperation.calculateRemainingBorrowAmount(obligation, associateReserve, reserveTokenPrice, borrowReserve);
   }
 
   calculateAllowedWithdrawAmount(withdrawReserve: string): DecimalJs {
@@ -449,20 +442,11 @@ export class ElendClient {
     const obligation = this.obligations.get(marketType);
     if (!obligation) return new DecimalJs(0);
     const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-    
-    return this.obligationCalculationOperation.calculateAllowedWithdrawAmount(
-      obligation,
-      associateReserve,
-      reserveTokenPrice,
-      withdrawReserve,
-      true,
-    );
+
+    return this.obligationCalculationOperation.calculateAllowedWithdrawAmount(obligation, associateReserve, reserveTokenPrice, withdrawReserve, true);
   }
 
-  async getTotalIncentiveRewardStatisticObligation(
-    marketType: string,
-    reservesIds?: string[]
-  ): Promise<DetailIncentiveRewardRes[]> {
+  async getTotalIncentiveRewardStatisticObligation(marketType: string, reservesIds?: string[]): Promise<DetailIncentiveRewardRes[]> {
     const obligation = this.obligations.get(marketType);
     if (!obligation) return [];
     const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
@@ -478,8 +462,8 @@ export class ElendClient {
       associateReserve,
       reserveMarketType,
       reserveTokenPrice,
-      reservesIds,
-    )
+      reservesIds
+    );
   }
 
   private getAssociateReserveObligationData(

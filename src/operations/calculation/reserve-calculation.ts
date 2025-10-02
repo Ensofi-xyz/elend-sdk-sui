@@ -9,10 +9,8 @@ import { ElendMarketQueryOperation } from '../query/query';
 import { ElendMarketRewardCalculationOperation } from './reward-calculation';
 
 export class ElendMarketReserveCalculationOperation implements IElendMarketReserveCalculationOperation {
-  private readonly queryOperation: ElendMarketQueryOperation
-  constructor(
-    queryOperation: ElendMarketQueryOperation,
-  ) {
+  private readonly queryOperation: ElendMarketQueryOperation;
+  constructor(queryOperation: ElendMarketQueryOperation) {
     this.queryOperation = queryOperation;
   }
 
@@ -74,15 +72,8 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
   async getDetailSupplyApy(reserve: Reserve, marketType: string, currentTimestampMs: number): Promise<DetailSupplyApyRes> {
     const supplyApy = calculateAPYFromAPR(this.calculateSupplyAPR(reserve, currentTimestampMs));
     const rewardCalculation = new ElendMarketRewardCalculationOperation(this.queryOperation);
-    const rewardIncentiveApys = await rewardCalculation.calculateIncentiveRewardApyInterest(
-      reserve,
-      marketType,
-      RewardOption.Deposit
-    );
-    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce(
-      (acc, apy) => acc.add(apy),
-      new DecimalJs(0)
-    );
+    const rewardIncentiveApys = await rewardCalculation.calculateIncentiveRewardApyInterest(reserve, marketType, RewardOption.Deposit);
+    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce((acc, apy) => acc.add(apy), new DecimalJs(0));
     return {
       totalApy: new DecimalJs(supplyApy).add(totalIncentiveApy).add(0),
       breakdownApy: {
@@ -96,15 +87,8 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
   async getDetailBorrowApy(reserve: Reserve, marketType: string, currentTimestampMs: number): Promise<DetailBorrowApyRes> {
     const borrowApy = calculateAPYFromAPR(this.calculateBorrowAPR(reserve, currentTimestampMs));
     const rewardCalculation = new ElendMarketRewardCalculationOperation(this.queryOperation);
-    const rewardIncentiveApys = await rewardCalculation.calculateIncentiveRewardApyInterest(
-      reserve,
-      marketType,
-      RewardOption.Borrow
-    );
-    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce(
-      (acc, apy) => acc.add(apy),
-      new DecimalJs(0)
-    );
+    const rewardIncentiveApys = await rewardCalculation.calculateIncentiveRewardApyInterest(reserve, marketType, RewardOption.Borrow);
+    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce((acc, apy) => acc.add(apy), new DecimalJs(0));
     return {
       totalApy: new DecimalJs(borrowApy).sub(totalIncentiveApy),
       breakdownApy: {
@@ -138,10 +122,7 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
       actionAmount,
       userAction
     );
-    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce(
-      (acc, apy) => acc.add(apy),
-      new DecimalJs(0)
-    );
+    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce((acc, apy) => acc.add(apy), new DecimalJs(0));
     return new DecimalJs(supplyApy).add(totalIncentiveApy);
   }
 
@@ -154,9 +135,10 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
     userAction: UserActionType
   ): Promise<DecimalJs> {
     const reserveData = reserve;
-    const actionAmount = userAction == UserActionType.Borrow
-      ? newBorrowedAmount.toDecimalJs().sub(reserveData.liquidity.borrowedAmount.toDecimalJs()).toNumber()
-      : reserveData.liquidity.borrowedAmount.toDecimalJs().sub(newBorrowedAmount.toDecimalJs()).toNumber()
+    const actionAmount =
+      userAction == UserActionType.Borrow
+        ? newBorrowedAmount.toDecimalJs().sub(reserveData.liquidity.borrowedAmount.toDecimalJs()).toNumber()
+        : reserveData.liquidity.borrowedAmount.toDecimalJs().sub(newBorrowedAmount.toDecimalJs()).toNumber();
     reserveData.liquidity.availableAmount = newAvailableLiquidity;
     reserveData.liquidity.borrowedAmount = newBorrowedAmount;
 
@@ -170,10 +152,7 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
       actionAmount,
       userAction
     );
-    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce(
-      (acc, apy) => acc.add(apy),
-      new DecimalJs(0)
-    );
+    const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce((acc, apy) => acc.add(apy), new DecimalJs(0));
     return new DecimalJs(borrowApy).sub(totalIncentiveApy);
   }
 
