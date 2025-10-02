@@ -49,7 +49,7 @@ export class Decimal {
   }
 
   toDecimalJs(): DecimalJs {
-    return new DecimalJs(this.value / Decimal.WAD);
+    return new DecimalJs(BigInt(this.value) / BigInt(Decimal.WAD));
   }
 
   // --- arithmetic ---
