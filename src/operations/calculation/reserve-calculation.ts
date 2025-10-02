@@ -198,23 +198,23 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
     }
   }
 
-  private calculateSupplyAPR(reserve: Reserve, timestampMs: number) {
+  calculateSupplyAPR(reserve: Reserve, timestampMs: number) {
     const currentUtilization = this.calculateUtilizationRatio(reserve);
     const borrowRate = this.calculateBorrowRate(reserve, timestampMs);
     const protocolTakeRatePct = 1 - reserve.config.reserveFactorRateBps / 10_000;
     return currentUtilization * borrowRate * protocolTakeRatePct;
   }
 
-  private calculateBorrowAPR(reserve: Reserve, timestampMs?: number) {
+  calculateBorrowAPR(reserve: Reserve, timestampMs?: number) {
     return this.calculateBorrowRate(reserve, timestampMs);
   }
 
-  private calculateBorrowRate(reserve: Reserve, timestampMs?: number) {
+  calculateBorrowRate(reserve: Reserve, timestampMs?: number) {
     const estimatedCurrentUtilization = this.calculateUtilizationRatio(reserve, timestampMs);
     return this.getBorrowRate(reserve, estimatedCurrentUtilization);
   }
 
-  private getEstimatedDebtAndSupply(
+  getEstimatedDebtAndSupply(
     reserve: Reserve,
     timestampMs: number
   ): {
@@ -241,7 +241,7 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
     }
   }
 
-  private getBorrowRate(reserve: Reserve, utilizationRate: number): number {
+  getBorrowRate(reserve: Reserve, utilizationRate: number): number {
     const baseBorrowRate = reserve.config.baseFixedInterestRateBps / 10_000;
     const utilizationOptimal = reserve.config.utilizationOptimalBps / 10_000;
     const maxUtilization = reserve.config.utilizationLimitBlockBorrowingAboveBps / 10_000;

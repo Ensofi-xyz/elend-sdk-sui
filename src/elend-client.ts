@@ -57,9 +57,9 @@ export class ElendClient {
   private readonly rewardOperation: IElendMarketRewardOperation;
   private readonly queryOperation: IElendMarketQueryOperation;
 
-  private readonly reserveCalculationOperation: IElendMarketReserveCalculationOperation;
-  private readonly obligationCalculationOperation: IElendMarketObligationCalculationOperation;
-  private readonly rewardCalculationOperation: IElendMarketRewardCalculationOperation;
+  readonly reserveCalculationOperation: IElendMarketReserveCalculationOperation;
+  readonly obligationCalculationOperation: IElendMarketObligationCalculationOperation;
+  readonly rewardCalculationOperation: IElendMarketRewardCalculationOperation;
 
   constructor(networkConfig: NetworkConfig, suiClient: SuiClient) {
     this.networkConfig = networkConfig;
