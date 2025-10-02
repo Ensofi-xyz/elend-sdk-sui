@@ -115,8 +115,14 @@ class ElendMarketReserveCalculationOperation {
     getBorrowedAmount(reserve) {
         return reserve.liquidity.borrowedAmount.toDecimalJs();
     }
+    getTotalMintCollateral(reserve) {
+        return new decimal_js_1.Decimal(reserve.collateral.mintTotalAmount);
+    }
     getLiquidityAvailableAmount(reserve) {
         return new decimal_js_1.Decimal(reserve.liquidity.availableAmount.toString());
+    }
+    getCumulativeBorrowRate(reserve) {
+        return reserve.liquidity.cumulativeBorrowRate.toDecimalJs();
     }
     getAccumulatedProtocolFees(reserve) {
         return reserve.liquidity.accumulatedProtocolFees.toDecimalJs();

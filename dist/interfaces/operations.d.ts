@@ -72,6 +72,11 @@ export interface IElendMarketReserveCalculationOperation {
     totalSupplyAPYWithNewAvailableSupplyAmount(reserve: Reserve, marketType: string, newAvailableAmount: bigint, currentTimestampMs: number, userAction: UserActionType): Promise<DecimalJs>;
     totalBorrowAPYWithNewBorrowedAmount(reserve: Reserve, marketType: string, newAvailableLiquidity: bigint, newBorrowedAmount: Decimal, currentTimestampMs: number, userAction: UserActionType): Promise<DecimalJs>;
     getTotalSupply(reserve: Reserve): DecimalJs;
+    getBorrowedAmount(reserve: Reserve): DecimalJs;
+    getTotalMintCollateral(reserve: Reserve): DecimalJs;
+    getCumulativeBorrowRate(reserve: Reserve): DecimalJs;
+    calculateSupplyAPR(reserve: Reserve, timestampMs: number): number;
+    calculateBorrowAPR(reserve: Reserve, timestampMs?: number): number;
 }
 export interface IElendMarketObligationCalculationOperation {
     getTotalSuppliedUSDValueObligation(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveTokenPrice: Map<string, DecimalJs>): DecimalJs;

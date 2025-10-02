@@ -18,7 +18,9 @@ export declare class ElendMarketReserveCalculationOperation implements IElendMar
     totalBorrowAPYWithNewBorrowedAmount(reserve: Reserve, marketType: string, newAvailableLiquidity: bigint, newBorrowedAmount: Decimal, currentTimestampMs: number, userAction: UserActionType): Promise<DecimalJs>;
     getTotalSupply(reserve: Reserve): DecimalJs;
     getBorrowedAmount(reserve: Reserve): DecimalJs;
+    getTotalMintCollateral(reserve: Reserve): DecimalJs;
     getLiquidityAvailableAmount(reserve: Reserve): DecimalJs;
+    getCumulativeBorrowRate(reserve: Reserve): DecimalJs;
     getAccumulatedProtocolFees(reserve: Reserve): DecimalJs;
     getReserveMarketPrice(reserve: Reserve): DecimalJs;
     getMintDecimals(reserve: Reserve): number;
