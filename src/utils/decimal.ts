@@ -48,9 +48,9 @@ export class Decimal {
     return this.value / Decimal.WAD;
   }
 
-  toDecimalJs(): DecimalJs {
-    return new DecimalJs(BigInt(this.value) / BigInt(Decimal.WAD));
-  }
+toDecimalJs(): DecimalJs {
+  return new DecimalJs(this.value.toString()).div(new DecimalJs(Decimal.WAD.toString()));
+}
 
   // --- arithmetic ---
   add(b: Decimal): Decimal {
