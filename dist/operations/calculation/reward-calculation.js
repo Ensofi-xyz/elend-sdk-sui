@@ -104,10 +104,11 @@ class ElendMarketRewardCalculationOperation {
         const reserveCalculation = new reserve_calculation_1.ElendMarketReserveCalculationOperation(this.queryOperation);
         for (const rewardConfig of rewardConfigs) {
             const totalDuration = rewardConfig.endAt - rewardConfig.startedAt;
-            const currentTimestamp = new Date().getTime() / 1000;
+            const currentTimestamp = new Date().getTime();
             const remainingTimestamp = Math.max(0, Number(rewardConfig.endAt) - currentTimestamp);
             if (remainingTimestamp <= 0) {
                 result.set(rewardConfig.rewardTokenType, new decimal_js_1.Decimal(0));
+                continue;
             }
             let totalEffective = new decimal_js_1.Decimal(0);
             switch (userAction) {
@@ -126,7 +127,9 @@ class ElendMarketRewardCalculationOperation {
             }
             const marketPrice = reserveCalculation.getReserveMarketPrice(reserve);
             const totalEffectiveValue = totalEffective.div(new decimal_js_1.Decimal(Math.pow(10, reserve.liquidity.mintDecimal))).mul(marketPrice);
-            const remainingRewardFunds = new decimal_js_1.Decimal(rewardConfig.totalFunds.toString()).div(new decimal_js_1.Decimal(totalDuration.toString())).mul(new decimal_js_1.Decimal(remainingTimestamp.toString()));
+            const remainingRewardFunds = new decimal_js_1.Decimal(rewardConfig.totalFunds.toString())
+                .div(new decimal_js_1.Decimal(totalDuration.toString()))
+                .mul(new decimal_js_1.Decimal(remainingTimestamp.toString()));
             const remainingRewardFundsValue = remainingRewardFunds.div(Math.pow(10, 9));
             result.set(rewardConfig.rewardTokenType, remainingRewardFundsValue.div(totalEffectiveValue).div(remainingTimestamp).mul(utils_1.MILLISECONDS_PER_YEAR));
         }

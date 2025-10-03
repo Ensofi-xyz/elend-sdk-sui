@@ -144,11 +144,12 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
     const reserveCalculation = new ElendMarketReserveCalculationOperation(this.queryOperation);
     for (const rewardConfig of rewardConfigs) {
       const totalDuration = rewardConfig.endAt - rewardConfig.startedAt;
-      const currentTimestamp = new Date().getTime() / 1000;
+      const currentTimestamp = new Date().getTime();
       const remainingTimestamp = Math.max(0, Number(rewardConfig.endAt) - currentTimestamp);
 
       if (remainingTimestamp <= 0) {
         result.set(rewardConfig.rewardTokenType, new DecimalJs(0));
+        continue;
       }
 
       let totalEffective: DecimalJs = new DecimalJs(0);
@@ -170,7 +171,9 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
       const marketPrice = reserveCalculation.getReserveMarketPrice(reserve);
       const totalEffectiveValue = totalEffective.div(new DecimalJs(Math.pow(10, reserve.liquidity.mintDecimal))).mul(marketPrice);
 
-      const remainingRewardFunds = new DecimalJs(rewardConfig.totalFunds.toString()).div(new DecimalJs(totalDuration.toString())).mul(new DecimalJs(remainingTimestamp.toString()));
+      const remainingRewardFunds = new DecimalJs(rewardConfig.totalFunds.toString())
+        .div(new DecimalJs(totalDuration.toString()))
+        .mul(new DecimalJs(remainingTimestamp.toString()));
       const remainingRewardFundsValue = remainingRewardFunds.div(Math.pow(10, 9));
 
       result.set(rewardConfig.rewardTokenType, remainingRewardFundsValue.div(totalEffectiveValue).div(remainingTimestamp).mul(MILLISECONDS_PER_YEAR));
