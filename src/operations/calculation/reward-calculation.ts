@@ -144,11 +144,12 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
     const reserveCalculation = new ElendMarketReserveCalculationOperation(this.queryOperation);
     for (const rewardConfig of rewardConfigs) {
       const totalDuration = rewardConfig.endAt - rewardConfig.startedAt;
-      const currentTimestamp = new Date().getTime() / 1000;
+      const currentTimestamp = new Date().getTime();
       const remainingTimestamp = Math.max(0, Number(rewardConfig.endAt) - currentTimestamp);
 
       if (remainingTimestamp <= 0) {
         result.set(rewardConfig.rewardTokenType, new DecimalJs(0));
+        continue;
       }
 
       let totalEffective: DecimalJs = new DecimalJs(0);
