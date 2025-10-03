@@ -12,15 +12,15 @@ const rpcUrl = 'https://fullnode.testnet.sui.io:443';
 const wsRpcUrl = 'https://fullnode.testnet.sui.io:443';
 
 const signer = getSignerByPrivateKey('suiprivkey1qzwd7tkdp4u2s7j9g5s624hud7d3ltq6q6xp9k6pq4s9jehu4zsnylljw8k');
-const borrowReserve = '0xa50848b8ea74455f810fc882fd1c309a07fde5ed6022488d3fb97cfa1c790c00';
-const borrowAmount = 1 * 10 ** 6;
+const borrowReserve = '0x543539fa66035a81df16fe5eb7e4c1b839ab53f8bce3d07e0efdbed988a3f133';
+const borrowAmount = 5 * 10 ** 6;
 
 const borrow = async () => {
   const suiClient = getSuiClientInstance(rpcUrl, wsRpcUrl);
   const elendClient = await ElendClient.create(Network.Testnet, {
     obligationOwner: signer.toSuiAddress(),
     suiClient,
-    isLoadReserves: true,
+    isLoadData: true,
   });
   const tx = await elendClient.borrow(borrowReserve, borrowAmount);
 

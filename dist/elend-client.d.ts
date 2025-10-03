@@ -2,6 +2,7 @@ import { Decimal as DecimalJs } from 'decimal.js';
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
 import { NetworkConfig } from './interfaces/config';
+import { IElendMarketObligationCalculationOperation, IElendMarketReserveCalculationOperation, IElendMarketRewardCalculationOperation } from './interfaces/operations';
 import { DetailBorrowApyRes, DetailBorrowedRes, DetailIncentiveRewardRes, DetailSuppliedRes, DetailSupplyApyRes, MarketClientRes, ReserveClientRes } from './types/client';
 import { Network, UserActionType } from './types/common';
 import { Obligation, Reserve } from './types/object';
@@ -19,9 +20,9 @@ export declare class ElendClient {
     private readonly repayOperation;
     private readonly rewardOperation;
     private readonly queryOperation;
-    private readonly reserveCalculationOperation;
-    private readonly obligationCalculationOperation;
-    private readonly rewardCalculationOperation;
+    readonly reserveCalculationOperation: IElendMarketReserveCalculationOperation;
+    readonly obligationCalculationOperation: IElendMarketObligationCalculationOperation;
+    readonly rewardCalculationOperation: IElendMarketRewardCalculationOperation;
     constructor(networkConfig: NetworkConfig, suiClient: SuiClient);
     static create(network: Network, options?: {
         isLoadData: boolean;

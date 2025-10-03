@@ -11,9 +11,9 @@ import { getSignerByPrivateKey, getSuiClientInstance } from '../src/utils/sui-cl
 const rpcUrl = 'https://fullnode.testnet.sui.io:443';
 const wsRpcUrl = 'https://fullnode.testnet.sui.io:443';
 
-const signer = getSignerByPrivateKey('suiprivkey1qpf275dj6muyampyc5emgyrslt9whguk2mvurn3am9x7yr5937yzkjaafxy');
-const depositReserve = '0x02a4f312a6a1a3ad524b878773d5e218d781d2e5aa474f4283a702a8fa6d8e20';
-const depositAmount = 100 * 10 ** 6;
+const signer = getSignerByPrivateKey('suiprivkey1qzwd7tkdp4u2s7j9g5s624hud7d3ltq6q6xp9k6pq4s9jehu4zsnylljw8k');
+const depositReserve = '0x3a80fd776b73e76e24bea4e7bb0bb0364bc030eb7bbee814132f9546a4e5bbc6';
+const depositAmount = 3 * 10 ** 9;
 const marketType = '0x1fe250637cb2d5a08f58288664f4f5f8d2eee0001529a4fb30c7449649c95559::elend_market::MAIN_POOL';
 
 const deposit = async () => {
@@ -30,7 +30,7 @@ const deposit = async () => {
     const initObligationRes = await waitSignAndExecuteTransactionIX(suiClient, tx, signer);
     console.log('init obligation res: ', initObligationRes);
   }
-  const tx = await elendClient.deposit(depositReserve, marketType, depositAmount);
+  const tx = await elendClient.deposit(depositReserve, depositAmount);
 
   // const simulate = await suiClient.devInspectTransactionBlock({
   //   transactionBlock: tx,

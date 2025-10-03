@@ -23,11 +23,14 @@ export declare class ElendMarketReserveCalculationOperation implements IElendMar
     getReserveMarketPrice(reserve: Reserve): DecimalJs;
     getMintDecimals(reserve: Reserve): number;
     calculateUtilizationRatio(reserve: Reserve, slot?: number): number;
-    private calculateSupplyAPR;
-    private calculateBorrowAPR;
-    private calculateBorrowRate;
-    private getEstimatedDebtAndSupply;
-    private getBorrowRate;
+    calculateSupplyAPR(reserve: Reserve, timestampMs: number): number;
+    calculateBorrowAPR(reserve: Reserve, timestampMs?: number): number;
+    calculateBorrowRate(reserve: Reserve, timestampMs?: number): number;
+    getEstimatedDebtAndSupply(reserve: Reserve, timestampMs: number): {
+        totalBorrow: DecimalJs;
+        totalSupply: DecimalJs;
+    };
+    getBorrowRate(reserve: Reserve, utilizationRate: number): number;
     private compoundInterest;
     private approximateCompoundedInterest;
 }
