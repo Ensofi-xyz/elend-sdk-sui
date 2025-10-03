@@ -126,7 +126,7 @@ class ElendMarketRewardCalculationOperation {
             }
             const marketPrice = reserveCalculation.getReserveMarketPrice(reserve);
             const totalEffectiveValue = totalEffective.div(new decimal_js_1.Decimal(Math.pow(10, reserve.liquidity.mintDecimal))).mul(marketPrice);
-            const remainingRewardFunds = new decimal_js_1.Decimal(rewardConfig.totalFunds).div(new decimal_js_1.Decimal(totalDuration)).mul(new decimal_js_1.Decimal(remainingTimestamp));
+            const remainingRewardFunds = new decimal_js_1.Decimal(rewardConfig.totalFunds.toString()).div(new decimal_js_1.Decimal(totalDuration.toString())).mul(new decimal_js_1.Decimal(remainingTimestamp.toString()));
             const remainingRewardFundsValue = remainingRewardFunds.div(Math.pow(10, 9));
             result.set(rewardConfig.rewardTokenType, remainingRewardFundsValue.div(totalEffectiveValue).div(remainingTimestamp).mul(utils_1.MILLISECONDS_PER_YEAR));
         }
