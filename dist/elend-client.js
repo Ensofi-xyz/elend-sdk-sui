@@ -116,9 +116,9 @@ class ElendClient {
         }
         return this.markets;
     }
-    getReserves(marketTypeInput) {
+    async getReserves(marketTypeInput) {
         if (this.reserves.size == 0) {
-            this.loadReserves();
+            await this.loadReserves();
         }
         const result = new Map();
         for (const [marketType, reserves] of this.reserves.entries()) {

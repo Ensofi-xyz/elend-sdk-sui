@@ -54,8 +54,8 @@ export class ElendClient {
   private readonly withdrawOperation: IWithdrawElendMarketOperation;
   private readonly repayOperation: IRepayElendMarketOperation;
 
-  private readonly rewardOperation: IElendMarketRewardOperation;
-  private readonly queryOperation: IElendMarketQueryOperation;
+  readonly rewardOperation: IElendMarketRewardOperation;
+  readonly queryOperation: IElendMarketQueryOperation;
 
   readonly reserveCalculationOperation: IElendMarketReserveCalculationOperation;
   readonly obligationCalculationOperation: IElendMarketObligationCalculationOperation;
@@ -180,9 +180,9 @@ export class ElendClient {
     return this.markets;
   }
 
-  getReserves(marketTypeInput?: string): Map<string, ReserveClientRes[]> {
+  async getReserves(marketTypeInput?: string): Promise<Map<string, ReserveClientRes[]>> {
     if (this.reserves.size == 0) {
-      this.loadReserves();
+      await this.loadReserves();
     }
     const result = new Map<string, ReserveClientRes[]>();
     for (const [marketType, reserves] of this.reserves.entries()) {

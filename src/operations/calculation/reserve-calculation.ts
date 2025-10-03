@@ -164,8 +164,16 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
     return reserve.liquidity.borrowedAmount.toDecimalJs();
   }
 
+  getTotalMintCollateral(reserve: Reserve): DecimalJs {
+    return new DecimalJs(reserve.collateral.mintTotalAmount);
+  }
+
   getLiquidityAvailableAmount(reserve: Reserve): DecimalJs {
     return new DecimalJs(reserve.liquidity.availableAmount.toString());
+  }
+
+  getCumulativeBorrowRate(reserve: Reserve): DecimalJs {
+    return reserve.liquidity.cumulativeBorrowRate.toDecimalJs();
   }
 
   getAccumulatedProtocolFees(reserve: Reserve): DecimalJs {
