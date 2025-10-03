@@ -312,7 +312,7 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
               reserve: rewardConfig.fields.reserve,
               rewardTokenType: rewardConfig.fields.reward_token_type,
               option: rewardConfig.fields.option,
-              totalFunds: rewardConfig.fields.totalFunds,
+              totalFunds: rewardConfig.fields.total_funds,
               totalDistributed: new Decimal(rewardConfig.fields.total_distributed.fields.value),
               startedAt: BigInt(rewardConfig.fields.started_at),
               endAt: BigInt(rewardConfig.fields.end_at),
