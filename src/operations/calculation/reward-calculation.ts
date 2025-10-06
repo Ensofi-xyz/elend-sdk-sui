@@ -120,6 +120,11 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
           break;
       }
 
+      if (totalEffective.eq(0)) {
+        result.set(rewardConfig.rewardTokenType, new DecimalJs(0));
+        continue;
+      }
+
       const marketPrice = reserveCalculation.getReserveMarketPrice(reserve);
       const totalEffectiveValue = totalEffective.div(new DecimalJs(Math.pow(10, reserve.liquidity.mintDecimal))).mul(marketPrice);
 
@@ -168,10 +173,17 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
           break;
       }
 
+      if (totalEffective.eq(0)) {
+        result.set(rewardConfig.rewardTokenType, new DecimalJs(0));
+        continue;
+      }
+      
       const marketPrice = reserveCalculation.getReserveMarketPrice(reserve);
       const totalEffectiveValue = totalEffective.div(new DecimalJs(Math.pow(10, reserve.liquidity.mintDecimal))).mul(marketPrice);
 
-      const remainingRewardFunds = new DecimalJs(rewardConfig.totalFunds.toString()).div(new DecimalJs(totalDuration.toString())).mul(new DecimalJs(remainingTimestamp.toString()));
+      const remainingRewardFunds = new DecimalJs(rewardConfig.totalFunds.toString())
+        .div(new DecimalJs(totalDuration.toString()))
+        .mul(new DecimalJs(remainingTimestamp.toString()));
       const remainingRewardFundsValue = remainingRewardFunds.div(Math.pow(10, 9));
 
       result.set(rewardConfig.rewardTokenType, remainingRewardFundsValue.div(totalEffectiveValue).div(remainingTimestamp).mul(MILLISECONDS_PER_YEAR));

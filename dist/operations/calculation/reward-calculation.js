@@ -90,6 +90,10 @@ class ElendMarketRewardCalculationOperation {
                     totalEffective = reserveCalculation.getBorrowedAmount(reserve);
                     break;
             }
+            if (totalEffective.eq(0)) {
+                result.set(rewardConfig.rewardTokenType, new decimal_js_1.Decimal(0));
+                continue;
+            }
             const marketPrice = reserveCalculation.getReserveMarketPrice(reserve);
             const totalEffectiveValue = totalEffective.div(new decimal_js_1.Decimal(Math.pow(10, reserve.liquidity.mintDecimal))).mul(marketPrice);
             const remainingRewardFunds = new decimal_js_1.Decimal(rewardConfig.totalFunds).div(new decimal_js_1.Decimal(totalDuration)).mul(new decimal_js_1.Decimal(remainingTimestamp));
@@ -125,9 +129,15 @@ class ElendMarketRewardCalculationOperation {
                     totalEffective = reserveCalculation.getBorrowedAmount(reserve).sub(new decimal_js_1.Decimal(amount));
                     break;
             }
+            if (totalEffective.eq(0)) {
+                result.set(rewardConfig.rewardTokenType, new decimal_js_1.Decimal(0));
+                continue;
+            }
             const marketPrice = reserveCalculation.getReserveMarketPrice(reserve);
             const totalEffectiveValue = totalEffective.div(new decimal_js_1.Decimal(Math.pow(10, reserve.liquidity.mintDecimal))).mul(marketPrice);
-            const remainingRewardFunds = new decimal_js_1.Decimal(rewardConfig.totalFunds.toString()).div(new decimal_js_1.Decimal(totalDuration.toString())).mul(new decimal_js_1.Decimal(remainingTimestamp.toString()));
+            const remainingRewardFunds = new decimal_js_1.Decimal(rewardConfig.totalFunds.toString())
+                .div(new decimal_js_1.Decimal(totalDuration.toString()))
+                .mul(new decimal_js_1.Decimal(remainingTimestamp.toString()));
             const remainingRewardFundsValue = remainingRewardFunds.div(Math.pow(10, 9));
             result.set(rewardConfig.rewardTokenType, remainingRewardFundsValue.div(totalEffectiveValue).div(remainingTimestamp).mul(utils_1.MILLISECONDS_PER_YEAR));
         }
