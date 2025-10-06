@@ -9,6 +9,8 @@ export const MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * 60; // 3,600,000
 export const MILLISECONDS_PER_DAY = MILLISECONDS_PER_HOUR * 24; // 86,400,000
 export const MILLISECONDS_PER_YEAR = MILLISECONDS_PER_DAY * 365;
 
+export const U64_MAX: bigint = 18446744073709551615n
+
 export const getTokenTypeForReserve = (reserveId: string, packageConfig: ElendMarketConfig): string | null => {
   const reserves = packageConfig.reserves;
   for (const [tokenType, reserveInfo] of Object.entries(reserves)) {

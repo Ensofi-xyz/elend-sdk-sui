@@ -4,6 +4,7 @@ export declare const MILLISECONDS_PER_MINUTE: number;
 export declare const MILLISECONDS_PER_HOUR: number;
 export declare const MILLISECONDS_PER_DAY: number;
 export declare const MILLISECONDS_PER_YEAR: number;
+export declare const U64_MAX: bigint;
 export declare const getTokenTypeForReserve: (reserveId: string, packageConfig: ElendMarketConfig) => string | null;
 export declare const i64ToBigInt: (magnitude: bigint, negative: boolean) => bigint;
 export declare const remove0xPrefix: (input: string) => string;
