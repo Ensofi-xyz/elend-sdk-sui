@@ -114,7 +114,7 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
     args: {
       owner: string;
       reserve: string;
-      collateralAmount: number;
+      collateralAmount: bigint;
       obligationOwnerCap: string;
       obligationId: string;
       packageInfo: ElendMarketConfig;

@@ -243,7 +243,7 @@ export class ElendClient {
     });
   }
 
-  async withdraw(reserve: string, collateralAmount: number): Promise<Transaction> {
+  async withdraw(reserve: string, collateralAmount: bigint): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }

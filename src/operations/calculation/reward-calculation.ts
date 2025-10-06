@@ -177,7 +177,7 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
         result.set(rewardConfig.rewardTokenType, new DecimalJs(0));
         continue;
       }
-      
+
       const marketPrice = reserveCalculation.getReserveMarketPrice(reserve);
       const totalEffectiveValue = totalEffective.div(new DecimalJs(Math.pow(10, reserve.liquidity.mintDecimal))).mul(marketPrice);
 

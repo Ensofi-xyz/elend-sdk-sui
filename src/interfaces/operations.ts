@@ -23,7 +23,7 @@ export interface DepositReserveLiquidityAndObligationCollateralOperationArgs {
 export interface WithdrawCTokensAndRedeemLiquidityOperationArgs {
   owner: string;
   reserve: string;
-  collateralAmount: number;
+  collateralAmount: bigint;
   marketType: string;
 }
 
