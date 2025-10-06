@@ -163,9 +163,11 @@ export class ElendMarketObligationCalculationOperation implements IElendMarketOb
     obligation: Obligation,
     associateReserves: Map<string, Reserve>,
     reserveTokenPrice: Map<string, DecimalJs>,
-    borrowReserve: Reserve,
+    borrowReserve: Reserve
   ): DecimalJs {
-    const remainingBorrowLiquidityReserve = new DecimalJs(borrowReserve.config.borrowLimit.toString()).sub(borrowReserve.liquidity.borrowedAmount.toDecimalJs());
+    const remainingBorrowLiquidityReserve = new DecimalJs(borrowReserve.config.borrowLimit.toString()).sub(
+      borrowReserve.liquidity.borrowedAmount.toDecimalJs()
+    );
     const availableLiquidityReserve = new DecimalJs(borrowReserve.liquidity.availableAmount);
 
     if (remainingBorrowLiquidityReserve.equals(new DecimalJs(0))) return new DecimalJs(0);
