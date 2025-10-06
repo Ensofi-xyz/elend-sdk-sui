@@ -119,22 +119,18 @@ class ElendMarketObligationCalculationOperation {
         return totalDepositedValue.div(totalDebtValue);
     }
     calculateRemainingBorrowAmount(obligation, associateReserves, reserveTokenPrice, borrowReserve) {
-        const reserve = associateReserves.get(borrowReserve);
-        if (!reserve) {
-            return new decimal_js_1.Decimal(0);
-        }
-        const remainingBorrowLiquidityReserve = new decimal_js_1.Decimal(reserve.config.borrowLimit.toString()).sub(reserve.liquidity.borrowedAmount.toDecimalJs());
-        const availableLiquidityReserve = new decimal_js_1.Decimal(reserve.liquidity.availableAmount);
+        const remainingBorrowLiquidityReserve = new decimal_js_1.Decimal(borrowReserve.config.borrowLimit.toString()).sub(borrowReserve.liquidity.borrowedAmount.toDecimalJs());
+        const availableLiquidityReserve = new decimal_js_1.Decimal(borrowReserve.liquidity.availableAmount);
         if (remainingBorrowLiquidityReserve.equals(new decimal_js_1.Decimal(0)))
             return new decimal_js_1.Decimal(0);
-        let marketPrice = reserveTokenPrice.get(borrowReserve);
+        let marketPrice = reserveTokenPrice.get(borrowReserve.id);
         if (!marketPrice) {
-            marketPrice = reserve.liquidity.marketPrice?.toDecimalJs?.() ?? new decimal_js_1.Decimal(0);
+            marketPrice = borrowReserve.liquidity.marketPrice?.toDecimalJs?.() ?? new decimal_js_1.Decimal(0);
         }
         const totalAllowedBorrowValue = this.estimateAllowedBorrowValue(obligation, associateReserves, reserveTokenPrice);
         const totalBorrowFactorDebtValue = this.estimateTotalBorrowFactorDebtValue(obligation, associateReserves, reserveTokenPrice);
         const remainingBorrowValue = totalAllowedBorrowValue.sub(totalBorrowFactorDebtValue);
-        const remainingBorrowAmount = remainingBorrowValue.div(marketPrice).mul(new decimal_js_1.Decimal(Math.pow(10, reserve.liquidity.mintDecimal)));
+        const remainingBorrowAmount = remainingBorrowValue.div(marketPrice).mul(new decimal_js_1.Decimal(Math.pow(10, borrowReserve.liquidity.mintDecimal)));
         return decimal_js_1.Decimal.min(remainingBorrowAmount, remainingBorrowLiquidityReserve, availableLiquidityReserve);
     }
     calculateAllowedWithdrawAmount(obligation, associateReserves, reserveTokenPrice, reserve, permissiveWithdrawMax) {

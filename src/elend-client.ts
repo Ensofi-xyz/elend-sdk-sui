@@ -428,8 +428,10 @@ export class ElendClient {
     return this.obligationCalculationOperation.calculateCurrentHealthRatioObligation(obligation, associateReserve, reserveTokenPrice);
   }
 
-  calculateRemainingBorrowAmount(borrowReserve: string): DecimalJs {
-    const marketType = this.getMarketTypeOfReserve(borrowReserve);
+  calculateRemainingBorrowAmount(borrowReserveAddress: string): DecimalJs {
+    const marketType = this.getMarketTypeOfReserve(borrowReserveAddress);
+    const borrowReserve = this.reserves.get(marketType)?.find(reserve => reserve.id == borrowReserveAddress);
+    if (!borrowReserve) return new DecimalJs(0);
     const obligation = this.obligations.get(marketType);
     if (!obligation) return new DecimalJs(0);
     const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);

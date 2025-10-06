@@ -55,7 +55,7 @@ export declare class ElendClient {
     getDetailSuppliedOnMarketObligation(marketType: string, reserveIds?: string[]): DetailSuppliedRes[];
     getDetailBorrowedOnMarketObligation(marketType: string, reserveIds?: string[]): DetailBorrowedRes[];
     calculateCurrentHealthRatioObligation(marketType: string): DecimalJs;
-    calculateRemainingBorrowAmount(borrowReserve: string): DecimalJs;
+    calculateRemainingBorrowAmount(borrowReserveAddress: string): DecimalJs;
     calculateAllowedWithdrawAmount(withdrawReserve: string): DecimalJs;
     getTotalIncentiveRewardStatisticObligation(marketType: string, reservesIds?: string[]): Promise<DetailIncentiveRewardRes[]>;
     private getAssociateReserveObligationData;

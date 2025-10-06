@@ -317,8 +317,11 @@ class ElendClient {
         const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
         return this.obligationCalculationOperation.calculateCurrentHealthRatioObligation(obligation, associateReserve, reserveTokenPrice);
     }
-    calculateRemainingBorrowAmount(borrowReserve) {
-        const marketType = this.getMarketTypeOfReserve(borrowReserve);
+    calculateRemainingBorrowAmount(borrowReserveAddress) {
+        const marketType = this.getMarketTypeOfReserve(borrowReserveAddress);
+        const borrowReserve = this.reserves.get(marketType)?.find(reserve => reserve.id == borrowReserveAddress);
+        if (!borrowReserve)
+            return new decimal_js_1.Decimal(0);
         const obligation = this.obligations.get(marketType);
         if (!obligation)
             return new decimal_js_1.Decimal(0);

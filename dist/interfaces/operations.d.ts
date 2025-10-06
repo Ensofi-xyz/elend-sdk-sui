@@ -84,7 +84,7 @@ export interface IElendMarketObligationCalculationOperation {
     getDetailSuppliedOnMarketObligation(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveTokenPrice: Map<string, DecimalJs>, reserves?: Reserve[]): DetailSuppliedRes[];
     getDetailBorrowedOnMarketObligation(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveTokenPrice: Map<string, DecimalJs>, reserves?: Reserve[]): DetailBorrowedRes[];
     calculateCurrentHealthRatioObligation(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveTokenPrice: Map<string, DecimalJs>): DecimalJs;
-    calculateRemainingBorrowAmount(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveTokenPrice: Map<string, DecimalJs>, borrowReserve: string): DecimalJs;
+    calculateRemainingBorrowAmount(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveTokenPrice: Map<string, DecimalJs>, borrowReserve: Reserve): DecimalJs;
     calculateAllowedWithdrawAmount(obligation: Obligation, associateReserves: Map<string, Reserve>, reserveTokenPrice: Map<string, DecimalJs>, withdrawReserve: string, permissiveWithdrawMax: boolean): DecimalJs;
 }
 export interface IElendMarketRewardCalculationOperation {

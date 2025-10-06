@@ -163,19 +163,15 @@ export class ElendMarketObligationCalculationOperation implements IElendMarketOb
     obligation: Obligation,
     associateReserves: Map<string, Reserve>,
     reserveTokenPrice: Map<string, DecimalJs>,
-    borrowReserve: string
+    borrowReserve: Reserve,
   ): DecimalJs {
-    const reserve = associateReserves.get(borrowReserve);
-    if (!reserve) {
-      return new DecimalJs(0);
-    }
-    const remainingBorrowLiquidityReserve = new DecimalJs(reserve.config.borrowLimit.toString()).sub(reserve.liquidity.borrowedAmount.toDecimalJs());
-    const availableLiquidityReserve = new DecimalJs(reserve.liquidity.availableAmount);
+    const remainingBorrowLiquidityReserve = new DecimalJs(borrowReserve.config.borrowLimit.toString()).sub(borrowReserve.liquidity.borrowedAmount.toDecimalJs());
+    const availableLiquidityReserve = new DecimalJs(borrowReserve.liquidity.availableAmount);
 
     if (remainingBorrowLiquidityReserve.equals(new DecimalJs(0))) return new DecimalJs(0);
-    let marketPrice = reserveTokenPrice.get(borrowReserve);
+    let marketPrice = reserveTokenPrice.get(borrowReserve.id);
     if (!marketPrice) {
-      marketPrice = reserve.liquidity.marketPrice?.toDecimalJs?.() ?? new DecimalJs(0);
+      marketPrice = borrowReserve.liquidity.marketPrice?.toDecimalJs?.() ?? new DecimalJs(0);
     }
 
     const totalAllowedBorrowValue = this.estimateAllowedBorrowValue(obligation, associateReserves, reserveTokenPrice);
@@ -183,7 +179,7 @@ export class ElendMarketObligationCalculationOperation implements IElendMarketOb
     const totalBorrowFactorDebtValue = this.estimateTotalBorrowFactorDebtValue(obligation, associateReserves, reserveTokenPrice);
 
     const remainingBorrowValue = totalAllowedBorrowValue.sub(totalBorrowFactorDebtValue);
-    const remainingBorrowAmount = remainingBorrowValue.div(marketPrice).mul(new DecimalJs(Math.pow(10, reserve.liquidity.mintDecimal)));
+    const remainingBorrowAmount = remainingBorrowValue.div(marketPrice).mul(new DecimalJs(Math.pow(10, borrowReserve.liquidity.mintDecimal)));
 
     return DecimalJs.min(remainingBorrowAmount, remainingBorrowLiquidityReserve, availableLiquidityReserve);
   }

@@ -143,7 +143,7 @@ export interface IElendMarketObligationCalculationOperation {
     obligation: Obligation,
     associateReserves: Map<string, Reserve>,
     reserveTokenPrice: Map<string, DecimalJs>,
-    borrowReserve: string
+    borrowReserve: Reserve,
   ): DecimalJs;
   calculateAllowedWithdrawAmount(
     obligation: Obligation,
