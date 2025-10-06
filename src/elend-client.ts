@@ -257,16 +257,19 @@ export class ElendClient {
     });
   }
 
-  async repay(reserve: string, liquidityAmount: number): Promise<Transaction> {
+  async repay(repayReserve: string, liquidityAmount: bigint): Promise<Transaction> {
     if (isNil(this.obligationOwner)) {
       throw Error('Have not load obligation owner yet');
     }
 
-    const marketType = this.getMarketTypeOfReserve(reserve);
+    const marketType = this.getMarketTypeOfReserve(repayReserve);
+    const reserve = this.reserves.get(marketType)?.find(reserve => reserve.id == repayReserve);
+    if (!reserve) throw new Error('Not found repay reserve');
     return this.repayOperation.buildRepayTxn({
       amount: liquidityAmount,
       owner: this.obligationOwner,
-      reserve,
+      reserve: repayReserve,
+      decimals: reserve.liquidity.mintDecimal,
       marketType,
     });
   }

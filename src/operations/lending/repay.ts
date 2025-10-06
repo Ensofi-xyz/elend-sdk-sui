@@ -11,7 +11,7 @@ import { ElendMarketConfig, NetworkConfig } from '../../interfaces/config';
 import { IElendMarketContract } from '../../interfaces/functions';
 import { IElendMarketQueryOperation, IRepayElendMarketOperation, RepayObligationLiquidityOperationArgs } from '../../interfaces/operations';
 import { RewardOption } from '../../types/common';
-import { getTokenTypeForReserve, splitCoin } from '../../utils';
+import { getTokenTypeForReserve, splitCoin, U64_MAX } from '../../utils';
 import { ElendMarketQueryOperation } from '../query/query';
 import { refreshReserves } from './common';
 
@@ -21,6 +21,8 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
   private networkConfig: NetworkConfig;
   private pythClient: SuiPythClient;
   private suiClient: SuiClient;
+
+  private readonly ABSILON = 0.3;
 
   constructor(networkConfig: NetworkConfig, suiClient: SuiClient) {
     this.contract = new ElendMarketContract(networkConfig);
@@ -35,7 +37,7 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
   }
 
   async buildRepayTxn(args: RepayObligationLiquidityOperationArgs): Promise<Transaction> {
-    const { owner, reserve, amount, marketType } = args;
+    const { owner, reserve, amount, decimals, marketType } = args;
     const tx = new Transaction();
 
     const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner, marketType);
@@ -96,6 +98,7 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
       owner,
       reserve,
       amount,
+      decimals,
       obligationOwnerCap: obligationOwnerCap.id,
       obligationId,
       packageInfo,
@@ -109,13 +112,16 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
     args: {
       owner: string;
       reserve: string;
-      amount: number;
+      amount: bigint;
+      decimals: number;
       obligationOwnerCap: string;
       obligationId: string;
       packageInfo: ElendMarketConfig;
     }
   ): Promise<void> {
-    const { owner, reserve, amount, obligationOwnerCap, obligationId, packageInfo } = args;
+    const { owner, reserve, decimals, obligationOwnerCap, obligationId, packageInfo } = args;
+
+    let { amount } = args;
 
     const tokenType = getTokenTypeForReserve(reserve, packageInfo);
     if (!tokenType) {
@@ -127,8 +133,20 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
       coinType: tokenType,
     });
     console.log('🚀 ~ RepayElendMarketOperation ~ handleRepayOperation ~ totalAmount:', totalAmount);
-    //TODO SUI: const repayCoin = tx.splitCoins(tx.gas, [Number(amount) + (0.3 * Math.pow(10, 9))]);
-    const repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(amount) + 0.3 * Math.pow(10, 9)]);
+    let repayCoin;
+    if (amount == U64_MAX) {
+      if (tokenType == '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI') {
+        repayCoin = tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance)]);
+      } else {
+        repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(totalAmount.totalBalance)]);
+      }
+    } else {
+      if (tokenType == '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI') {
+        repayCoin = tx.splitCoins(tx.gas, [Number(amount) + (this.ABSILON * Math.pow(10, decimals))]);
+      } else {
+        repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(amount) + (this.ABSILON * Math.pow(10, decimals))]);
+      }
+    }
 
     this.contract.repayObligationLiquidity(tx, [packageInfo.marketType['MAIN_POOL'], tokenType], {
       version: packageInfo.version.id,
