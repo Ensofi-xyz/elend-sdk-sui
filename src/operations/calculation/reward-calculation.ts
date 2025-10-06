@@ -222,7 +222,7 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
         break;
     }
 
-    const rewardDistributeRate = new DecimalJs(rewardConfig.totalFunds / (rewardConfig.endAt - rewardConfig.startedAt));
+    const rewardDistributeRate = new DecimalJs(BigInt(rewardConfig.totalFunds) / (BigInt(rewardConfig.endAt) - BigInt(rewardConfig.startedAt)));
     const globalRewardIndex = rewardDistributeRate.mul(new DecimalJs(elapsedTime)).div(totalEffective);
 
     const newGlobalRewardIndex = globalRewardIndex.add(rewardConfig.lastGlobalRewardIndex.toDecimalJs());

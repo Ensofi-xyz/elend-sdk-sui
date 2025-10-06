@@ -164,7 +164,7 @@ class ElendMarketRewardCalculationOperation {
                         new decimal_js_1.Decimal(0);
                 break;
         }
-        const rewardDistributeRate = new decimal_js_1.Decimal(rewardConfig.totalFunds / (rewardConfig.endAt - rewardConfig.startedAt));
+        const rewardDistributeRate = new decimal_js_1.Decimal(BigInt(rewardConfig.totalFunds) / (BigInt(rewardConfig.endAt) - BigInt(rewardConfig.startedAt)));
         const globalRewardIndex = rewardDistributeRate.mul(new decimal_js_1.Decimal(elapsedTime)).div(totalEffective);
         const newGlobalRewardIndex = globalRewardIndex.add(rewardConfig.lastGlobalRewardIndex.toDecimalJs());
         const earnedAmount = newGlobalRewardIndex.sub(userReward.userRewardIndex.toDecimalJs()).mul(userEffective);
