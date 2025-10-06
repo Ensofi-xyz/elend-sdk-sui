@@ -29,7 +29,8 @@ export interface BorrowObligationLiquidityOperationArgs {
 export interface RepayObligationLiquidityOperationArgs {
     owner: string;
     reserve: string;
-    amount: number;
+    amount: bigint;
+    decimals: number;
     marketType: string;
 }
 export interface IDepositElendMarketOperation {

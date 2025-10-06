@@ -12,6 +12,7 @@ const query_1 = require("../query/query");
 const common_2 = require("./common");
 class RepayElendMarketOperation {
     constructor(networkConfig, suiClient) {
+        this.ABSILON = 0.3;
         this.contract = new core_1.ElendMarketContract(networkConfig);
         this.query = new query_1.ElendMarketQueryOperation(networkConfig, suiClient);
         this.networkConfig = networkConfig;
@@ -19,7 +20,7 @@ class RepayElendMarketOperation {
         this.suiClient = suiClient;
     }
     async buildRepayTxn(args) {
-        const { owner, reserve, amount, marketType } = args;
+        const { owner, reserve, amount, decimals, marketType } = args;
         const tx = new transactions_1.Transaction();
         const obligationOwnerCap = await this.query.fetchObligationOwnerCapObject(owner, marketType);
         if ((0, lodash_1.isNil)(obligationOwnerCap)) {
@@ -69,6 +70,7 @@ class RepayElendMarketOperation {
             owner,
             reserve,
             amount,
+            decimals,
             obligationOwnerCap: obligationOwnerCap.id,
             obligationId,
             packageInfo,
@@ -76,7 +78,8 @@ class RepayElendMarketOperation {
         return tx;
     }
     async handleRepayOperation(tx, args) {
-        const { owner, reserve, amount, obligationOwnerCap, obligationId, packageInfo } = args;
+        const { owner, reserve, decimals, obligationOwnerCap, obligationId, packageInfo } = args;
+        let { amount } = args;
         const tokenType = (0, utils_1.getTokenTypeForReserve)(reserve, packageInfo);
         if (!tokenType) {
             throw new Error(`Token type not found for reserve: ${reserve}`);
@@ -86,8 +89,23 @@ class RepayElendMarketOperation {
             coinType: tokenType,
         });
         console.log('🚀 ~ RepayElendMarketOperation ~ handleRepayOperation ~ totalAmount:', totalAmount);
-        //TODO SUI: const repayCoin = tx.splitCoins(tx.gas, [Number(amount) + (0.3 * Math.pow(10, 9))]);
-        const repayCoin = await (0, utils_1.splitCoin)(this.suiClient, tx, owner, tokenType, [Number(amount) + 0.3 * Math.pow(10, 9)]);
+        let repayCoin;
+        if (amount == utils_1.U64_MAX) {
+            if (tokenType == '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI') {
+                repayCoin = tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance)]);
+            }
+            else {
+                repayCoin = await (0, utils_1.splitCoin)(this.suiClient, tx, owner, tokenType, [Number(totalAmount.totalBalance)]);
+            }
+        }
+        else {
+            if (tokenType == '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI') {
+                repayCoin = tx.splitCoins(tx.gas, [Number(amount) + this.ABSILON * Math.pow(10, decimals)]);
+            }
+            else {
+                repayCoin = await (0, utils_1.splitCoin)(this.suiClient, tx, owner, tokenType, [Number(amount) + this.ABSILON * Math.pow(10, decimals)]);
+            }
+        }
         this.contract.repayObligationLiquidity(tx, [packageInfo.marketType['MAIN_POOL'], tokenType], {
             version: packageInfo.version.id,
             reserve: reserve,

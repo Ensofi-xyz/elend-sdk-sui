@@ -11,7 +11,7 @@ import { ElendMarketConfig, NetworkConfig } from '../../interfaces/config';
 import { IElendMarketContract } from '../../interfaces/functions';
 import { IElendMarketQueryOperation, IRepayElendMarketOperation, RepayObligationLiquidityOperationArgs } from '../../interfaces/operations';
 import { RewardOption } from '../../types/common';
-import { getTokenTypeForReserve, splitCoin, U64_MAX } from '../../utils';
+import { U64_MAX, getTokenTypeForReserve, splitCoin } from '../../utils';
 import { ElendMarketQueryOperation } from '../query/query';
 import { refreshReserves } from './common';
 
@@ -142,9 +142,9 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
       }
     } else {
       if (tokenType == '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI') {
-        repayCoin = tx.splitCoins(tx.gas, [Number(amount) + (this.ABSILON * Math.pow(10, decimals))]);
+        repayCoin = tx.splitCoins(tx.gas, [Number(amount) + this.ABSILON * Math.pow(10, decimals)]);
       } else {
-        repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(amount) + (this.ABSILON * Math.pow(10, decimals))]);
+        repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(amount) + this.ABSILON * Math.pow(10, decimals)]);
       }
     }
 

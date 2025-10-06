@@ -40,7 +40,7 @@ export declare class ElendClient {
     deposit(reserve: string, liquidityAmount: number): Promise<Transaction>;
     borrow(reserve: string, liquidityAmount: number): Promise<Transaction>;
     withdraw(reserve: string, collateralAmount: bigint): Promise<Transaction>;
-    repay(reserve: string, liquidityAmount: number): Promise<Transaction>;
+    repay(repayReserve: string, liquidityAmount: bigint): Promise<Transaction>;
     claim_reward(reserve: string, option: number): Promise<Transaction>;
     getTotalSuppliedUSDValueOnMarket(marketType: string, reserveIds?: string[]): DecimalJs;
     getTotalBorrowedUSDValueOnMarket(marketType: string, reserveIds?: string[]): DecimalJs;

@@ -8,6 +8,7 @@ export declare class RepayElendMarketOperation implements IRepayElendMarketOpera
     private networkConfig;
     private pythClient;
     private suiClient;
+    private readonly ABSILON;
     constructor(networkConfig: NetworkConfig, suiClient: SuiClient);
     buildRepayTxn(args: RepayObligationLiquidityOperationArgs): Promise<Transaction>;
     private handleRepayOperation;
