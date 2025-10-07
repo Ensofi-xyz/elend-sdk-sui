@@ -20,6 +20,11 @@ export class Decimal {
     return new Decimal(BigInt(v) * Decimal.WAD);
   }
 
+  static fromDecimalJs(v: DecimalJs): Decimal {
+    const scaled = v.mul(new DecimalJs(Decimal.WAD.toString())).floor();
+    return new Decimal(BigInt(scaled.toString()));
+  }
+
   static fromU128(v: bigint): Decimal {
     return new Decimal(v * Decimal.WAD);
   }

@@ -6,6 +6,7 @@ export declare class Decimal {
     constructor(value: bigint);
     static one(): Decimal;
     static from(v: number | bigint): Decimal;
+    static fromDecimalJs(v: DecimalJs): Decimal;
     static fromU128(v: bigint): Decimal;
     static fromPercent(v: number): Decimal;
     static fromPercentU64(v: bigint): Decimal;

@@ -14,6 +14,10 @@ class Decimal {
     static from(v) {
         return new Decimal(BigInt(v) * Decimal.WAD);
     }
+    static fromDecimalJs(v) {
+        const scaled = v.mul(new decimal_js_1.Decimal(Decimal.WAD.toString())).floor();
+        return new Decimal(BigInt(scaled.toString()));
+    }
     static fromU128(v) {
         return new Decimal(v * Decimal.WAD);
     }

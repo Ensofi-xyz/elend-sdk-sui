@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ElendClient = void 0;
 const decimal_js_1 = require("decimal.js");
@@ -14,6 +17,7 @@ const withdraw_1 = require("./operations/lending/withdraw");
 const query_1 = require("./operations/query/query");
 const reward_1 = require("./operations/reward/reward");
 const sui_client_1 = require("./utils/sui-client");
+const cloneDeep_1 = __importDefault(require("lodash/cloneDeep"));
 class ElendClient {
     constructor(networkConfig, suiClient) {
         this.networkConfig = networkConfig;
@@ -216,25 +220,25 @@ class ElendClient {
         const reserves = this.reserves.get(marketType);
         if (!reserves)
             return (0, decimal_js_1.Decimal)(0);
-        return this.reserveCalculationOperation.getTotalSuppliedUSDValueOnMarket(reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves);
+        return this.reserveCalculationOperation.getTotalSuppliedUSDValueOnMarket((reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves).map(reserve => (0, cloneDeep_1.default)(reserve)));
     }
     getTotalBorrowedUSDValueOnMarket(marketType, reserveIds) {
         const reserves = this.reserves.get(marketType);
         if (!reserves)
             return (0, decimal_js_1.Decimal)(0);
-        return this.reserveCalculationOperation.getTotalBorrowedUSDValueOnMarket(reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves);
+        return this.reserveCalculationOperation.getTotalBorrowedUSDValueOnMarket((reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves).map(reserve => (0, cloneDeep_1.default)(reserve)));
     }
     getDetailSuppliedOnMarket(marketType, reserveIds) {
         const reserves = this.reserves.get(marketType);
         if (!reserves)
             return [];
-        return this.reserveCalculationOperation.getDetailSuppliedOnMarket(reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves);
+        return this.reserveCalculationOperation.getDetailSuppliedOnMarket((reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves).map(reserve => (0, cloneDeep_1.default)(reserve)));
     }
     getDetailBorrowedOnMarket(marketType, reserveIds) {
         const reserves = this.reserves.get(marketType);
         if (!reserves)
             return [];
-        return this.reserveCalculationOperation.getDetailBorrowedOnMarket(reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves);
+        return this.reserveCalculationOperation.getDetailBorrowedOnMarket((reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves).map(reserve => (0, cloneDeep_1.default)(reserve)));
     }
     async getDetailSupplyApy(reserveId) {
         const currentTimestampMs = new Date().getTime();
@@ -245,7 +249,8 @@ class ElendClient {
         const reserve = reserves.find(reserve => reserve.id == reserveId);
         if (!reserve)
             throw new Error(`Not found reserve id ${reserveId}`);
-        return this.reserveCalculationOperation.getDetailSupplyApy(reserve, marketType, currentTimestampMs);
+        const reserveClone = (0, cloneDeep_1.default)(reserve);
+        return this.reserveCalculationOperation.getDetailSupplyApy(reserveClone, marketType, currentTimestampMs);
     }
     async getDetailBorrowApy(reserveId) {
         const currentTimestampMs = new Date().getTime();
@@ -256,7 +261,8 @@ class ElendClient {
         const reserve = reserves.find(reserve => reserve.id == reserveId);
         if (!reserve)
             throw new Error(`Not found reserve id ${reserveId}`);
-        return this.reserveCalculationOperation.getDetailBorrowApy(reserve, marketType, currentTimestampMs);
+        const reserveClone = (0, cloneDeep_1.default)(reserve);
+        return this.reserveCalculationOperation.getDetailBorrowApy(reserveClone, marketType, currentTimestampMs);
     }
     async totalSupplyAPYWithNewAvailableSupplyAmount(reserveId, newAvailableAmount, userAction) {
         const currentTimestampMs = new Date().getTime();
@@ -267,6 +273,7 @@ class ElendClient {
         const reserve = reserves.find(reserve => reserve.id == reserveId);
         if (!reserve)
             throw new Error(`Not found reserve id ${reserveId}`);
+        const reserveClone = (0, cloneDeep_1.default)(reserve);
         return this.reserveCalculationOperation.totalSupplyAPYWithNewAvailableSupplyAmount(reserve, marketType, newAvailableAmount, currentTimestampMs, userAction);
     }
     async totalBorrowAPYWithNewBorrowedAmount(reserveId, newAvailableLiquidity, newBorrowedAmount, userAction) {
@@ -278,67 +285,76 @@ class ElendClient {
         const reserve = reserves.find(reserve => reserve.id == reserveId);
         if (!reserve)
             throw new Error(`Not found reserve id ${reserveId}`);
-        return this.reserveCalculationOperation.totalBorrowAPYWithNewBorrowedAmount(reserve, marketType, newAvailableLiquidity, newBorrowedAmount, currentTimestampMs, userAction);
+        const reserveClone = (0, cloneDeep_1.default)(reserve);
+        return this.reserveCalculationOperation.totalBorrowAPYWithNewBorrowedAmount(reserveClone, marketType, newAvailableLiquidity, newBorrowedAmount, currentTimestampMs, userAction);
     }
     getTotalSuppliedUSDValueObligation(marketType) {
         const obligation = this.obligations.get(marketType);
         if (!obligation)
             return new decimal_js_1.Decimal(0);
-        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-        return this.obligationCalculationOperation.getTotalSuppliedUSDValueObligation(obligation, associateReserve, reserveTokenPrice);
+        const obligationClone = (0, cloneDeep_1.default)(obligation);
+        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligationClone, marketType);
+        return this.obligationCalculationOperation.getTotalSuppliedUSDValueObligation(obligationClone, associateReserve, reserveTokenPrice);
     }
     getTotalBorrowedUSDValueObligation(marketType) {
         const obligation = this.obligations.get(marketType);
         if (!obligation)
             return new decimal_js_1.Decimal(0);
-        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-        return this.obligationCalculationOperation.getTotalBorrowedUSDValueObligation(obligation, associateReserve, reserveTokenPrice);
+        const obligationClone = (0, cloneDeep_1.default)(obligation);
+        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligationClone, marketType);
+        return this.obligationCalculationOperation.getTotalBorrowedUSDValueObligation(obligationClone, associateReserve, reserveTokenPrice);
     }
     getDetailSuppliedOnMarketObligation(marketType, reserveIds) {
         const obligation = this.obligations.get(marketType);
         if (!obligation)
             return [];
+        const obligationClone = (0, cloneDeep_1.default)(obligation);
         const reserves = this.reserves.get(marketType);
         if (!reserves)
             return [];
-        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-        return this.obligationCalculationOperation.getDetailSuppliedOnMarketObligation(obligation, associateReserve, reserveTokenPrice, reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves);
+        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligationClone, marketType);
+        return this.obligationCalculationOperation.getDetailSuppliedOnMarketObligation(obligationClone, associateReserve, reserveTokenPrice, reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves);
     }
     getDetailBorrowedOnMarketObligation(marketType, reserveIds) {
         const obligation = this.obligations.get(marketType);
         if (!obligation)
             return [];
+        const obligationClone = (0, cloneDeep_1.default)(obligation);
         const reserves = this.reserves.get(marketType);
         if (!reserves)
             return [];
-        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-        return this.obligationCalculationOperation.getDetailBorrowedOnMarketObligation(obligation, associateReserve, reserveTokenPrice, reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves);
+        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligationClone, marketType);
+        return this.obligationCalculationOperation.getDetailBorrowedOnMarketObligation(obligationClone, associateReserve, reserveTokenPrice, reserveIds ? reserves.filter(reserve => reserveIds.includes(reserve.id)) : reserves);
     }
     calculateCurrentHealthRatioObligation(marketType) {
         const obligation = this.obligations.get(marketType);
         if (!obligation)
             return new decimal_js_1.Decimal(0);
-        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-        return this.obligationCalculationOperation.calculateCurrentHealthRatioObligation(obligation, associateReserve, reserveTokenPrice);
+        const obligationClone = (0, cloneDeep_1.default)(obligation);
+        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligationClone, marketType);
+        return this.obligationCalculationOperation.calculateCurrentHealthRatioObligation(obligationClone, associateReserve, reserveTokenPrice);
     }
     calculateRemainingBorrowAmount(borrowReserveAddress) {
         const marketType = this.getMarketTypeOfReserve(borrowReserveAddress);
         const borrowReserve = this.reserves.get(marketType)?.find(reserve => reserve.id == borrowReserveAddress);
         if (!borrowReserve)
             return new decimal_js_1.Decimal(0);
+        const borrowReserveClone = (0, cloneDeep_1.default)(borrowReserve);
         const obligation = this.obligations.get(marketType);
         if (!obligation)
             return new decimal_js_1.Decimal(0);
-        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-        return this.obligationCalculationOperation.calculateRemainingBorrowAmount(obligation, associateReserve, reserveTokenPrice, borrowReserve);
+        const obligationClone = (0, cloneDeep_1.default)(obligation);
+        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligationClone, marketType);
+        return this.obligationCalculationOperation.calculateRemainingBorrowAmount(obligationClone, associateReserve, reserveTokenPrice, borrowReserveClone);
     }
     calculateAllowedWithdrawAmount(withdrawReserve) {
         const marketType = this.getMarketTypeOfReserve(withdrawReserve);
         const obligation = this.obligations.get(marketType);
         if (!obligation)
             return new decimal_js_1.Decimal(0);
-        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-        return this.obligationCalculationOperation.calculateAllowedWithdrawAmount(obligation, associateReserve, reserveTokenPrice, withdrawReserve, true);
+        const obligationClone = (0, cloneDeep_1.default)(obligation);
+        const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligationClone, marketType);
+        return this.obligationCalculationOperation.calculateAllowedWithdrawAmount(obligationClone, associateReserve, reserveTokenPrice, withdrawReserve, true);
     }
     async getTotalIncentiveRewardStatisticObligation(marketType, reservesIds) {
         const obligation = this.obligations.get(marketType);
@@ -353,6 +369,7 @@ class ElendClient {
             associateReserves.set(reserve.id, reserve);
             reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs());
         }
+        ;
         return this.rewardCalculationOperation.getTotalIncentiveRewardStatisticObligation(obligation, associateReserves, reserveTokenPrice, marketType, reservesIds);
     }
     getAssociateReserveObligationData(obligation, marketType) {
@@ -364,13 +381,15 @@ class ElendClient {
         for (const deposit of obligation.deposits) {
             const reserve = reserves.find(reserve => reserve.id == deposit);
             if (reserve) {
-                associateReserve.set(reserve.id, reserve);
-                reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs());
+                const reserveClone = (0, cloneDeep_1.default)(reserve);
+                associateReserve.set(reserve.id, reserveClone);
+                reserveTokenPrice.set(reserve.id, reserveClone.liquidity.marketPrice.toDecimalJs());
             }
         }
         for (const borrow of obligation.borrows) {
             const reserve = reserves.find(reserve => reserve.id == borrow);
             if (reserve) {
+                const reserveClone = (0, cloneDeep_1.default)(reserve);
                 associateReserve.set(reserve.id, reserve);
                 reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs());
             }
