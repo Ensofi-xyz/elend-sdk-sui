@@ -76,6 +76,7 @@ class DepositElendMarketOperation {
                     obligation: obligationId,
                     reserve,
                     option: common_1.RewardOption.Deposit,
+                    phase: rewardConfig.phase,
                 });
             }
         }

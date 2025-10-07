@@ -48,6 +48,19 @@ class RepayElendMarketOperation {
             clock: constant_1.SUI_SYSTEM_CLOCK,
         });
         const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, common_1.RewardOption.Borrow);
+        for (const rewardConfig of rewardConfigs) {
+            const rewardTokenType = rewardConfig.rewardTokenType;
+            const userReward = await this.query.fetchUserReward(reserve, rewardTokenType, common_1.RewardOption.Borrow, obligationId, owner);
+            if (!userReward) {
+                this.contract.initUserReward(tx, [marketType, rewardTokenType], {
+                    version: packageInfo.version.id,
+                    obligation: obligationId,
+                    reserve,
+                    option: common_1.RewardOption.Borrow,
+                    phase: rewardConfig.phase,
+                });
+            }
+        }
         const tokenType = (0, utils_1.getTokenTypeForReserve)(reserve, packageInfo);
         if (!tokenType) {
             throw new Error(`Token type not found for reserve: ${reserve}`);

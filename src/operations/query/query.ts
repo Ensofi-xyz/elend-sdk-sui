@@ -319,6 +319,7 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
               initialGlobalRewardIndex: new Decimal(rewardConfig.fields.initial_global_reward_index.fields.value),
               lastGlobalRewardIndex: new Decimal(rewardConfig.fields.last_global_reward_index.fields.value),
               lastUpdatedAt: BigInt(rewardConfig.fields.last_updated_at),
+              phase: Number(rewardConfig.fields.phase),
             });
           }
         }
@@ -360,6 +361,7 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
         userRewardIndex: new Decimal(data.user_reward_index.fields.value),
         earnedAmount: new Decimal(data.earned_amount.fields.value),
         claimedAmount: new Decimal(data.claimed_amount.fields.value),
+        phase: Number(data.phase),
       } as UserReward;
     } else {
       return null;

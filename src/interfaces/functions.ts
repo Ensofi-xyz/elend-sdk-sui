@@ -99,6 +99,7 @@ export interface InitUserRewardArgs {
   obligation: TransactionObjectInput;
   reserve: string;
   option: number;
+  phase: number;
 }
 
 export interface UpdateUserRewardArgs {

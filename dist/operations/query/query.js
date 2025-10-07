@@ -274,6 +274,7 @@ class ElendMarketQueryOperation {
                             initialGlobalRewardIndex: new utils_1.Decimal(rewardConfig.fields.initial_global_reward_index.fields.value),
                             lastGlobalRewardIndex: new utils_1.Decimal(rewardConfig.fields.last_global_reward_index.fields.value),
                             lastUpdatedAt: BigInt(rewardConfig.fields.last_updated_at),
+                            phase: Number(rewardConfig.fields.phase),
                         });
                     }
                 }
@@ -310,6 +311,7 @@ class ElendMarketQueryOperation {
                 userRewardIndex: new utils_1.Decimal(data.user_reward_index.fields.value),
                 earnedAmount: new utils_1.Decimal(data.earned_amount.fields.value),
                 claimedAmount: new utils_1.Decimal(data.claimed_amount.fields.value),
+                phase: Number(data.phase),
             };
         }
         else {

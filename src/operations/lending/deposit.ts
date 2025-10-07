@@ -107,6 +107,7 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
           obligation: obligationId,
           reserve,
           option: RewardOption.Deposit,
+          phase: rewardConfig.phase,
         });
       }
     }

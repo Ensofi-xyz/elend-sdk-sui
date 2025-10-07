@@ -138,6 +138,7 @@ export interface RewardConfig {
   initialGlobalRewardIndex: Decimal;
   lastGlobalRewardIndex: Decimal;
   lastUpdatedAt: bigint;
+  phase: number;
 }
 
 export interface UserReward {
@@ -149,4 +150,5 @@ export interface UserReward {
   userRewardIndex: Decimal;
   earnedAmount: Decimal;
   claimedAmount: Decimal;
+  phase: number;
 }

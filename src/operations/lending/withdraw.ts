@@ -75,6 +75,19 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
     );
 
     const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, RewardOption.Deposit);
+    for (const rewardConfig of rewardConfigs) {
+      const rewardTokenType = rewardConfig.rewardTokenType;
+      const userReward = await this.query.fetchUserReward(reserve, rewardTokenType, RewardOption.Deposit, obligationId, owner);
+      if (!userReward) {
+        this.contract.initUserReward(tx, [marketType, rewardTokenType], {
+          version: packageInfo.version.id,
+          obligation: obligationId,
+          reserve,
+          option: RewardOption.Deposit,
+          phase: rewardConfig.phase,
+        });
+      }
+    }
     const tokenType = getTokenTypeForReserve(reserve, packageInfo);
     if (!tokenType) {
       throw new Error(`Token type not found for reserve: ${reserve}`);

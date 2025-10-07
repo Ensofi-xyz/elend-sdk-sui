@@ -81,6 +81,7 @@ export class BorrowElendMarketOperation implements IBorrowElendMarketOperation {
           obligation: obligationId,
           reserve,
           option: RewardOption.Borrow,
+          phase: rewardConfig.phase,
         });
       }
     }

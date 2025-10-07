@@ -149,11 +149,11 @@ export class ElendMarketContract implements IElendMarketContract {
   }
 
   initUserReward(tx: Transaction, typeArgs: [string, string], args: InitUserRewardArgs): void {
-    const { version, obligation, reserve, option } = args;
+    const { version, obligation, reserve, option, phase } = args;
     tx.moveCall({
       target: `${this.packageId}::lending_market::init_user_reward`,
       typeArguments: typeArgs,
-      arguments: [tx.object(version), tx.object(obligation), tx.pure.address(reserve), tx.pure.u8(option)],
+      arguments: [tx.object(version), tx.object(obligation), tx.pure.address(reserve), tx.pure.u8(option), tx.pure.u16(phase)],
     });
   }
 

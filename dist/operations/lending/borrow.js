@@ -56,6 +56,7 @@ class BorrowElendMarketOperation {
                     obligation: obligationId,
                     reserve,
                     option: common_1.RewardOption.Borrow,
+                    phase: rewardConfig.phase,
                 });
             }
         }
