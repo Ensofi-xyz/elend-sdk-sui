@@ -23,6 +23,7 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
   private suiClient: SuiClient;
 
   private readonly ABSILON = 0.3;
+  private readonly ESTIMATE_GAS = 300000000;
 
   constructor(networkConfig: NetworkConfig, suiClient: SuiClient) {
     this.contract = new ElendMarketContract(networkConfig);
@@ -136,7 +137,7 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
     let repayCoin;
     if (amount == U64_MAX) {
       if (tokenType == '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI') {
-        repayCoin = tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance)]);
+        repayCoin = tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - this.ESTIMATE_GAS]);
       } else {
         repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(totalAmount.totalBalance)]);
       }
