@@ -49,7 +49,7 @@ class ElendMarketRewardCalculationOperation {
             // Borrow reward
             const rewardConfigBorrows = await this.queryOperation.fetchRewardConfigs(reserveAddress, marketType, types_1.RewardOption.Borrow);
             for (const rewardConfigBorrow of rewardConfigBorrows) {
-                const userRewardBorrow = await this.queryOperation.fetchUserReward(reserveAddress, rewardConfigBorrow.rewardTokenType, types_1.RewardOption.Deposit, obligation.id, obligation.owner);
+                const userRewardBorrow = await this.queryOperation.fetchUserReward(reserveAddress, rewardConfigBorrow.rewardTokenType, types_1.RewardOption.Borrow, obligation.id, obligation.owner);
                 if (!userRewardBorrow)
                     continue;
                 const pendingRewardBorrow = userRewardBorrow

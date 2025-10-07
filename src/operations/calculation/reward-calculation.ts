@@ -45,7 +45,7 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
             );
 
             if (!userRewardDeposit) continue;
-            
+
             const pendingRewardDeposit = userRewardDeposit
               ? this.estimatePendingReward(reserve, obligation, associateReserves, reserveTokenPrice, rewardConfigDeposit, userRewardDeposit)
               : new DecimalJs(0);
@@ -71,7 +71,7 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
             const userRewardBorrow = await this.queryOperation.fetchUserReward(
               reserveAddress,
               rewardConfigBorrow.rewardTokenType,
-              RewardOption.Deposit,
+              RewardOption.Borrow,
               obligation.id,
               obligation.owner
             );
