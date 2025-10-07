@@ -17,7 +17,7 @@ import {
   InitObligationArgs,
 } from '../../interfaces/operations';
 import { RewardOption } from '../../types/common';
-import { GAS_BUDGET, getTokenTypeForReserve, SUI_COIN_TYPE } from '../../utils/common';
+import { GAS_BUDGET, SUI_COIN_TYPE, getTokenTypeForReserve } from '../../utils/common';
 import { splitCoin } from '../../utils/split-coin';
 import { ElendMarketQueryOperation } from '../query/query';
 import { refreshReserves } from './common';
@@ -171,9 +171,10 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
         owner,
         coinType: tokenType,
       });
-      depositCoin = await Number(totalAmount.totalBalance) - amount < GAS_BUDGET 
-        ? tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - GAS_BUDGET])
-        : tx.splitCoins(tx.gas, [amount])
+      depositCoin =
+        (await Number(totalAmount.totalBalance)) - amount < GAS_BUDGET
+          ? tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - GAS_BUDGET])
+          : tx.splitCoins(tx.gas, [amount]);
     } else {
       depositCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [amount]);
     }

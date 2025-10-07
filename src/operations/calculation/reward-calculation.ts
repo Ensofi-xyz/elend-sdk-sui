@@ -216,13 +216,13 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
       case RewardOption.Deposit: //supply
         totalEffective = reserveCalculation.getTotalSupply(reserve);
         userEffective =
-          obligationCalculation.getDetailSuppliedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]?.suppliedAmount ||
+          obligationCalculation.getDetailSuppliedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]?.suppliedAmount.mul( Math.pow(10, reserve.liquidity.mintDecimal)) ||
           new DecimalJs(0);
         break;
       case RewardOption.Borrow: //borrow
         totalEffective = reserveCalculation.getBorrowedAmount(reserve);
         userEffective =
-          obligationCalculation.getDetailBorrowedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]?.borrowedAmount ||
+          obligationCalculation.getDetailBorrowedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]?.borrowedAmount.mul( Math.pow(10, reserve.liquidity.mintDecimal)) ||
           new DecimalJs(0);
         break;
     }

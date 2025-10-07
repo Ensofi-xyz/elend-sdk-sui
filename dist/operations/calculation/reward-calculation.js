@@ -157,13 +157,13 @@ class ElendMarketRewardCalculationOperation {
             case types_1.RewardOption.Deposit: //supply
                 totalEffective = reserveCalculation.getTotalSupply(reserve);
                 userEffective =
-                    obligationCalculation.getDetailSuppliedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]?.suppliedAmount ||
+                    obligationCalculation.getDetailSuppliedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]?.suppliedAmount.mul(Math.pow(10, reserve.liquidity.mintDecimal)) ||
                         new decimal_js_1.Decimal(0);
                 break;
             case types_1.RewardOption.Borrow: //borrow
                 totalEffective = reserveCalculation.getBorrowedAmount(reserve);
                 userEffective =
-                    obligationCalculation.getDetailBorrowedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]?.borrowedAmount ||
+                    obligationCalculation.getDetailBorrowedOnMarketObligation(obligation, associateReserves, reserveTokenPrice, [reserve])[0]?.borrowedAmount.mul(Math.pow(10, reserve.liquidity.mintDecimal)) ||
                         new decimal_js_1.Decimal(0);
                 break;
         }
