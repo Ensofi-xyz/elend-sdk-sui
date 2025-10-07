@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ElendClient = void 0;
 const decimal_js_1 = require("decimal.js");
 const lodash_1 = require("lodash");
+const cloneDeep_1 = __importDefault(require("lodash/cloneDeep"));
 const config_loader_1 = require("./core/config-loader");
 const obligation_calculation_1 = require("./operations/calculation/obligation-calculation");
 const reserve_calculation_1 = require("./operations/calculation/reserve-calculation");
@@ -17,7 +18,6 @@ const withdraw_1 = require("./operations/lending/withdraw");
 const query_1 = require("./operations/query/query");
 const reward_1 = require("./operations/reward/reward");
 const sui_client_1 = require("./utils/sui-client");
-const cloneDeep_1 = __importDefault(require("lodash/cloneDeep"));
 class ElendClient {
     constructor(networkConfig, suiClient) {
         this.networkConfig = networkConfig;
@@ -369,7 +369,6 @@ class ElendClient {
             associateReserves.set(reserve.id, reserve);
             reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs());
         }
-        ;
         return this.rewardCalculationOperation.getTotalIncentiveRewardStatisticObligation(obligation, associateReserves, reserveTokenPrice, marketType, reservesIds);
     }
     getAssociateReserveObligationData(obligation, marketType) {

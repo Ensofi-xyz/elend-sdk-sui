@@ -1,5 +1,6 @@
 import { Decimal as DecimalJs } from 'decimal.js';
 import { isNil } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
@@ -39,7 +40,6 @@ import { Network, UserActionType } from './types/common';
 import { Market, Obligation, Reserve } from './types/object';
 import { Decimal as DecimalFraction } from './utils/decimal';
 import { getSuiClientInstance } from './utils/sui-client';
-import cloneDeep from 'lodash/cloneDeep';
 
 export class ElendClient {
   public readonly networkConfig: NetworkConfig;
@@ -457,7 +457,12 @@ export class ElendClient {
     const obligationClone = cloneDeep(obligation);
     const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligationClone, marketType);
 
-    return this.obligationCalculationOperation.calculateRemainingBorrowAmount(obligationClone, associateReserve, reserveTokenPrice, borrowReserveClone);
+    return this.obligationCalculationOperation.calculateRemainingBorrowAmount(
+      obligationClone,
+      associateReserve,
+      reserveTokenPrice,
+      borrowReserveClone
+    );
   }
 
   calculateAllowedWithdrawAmount(withdrawReserve: string): DecimalJs {
@@ -467,7 +472,13 @@ export class ElendClient {
     const obligationClone = cloneDeep(obligation);
     const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligationClone, marketType);
 
-    return this.obligationCalculationOperation.calculateAllowedWithdrawAmount(obligationClone, associateReserve, reserveTokenPrice, withdrawReserve, true);
+    return this.obligationCalculationOperation.calculateAllowedWithdrawAmount(
+      obligationClone,
+      associateReserve,
+      reserveTokenPrice,
+      withdrawReserve,
+      true
+    );
   }
 
   async getTotalIncentiveRewardStatisticObligation(marketType: string, reservesIds?: string[]): Promise<DetailIncentiveRewardRes[]> {
@@ -481,7 +492,7 @@ export class ElendClient {
     for (const reserve of reserves) {
       associateReserves.set(reserve.id, reserve);
       reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs());
-    };
+    }
 
     return this.rewardCalculationOperation.getTotalIncentiveRewardStatisticObligation(
       obligation,

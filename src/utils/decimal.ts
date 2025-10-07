@@ -22,7 +22,8 @@ export class Decimal {
 
   static fromDecimalJs(v: DecimalJs): Decimal {
     const scaled = v.mul(new DecimalJs(Decimal.WAD.toString())).floor();
-    return new Decimal(BigInt(scaled.toString()));
+    const intStr = scaled.toFixed(0);
+    return new Decimal(BigInt(intStr));
   }
 
   static fromU128(v: bigint): Decimal {
