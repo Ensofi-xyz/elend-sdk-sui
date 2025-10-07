@@ -11,7 +11,7 @@ import { ElendMarketConfig, NetworkConfig } from '../../interfaces/config';
 import { IElendMarketContract } from '../../interfaces/functions';
 import { IElendMarketQueryOperation, IRepayElendMarketOperation, RepayObligationLiquidityOperationArgs } from '../../interfaces/operations';
 import { RewardOption } from '../../types/common';
-import { U64_MAX, getTokenTypeForReserve, splitCoin } from '../../utils';
+import { GAS_BUDGET, SUI_COIN_TYPE, U64_MAX, getTokenTypeForReserve, splitCoin } from '../../utils';
 import { ElendMarketQueryOperation } from '../query/query';
 import { refreshReserves } from './common';
 
@@ -23,7 +23,6 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
   private suiClient: SuiClient;
 
   private readonly ABSILON = 0.3;
-  private readonly ESTIMATE_GAS = 300000000;
 
   constructor(networkConfig: NetworkConfig, suiClient: SuiClient) {
     this.contract = new ElendMarketContract(networkConfig);
@@ -136,13 +135,13 @@ export class RepayElendMarketOperation implements IRepayElendMarketOperation {
     console.log('🚀 ~ RepayElendMarketOperation ~ handleRepayOperation ~ totalAmount:', totalAmount);
     let repayCoin;
     if (amount == U64_MAX) {
-      if (tokenType == '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI') {
-        repayCoin = tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - this.ESTIMATE_GAS]);
+      if (tokenType == SUI_COIN_TYPE) {
+        repayCoin = tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - GAS_BUDGET]);
       } else {
         repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(totalAmount.totalBalance)]);
       }
     } else {
-      if (tokenType == '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI') {
+      if (tokenType == SUI_COIN_TYPE) {
         repayCoin = tx.splitCoins(tx.gas, [Number(amount) + this.ABSILON * Math.pow(10, decimals)]);
       } else {
         repayCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [Number(amount) + this.ABSILON * Math.pow(10, decimals)]);

@@ -115,7 +115,19 @@ class DepositElendMarketOperation {
         if (!tokenType) {
             throw new Error(`Token type not found for reserve: ${reserve}`);
         }
-        const depositCoin = await (0, split_coin_1.splitCoin)(this.suiClient, tx, owner, tokenType, [amount]);
+        let depositCoin;
+        if (tokenType == common_2.SUI_COIN_TYPE) {
+            const totalAmount = await this.suiClient.getBalance({
+                owner,
+                coinType: tokenType,
+            });
+            depositCoin = await Number(totalAmount.totalBalance) - amount < common_2.GAS_BUDGET
+                ? tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - common_2.GAS_BUDGET])
+                : tx.splitCoins(tx.gas, [amount]);
+        }
+        else {
+            depositCoin = await (0, split_coin_1.splitCoin)(this.suiClient, tx, owner, tokenType, [amount]);
+        }
         const cToken = this.contract.depositReserveLiquidityAndMintCTokens(tx, [packageInfo.marketType['MAIN_POOL'], tokenType], {
             version: packageInfo.version.id,
             reserve: reserve,

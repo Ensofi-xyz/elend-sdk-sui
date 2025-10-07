@@ -10,6 +10,8 @@ export const MILLISECONDS_PER_DAY = MILLISECONDS_PER_HOUR * 24; // 86,400,000
 export const MILLISECONDS_PER_YEAR = MILLISECONDS_PER_DAY * 365;
 
 export const U64_MAX: bigint = 18446744073709551615n;
+export const SUI_COIN_TYPE = '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI';
+export const GAS_BUDGET = 200000000;
 
 export const getTokenTypeForReserve = (reserveId: string, packageConfig: ElendMarketConfig): string | null => {
   const reserves = packageConfig.reserves;

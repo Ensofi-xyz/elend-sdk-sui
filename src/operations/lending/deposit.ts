@@ -17,7 +17,7 @@ import {
   InitObligationArgs,
 } from '../../interfaces/operations';
 import { RewardOption } from '../../types/common';
-import { getTokenTypeForReserve } from '../../utils/common';
+import { GAS_BUDGET, getTokenTypeForReserve, SUI_COIN_TYPE } from '../../utils/common';
 import { splitCoin } from '../../utils/split-coin';
 import { ElendMarketQueryOperation } from '../query/query';
 import { refreshReserves } from './common';
@@ -165,7 +165,18 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
       throw new Error(`Token type not found for reserve: ${reserve}`);
     }
 
-    const depositCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [amount]);
+    let depositCoin;
+    if (tokenType == SUI_COIN_TYPE) {
+      const totalAmount = await this.suiClient.getBalance({
+        owner,
+        coinType: tokenType,
+      });
+      depositCoin = await Number(totalAmount.totalBalance) - amount < GAS_BUDGET 
+        ? tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - GAS_BUDGET])
+        : tx.splitCoins(tx.gas, [amount])
+    } else {
+      depositCoin = await splitCoin(this.suiClient, tx, owner, tokenType, [amount]);
+    }
 
     const cToken = this.contract.depositReserveLiquidityAndMintCTokens(tx, [packageInfo.marketType['MAIN_POOL'], tokenType], {
       version: packageInfo.version.id,

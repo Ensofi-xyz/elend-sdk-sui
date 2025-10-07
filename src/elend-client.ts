@@ -454,19 +454,21 @@ export class ElendClient {
   async getTotalIncentiveRewardStatisticObligation(marketType: string, reservesIds?: string[]): Promise<DetailIncentiveRewardRes[]> {
     const obligation = this.obligations.get(marketType);
     if (!obligation) return [];
-    const { associateReserve, reserveTokenPrice } = this.getAssociateReserveObligationData(obligation, marketType);
-    const reserveMarketType = new Map<string, string>(
-      Array.from(associateReserve.keys()).map(reserveId => {
-        const marketType = this.getMarketTypeOfReserve(reserveId);
-        return [reserveId, marketType];
-      })
-    );
+    const associateReserves = new Map<string, Reserve>();
+    const reserveTokenPrice = new Map<string, DecimalJs>();
+
+    const reserves = this.reserves.get(marketType);
+    if (!reserves) throw new Error(`Not found reserves in market: ${marketType}`);
+    for (const reserve of reserves) {
+      associateReserves.set(reserve.id, reserve);
+      reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs());
+    };
 
     return this.rewardCalculationOperation.getTotalIncentiveRewardStatisticObligation(
       obligation,
-      associateReserve,
-      reserveMarketType,
+      associateReserves,
       reserveTokenPrice,
+      marketType,
       reservesIds
     );
   }

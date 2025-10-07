@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.wait = exports.add0xPrefix = exports.remove0xPrefix = exports.i64ToBigInt = exports.getTokenTypeForReserve = exports.U64_MAX = exports.MILLISECONDS_PER_YEAR = exports.MILLISECONDS_PER_DAY = exports.MILLISECONDS_PER_HOUR = exports.MILLISECONDS_PER_MINUTE = exports.MILLISECONDS_PER_SECOND = void 0;
+exports.wait = exports.add0xPrefix = exports.remove0xPrefix = exports.i64ToBigInt = exports.getTokenTypeForReserve = exports.GAS_BUDGET = exports.SUI_COIN_TYPE = exports.U64_MAX = exports.MILLISECONDS_PER_YEAR = exports.MILLISECONDS_PER_DAY = exports.MILLISECONDS_PER_HOUR = exports.MILLISECONDS_PER_MINUTE = exports.MILLISECONDS_PER_SECOND = void 0;
 exports.calculateAPYFromAPR = calculateAPYFromAPR;
 exports.retry = retry;
 const decimal_js_1 = require("decimal.js");
@@ -10,6 +10,8 @@ exports.MILLISECONDS_PER_HOUR = exports.MILLISECONDS_PER_MINUTE * 60; // 3,600,0
 exports.MILLISECONDS_PER_DAY = exports.MILLISECONDS_PER_HOUR * 24; // 86,400,000
 exports.MILLISECONDS_PER_YEAR = exports.MILLISECONDS_PER_DAY * 365;
 exports.U64_MAX = 18446744073709551615n;
+exports.SUI_COIN_TYPE = '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI';
+exports.GAS_BUDGET = 200000000;
 const getTokenTypeForReserve = (reserveId, packageConfig) => {
     const reserves = packageConfig.reserves;
     for (const [tokenType, reserveInfo] of Object.entries(reserves)) {

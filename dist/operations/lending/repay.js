@@ -13,7 +13,6 @@ const common_2 = require("./common");
 class RepayElendMarketOperation {
     constructor(networkConfig, suiClient) {
         this.ABSILON = 0.3;
-        this.ESTIMATE_GAS = 300000000;
         this.contract = new core_1.ElendMarketContract(networkConfig);
         this.query = new query_1.ElendMarketQueryOperation(networkConfig, suiClient);
         this.networkConfig = networkConfig;
@@ -92,15 +91,15 @@ class RepayElendMarketOperation {
         console.log('🚀 ~ RepayElendMarketOperation ~ handleRepayOperation ~ totalAmount:', totalAmount);
         let repayCoin;
         if (amount == utils_1.U64_MAX) {
-            if (tokenType == '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI') {
-                repayCoin = tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - this.ESTIMATE_GAS]);
+            if (tokenType == utils_1.SUI_COIN_TYPE) {
+                repayCoin = tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - utils_1.GAS_BUDGET]);
             }
             else {
                 repayCoin = await (0, utils_1.splitCoin)(this.suiClient, tx, owner, tokenType, [Number(totalAmount.totalBalance)]);
             }
         }
         else {
-            if (tokenType == '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI') {
+            if (tokenType == utils_1.SUI_COIN_TYPE) {
                 repayCoin = tx.splitCoins(tx.gas, [Number(amount) + this.ABSILON * Math.pow(10, decimals)]);
             }
             else {

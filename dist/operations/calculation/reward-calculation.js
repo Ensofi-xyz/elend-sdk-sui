@@ -10,7 +10,7 @@ class ElendMarketRewardCalculationOperation {
     constructor(queryOperation) {
         this.queryOperation = queryOperation;
     }
-    async getTotalIncentiveRewardStatisticObligation(obligation, associateReserves, reserveMarketType, reserveTokenPrice, reserves) {
+    async getTotalIncentiveRewardStatisticObligation(obligation, associateReserves, reserveTokenPrice, marketType, reserves) {
         const results = await Promise.all(Array.from(associateReserves.entries())
             .filter(([reserveAddress]) => {
             if (!reserves)
@@ -18,7 +18,6 @@ class ElendMarketRewardCalculationOperation {
             return reserves.some(r => r === reserveAddress);
         })
             .map(async ([reserveAddress, reserve]) => {
-            const marketType = reserveMarketType.get(reserveAddress);
             if (!marketType) {
                 throw new Error(`Market type not found for reserve address: ${reserveAddress}`);
             }
@@ -168,10 +167,16 @@ class ElendMarketRewardCalculationOperation {
                         new decimal_js_1.Decimal(0);
                 break;
         }
-        const rewardDistributeRate = new decimal_js_1.Decimal(BigInt(rewardConfig.totalFunds) / (BigInt(rewardConfig.endAt) - BigInt(rewardConfig.startedAt)));
-        const globalRewardIndex = rewardDistributeRate.mul(new decimal_js_1.Decimal(elapsedTime)).div(totalEffective);
-        const newGlobalRewardIndex = globalRewardIndex.add(rewardConfig.lastGlobalRewardIndex.toDecimalJs());
-        const earnedAmount = newGlobalRewardIndex.sub(userReward.userRewardIndex.toDecimalJs()).mul(userEffective);
+        let earnedAmount;
+        if (totalEffective.eq(0) || userEffective.eq(0)) {
+            earnedAmount = new decimal_js_1.Decimal(0);
+        }
+        else {
+            const rewardDistributeRate = new decimal_js_1.Decimal(BigInt(rewardConfig.totalFunds) / (BigInt(rewardConfig.endAt) - BigInt(rewardConfig.startedAt)));
+            const globalRewardIndex = rewardDistributeRate.mul(new decimal_js_1.Decimal(elapsedTime)).div(totalEffective);
+            const newGlobalRewardIndex = globalRewardIndex.add(rewardConfig.lastGlobalRewardIndex.toDecimalJs());
+            earnedAmount = newGlobalRewardIndex.sub(userReward.userRewardIndex.toDecimalJs()).mul(userEffective);
+        }
         return userReward.earnedAmount.toDecimalJs().add(earnedAmount).sub(userReward.claimedAmount.toDecimalJs());
     }
 }

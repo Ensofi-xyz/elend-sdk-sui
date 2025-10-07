@@ -159,8 +159,8 @@ export interface IElendMarketRewardCalculationOperation {
   getTotalIncentiveRewardStatisticObligation(
     obligation: Obligation,
     associateReserves: Map<string, Reserve>,
-    reserveMarketType: Map<string, string>,
     reserveTokenPrice: Map<string, DecimalJs>,
+    marketType: string,
     reserves?: string[]
   ): Promise<DetailIncentiveRewardRes[]>;
   calculateIncentiveRewardApyInterest(reserve: Reserve, marketType: string, option: number): Promise<Map<string, DecimalJs>>;
