@@ -462,7 +462,7 @@ export class ElendClient {
     for (const reserve of reserves) {
       associateReserves.set(reserve.id, reserve);
       reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs());
-    };
+    }
 
     return this.rewardCalculationOperation.getTotalIncentiveRewardStatisticObligation(
       obligation,

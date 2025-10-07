@@ -229,7 +229,7 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
 
     let earnedAmount;
     if (totalEffective.eq(0) || userEffective.eq(0)) {
-      earnedAmount = new DecimalJs(0); 
+      earnedAmount = new DecimalJs(0);
     } else {
       const rewardDistributeRate = new DecimalJs(BigInt(rewardConfig.totalFunds) / (BigInt(rewardConfig.endAt) - BigInt(rewardConfig.startedAt)));
       const globalRewardIndex = rewardDistributeRate.mul(new DecimalJs(elapsedTime)).div(totalEffective);

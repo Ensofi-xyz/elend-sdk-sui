@@ -353,7 +353,6 @@ class ElendClient {
             associateReserves.set(reserve.id, reserve);
             reserveTokenPrice.set(reserve.id, reserve.liquidity.marketPrice.toDecimalJs());
         }
-        ;
         return this.rewardCalculationOperation.getTotalIncentiveRewardStatisticObligation(obligation, associateReserves, reserveTokenPrice, marketType, reservesIds);
     }
     getAssociateReserveObligationData(obligation, marketType) {

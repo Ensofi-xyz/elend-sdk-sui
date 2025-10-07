@@ -121,9 +121,10 @@ class DepositElendMarketOperation {
                 owner,
                 coinType: tokenType,
             });
-            depositCoin = await Number(totalAmount.totalBalance) - amount < common_2.GAS_BUDGET
-                ? tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - common_2.GAS_BUDGET])
-                : tx.splitCoins(tx.gas, [amount]);
+            depositCoin =
+                (await Number(totalAmount.totalBalance)) - amount < common_2.GAS_BUDGET
+                    ? tx.splitCoins(tx.gas, [Number(totalAmount.totalBalance) - common_2.GAS_BUDGET])
+                    : tx.splitCoins(tx.gas, [amount]);
         }
         else {
             depositCoin = await (0, split_coin_1.splitCoin)(this.suiClient, tx, owner, tokenType, [amount]);
