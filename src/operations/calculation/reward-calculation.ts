@@ -43,6 +43,9 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
               obligation.id,
               obligation.owner
             );
+
+            if (!userRewardDeposit) continue;
+            
             const pendingRewardDeposit = userRewardDeposit
               ? this.estimatePendingReward(reserve, obligation, associateReserves, reserveTokenPrice, rewardConfigDeposit, userRewardDeposit)
               : new DecimalJs(0);
@@ -72,6 +75,9 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
               obligation.id,
               obligation.owner
             );
+
+            if (!userRewardBorrow) continue;
+
             const pendingRewardBorrow = userRewardBorrow
               ? this.estimatePendingReward(reserve, obligation, associateReserves, reserveTokenPrice, rewardConfigBorrow, userRewardBorrow)
               : new DecimalJs(0);
@@ -84,7 +90,7 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
                 tokenType: rewardConfigBorrow.rewardTokenType,
                 decimals: 9,
               },
-              option: RewardOption.Deposit,
+              option: RewardOption.Borrow,
               earnedReward: userRewardBorrow ? userRewardBorrow.earnedAmount.toDecimalJs() : new DecimalJs(0),
               pendingReward: pendingRewardBorrow,
               claimedReward: userRewardBorrow ? userRewardBorrow.claimedAmount.toDecimalJs() : new DecimalJs(0),

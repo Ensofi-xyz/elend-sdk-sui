@@ -27,6 +27,8 @@ class ElendMarketRewardCalculationOperation {
             const rewardConfigDeposits = await this.queryOperation.fetchRewardConfigs(reserveAddress, marketType, types_1.RewardOption.Deposit);
             for (const rewardConfigDeposit of rewardConfigDeposits) {
                 const userRewardDeposit = await this.queryOperation.fetchUserReward(reserveAddress, rewardConfigDeposit.rewardTokenType, types_1.RewardOption.Deposit, obligation.id, obligation.owner);
+                if (!userRewardDeposit)
+                    continue;
                 const pendingRewardDeposit = userRewardDeposit
                     ? this.estimatePendingReward(reserve, obligation, associateReserves, reserveTokenPrice, rewardConfigDeposit, userRewardDeposit)
                     : new decimal_js_1.Decimal(0);
@@ -48,6 +50,8 @@ class ElendMarketRewardCalculationOperation {
             const rewardConfigBorrows = await this.queryOperation.fetchRewardConfigs(reserveAddress, marketType, types_1.RewardOption.Borrow);
             for (const rewardConfigBorrow of rewardConfigBorrows) {
                 const userRewardBorrow = await this.queryOperation.fetchUserReward(reserveAddress, rewardConfigBorrow.rewardTokenType, types_1.RewardOption.Deposit, obligation.id, obligation.owner);
+                if (!userRewardBorrow)
+                    continue;
                 const pendingRewardBorrow = userRewardBorrow
                     ? this.estimatePendingReward(reserve, obligation, associateReserves, reserveTokenPrice, rewardConfigBorrow, userRewardBorrow)
                     : new decimal_js_1.Decimal(0);
@@ -59,7 +63,7 @@ class ElendMarketRewardCalculationOperation {
                         tokenType: rewardConfigBorrow.rewardTokenType,
                         decimals: 9,
                     },
-                    option: types_1.RewardOption.Deposit,
+                    option: types_1.RewardOption.Borrow,
                     earnedReward: userRewardBorrow ? userRewardBorrow.earnedAmount.toDecimalJs() : new decimal_js_1.Decimal(0),
                     pendingReward: pendingRewardBorrow,
                     claimedReward: userRewardBorrow ? userRewardBorrow.claimedAmount.toDecimalJs() : new decimal_js_1.Decimal(0),

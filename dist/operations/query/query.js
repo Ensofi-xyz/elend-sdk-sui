@@ -297,7 +297,6 @@ class ElendMarketQueryOperation {
             },
         });
         if (userRewardRes.error) {
-            console.log('error', userRewardRes.error);
             return null;
         }
         if (userRewardRes.data?.content) {

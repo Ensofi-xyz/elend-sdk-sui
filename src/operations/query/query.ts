@@ -346,7 +346,6 @@ export class ElendMarketQueryOperation implements IElendMarketQueryOperation {
     });
 
     if (userRewardRes.error) {
-      console.log('error', userRewardRes.error);
       return null;
     }
 
