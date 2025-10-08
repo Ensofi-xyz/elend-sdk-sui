@@ -10,7 +10,7 @@ class ElendMarketContract {
     initObligation(tx, typeArgs, args) {
         const { version, market, owner, clock } = args;
         const [obligationOwnerCap, obligationId] = tx.moveCall({
-            target: `${this.packageId}::lending_market::init_obligation_v3`,
+            target: `${this.packageId}::lending_market::init_obligation`,
             typeArguments: [typeArgs],
             arguments: [tx.object(version), tx.object(market), tx.pure.address(owner), tx.object(clock)],
         });
@@ -35,7 +35,7 @@ class ElendMarketContract {
                 tx.object(reserveT1),
                 tx.object(reserveT2),
                 tx.object(reserveT3),
-                tx.object(clock)
+                tx.object(clock),
             ],
         });
     }

@@ -1,6 +1,6 @@
 import networkConfigs from '../../config/networks.json';
 import mainnetConfig from '../../config/versions/mainnet/v1.0.0.json';
-import testnetConfig from '../../config/versions/testnet/v1.0.4.json';
+import testnetConfig from '../../config/versions/testnet/v1.0.5.json';
 import { NetworkConfig } from '../interfaces/config';
 import { Network } from '../types/common';
 

@@ -29,7 +29,7 @@ export class ElendMarketContract implements IElendMarketContract {
     const { version, market, owner, clock } = args;
 
     const [obligationOwnerCap, obligationId] = tx.moveCall({
-      target: `${this.packageId}::lending_market::init_obligation_v3`,
+      target: `${this.packageId}::lending_market::init_obligation`,
       typeArguments: [typeArgs],
       arguments: [tx.object(version), tx.object(market), tx.pure.address(owner as string), tx.object(clock)],
     });
