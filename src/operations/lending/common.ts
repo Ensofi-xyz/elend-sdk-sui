@@ -13,7 +13,7 @@ import { Obligation } from '../../types/object';
 export const refreshReserves = async (
   tx: Transaction,
   args: {
-    obligationData: Obligation;
+    obligationData: Obligation | null;
     reserve: string;
     pythClient: SuiPythClient;
     networkConfig: NetworkConfig;
@@ -23,7 +23,9 @@ export const refreshReserves = async (
   const { obligationData, reserve, networkConfig, pythClient, contract } = args;
   const packageInfo = networkConfig.packages[networkConfig.latestVersion];
 
-  const reservesToRefresh = new Set<string>([...obligationData.deposits, ...obligationData.borrows]);
+  const reservesToRefresh = !isNil(obligationData) 
+    ? new Set<string>([...obligationData.deposits, ...obligationData.borrows])
+    : new Set<string>();
   reservesToRefresh.add(reserve);
 
   const reserves = packageInfo.reserves;

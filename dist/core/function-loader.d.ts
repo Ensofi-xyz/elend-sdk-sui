@@ -5,7 +5,7 @@ export declare class ElendMarketContract implements IElendMarketContract {
     private networkConfig;
     private packageId;
     constructor(networkConfig: NetworkConfig);
-    initObligation(tx: Transaction, typeArgs: string, args: InitObligationArgs): TransactionResult;
+    initObligation(tx: Transaction, typeArgs: string, args: InitObligationArgs): any;
     refreshReserve(tx: Transaction, typeArgs: [string, string], args: RefreshReserveArgs): void;
     refreshObligation(tx: Transaction, typeArgs: [string, string, string, string], args: RefreshObligation): void;
     depositReserveLiquidityAndMintCTokens(tx: Transaction, typeArgs: [string, string], args: DepositReserveLiquidityAndMintCTokensArgs): TransactionResult;
@@ -17,4 +17,5 @@ export declare class ElendMarketContract implements IElendMarketContract {
     initUserReward(tx: Transaction, typeArgs: [string, string], args: InitUserRewardArgs): void;
     updateUserReward(tx: Transaction, typeArgs: [string, string], args: UpdateUserRewardArgs): void;
     claimReward(tx: Transaction, typeArgs: [string, string], args: ClaimRewardArgs): void;
+    private isTransactionResult;
 }

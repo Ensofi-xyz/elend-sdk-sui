@@ -9,12 +9,12 @@ class ElendMarketContract {
     }
     initObligation(tx, typeArgs, args) {
         const { version, market, owner, clock } = args;
-        const result = tx.moveCall({
-            target: `${this.packageId}::lending_market::init_obligation`,
+        const [obligationOwnerCap, obligationId] = tx.moveCall({
+            target: `${this.packageId}::lending_market::init_obligation_v3`,
             typeArguments: [typeArgs],
             arguments: [tx.object(version), tx.object(market), tx.pure.address(owner), tx.object(clock)],
         });
-        return result;
+        return [obligationOwnerCap, obligationId];
     }
     refreshReserve(tx, typeArgs, args) {
         const { version, reserve, priceInfoObject, clock } = args;
@@ -29,7 +29,14 @@ class ElendMarketContract {
         tx.moveCall({
             target: `${this.packageId}::lending_market::refresh_obligation`,
             typeArguments: typeArgs,
-            arguments: [tx.object(version), tx.object(obligation), tx.object(reserveT1), tx.object(reserveT2), tx.object(reserveT3), tx.object(clock)],
+            arguments: [
+                tx.object(version),
+                this.isTransactionResult(obligation) ? obligation : tx.object(obligation),
+                tx.object(reserveT1),
+                tx.object(reserveT2),
+                tx.object(reserveT3),
+                tx.object(clock)
+            ],
         });
     }
     depositReserveLiquidityAndMintCTokens(tx, typeArgs, args) {
@@ -128,6 +135,9 @@ class ElendMarketContract {
             typeArguments: typeArgs,
             arguments: [tx.object(version), tx.object(tokenRewardState), tx.object(obligation), tx.pure.address(reserve), tx.pure.u8(option)],
         });
+    }
+    isTransactionResult(x) {
+        return typeof x === 'object' && x !== null && x.kind === 'Result';
     }
 }
 exports.ElendMarketContract = ElendMarketContract;

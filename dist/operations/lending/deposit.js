@@ -110,6 +110,82 @@ class DepositElendMarketOperation {
         });
         return tx;
     }
+    async buildInitAndDepositTxn(args) {
+        const { amount, owner, reserve, marketType } = args;
+        const tx = new transactions_1.Transaction();
+        const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
+        const market = packageInfo.lendingMarkets[marketType];
+        const [obligationOwnerCapResult, obligationResult] = this.contract.initObligation(tx, marketType, {
+            version: packageInfo.version.id,
+            market: market.id,
+            owner,
+            clock: constant_1.SUI_SYSTEM_CLOCK,
+        });
+        // - Refresh reserves
+        const reserves = packageInfo.reserves;
+        const priceFeedObjectReserveDeposit = await (0, common_3.refreshReserves)(tx, {
+            obligationData: null,
+            reserve,
+            pythClient: this.pythClient,
+            networkConfig: this.networkConfig,
+            contract: this.contract,
+        });
+        // - Refresh obligation
+        this.contract.refreshObligation(tx, [marketType, Object.keys(reserves)[0], Object.keys(reserves)[1], Object.keys(reserves)[2]], {
+            version: packageInfo.version.id,
+            obligation: obligationResult,
+            reserveT1: reserves[Object.keys(reserves)[0]].id,
+            reserveT2: reserves[Object.keys(reserves)[1]].id,
+            reserveT3: reserves[Object.keys(reserves)[2]].id,
+            clock: constant_1.SUI_SYSTEM_CLOCK,
+        });
+        const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, common_1.RewardOption.Deposit);
+        for (const rewardConfig of rewardConfigs) {
+            const rewardTokenType = rewardConfig.rewardTokenType;
+            this.contract.initUserReward(tx, [marketType, rewardTokenType], {
+                version: packageInfo.version.id,
+                obligation: obligationResult,
+                reserve,
+                option: common_1.RewardOption.Deposit,
+                phase: rewardConfig.phase,
+            });
+        }
+        const tokenType = (0, common_2.getTokenTypeForReserve)(reserve, packageInfo);
+        if (!tokenType) {
+            throw new Error(`Token type not found for reserve: ${reserve}`);
+        }
+        if (rewardConfigs.length > 0) {
+            this.contract.updateRewardConfig(tx, [marketType, tokenType], {
+                version: packageInfo.version.id,
+                reserve,
+                option: common_1.RewardOption.Deposit,
+                clock: constant_1.SUI_SYSTEM_CLOCK,
+            });
+            this.contract.updateUserReward(tx, [marketType, tokenType], {
+                version: packageInfo.version.id,
+                obligation: obligationResult,
+                reserve,
+                option: common_1.RewardOption.Deposit,
+            });
+        }
+        // - Handle deposit operation
+        await this.handleDepositOperation(tx, {
+            owner,
+            reserve,
+            amount,
+            obligationOwnerCap: obligationOwnerCapResult,
+            obligationId: obligationResult,
+            packageInfo,
+            priceFeedObjectReserveDeposit,
+        });
+        tx.transferObjects([obligationOwnerCapResult], owner);
+        tx.moveCall({
+            target: `${packageInfo.upgradedPackage}::lending_market::share_obligation`,
+            typeArguments: [marketType],
+            arguments: [tx.object(packageInfo.version.id), tx.object(obligationResult)],
+        });
+        return tx;
+    }
     async handleDepositOperation(tx, args) {
         const { owner, reserve, amount, obligationOwnerCap, obligationId, packageInfo, priceFeedObjectReserveDeposit } = args;
         const tokenType = (0, common_2.getTokenTypeForReserve)(reserve, packageInfo);

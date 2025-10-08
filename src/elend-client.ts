@@ -222,12 +222,24 @@ export class ElendClient {
     }
 
     const marketType = this.getMarketTypeOfReserve(reserve);
-    return this.depositOperation.buildDepositTxn({
-      owner: this.obligationOwner,
-      reserve,
-      amount: liquidityAmount,
-      marketType,
-    });
+    const obligation = this.obligations.get(marketType);
+    if (isNil(obligation)) {
+      console.log("hihi");
+      return this.depositOperation.buildInitAndDepositTxn({
+        owner: this.obligationOwner,
+        reserve,
+        amount: liquidityAmount,
+        marketType,
+      });
+    } else {
+      console.log("haha");
+      return this.depositOperation.buildDepositTxn({
+        owner: this.obligationOwner,
+        reserve,
+        amount: liquidityAmount,
+        marketType,
+      })
+    }
   }
 
   async borrow(reserve: string, liquidityAmount: number): Promise<Transaction> {

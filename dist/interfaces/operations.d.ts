@@ -36,6 +36,7 @@ export interface RepayObligationLiquidityOperationArgs {
 export interface IDepositElendMarketOperation {
     buildInitObligationTxn(args: InitObligationArgs): Promise<Transaction>;
     buildDepositTxn(args: DepositReserveLiquidityAndObligationCollateralOperationArgs): Promise<Transaction>;
+    buildInitAndDepositTxn(args: DepositReserveLiquidityAndObligationCollateralOperationArgs): Promise<Transaction>;
 }
 export interface IWithdrawElendMarketOperation {
     buildWithdrawTxn(args: WithdrawCTokensAndRedeemLiquidityOperationArgs): Promise<Transaction>;

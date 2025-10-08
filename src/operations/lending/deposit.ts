@@ -1,7 +1,7 @@
 import { isNil } from 'lodash';
 
 import { SuiClient } from '@mysten/sui/client';
-import { Transaction } from '@mysten/sui/transactions';
+import { Transaction, TransactionObjectArgument, TransactionResult } from '@mysten/sui/transactions';
 
 import { SuiPythClient } from '@pythnetwork/pyth-sui-js';
 import { ObjectId } from '@pythnetwork/pyth-sui-js/lib/client';
@@ -147,14 +147,101 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
     return tx;
   }
 
+  async buildInitAndDepositTxn(args: DepositReserveLiquidityAndObligationCollateralOperationArgs): Promise<Transaction> {
+    const { amount, owner, reserve, marketType } = args;
+    const tx = new Transaction();
+
+    const packageInfo = this.networkConfig.packages[this.networkConfig.latestVersion];
+    const market = packageInfo.lendingMarkets[marketType];
+    const [obligationOwnerCapResult, obligationResult] = this.contract.initObligation(tx, marketType, {
+      version: packageInfo.version.id,
+      market: market.id,
+      owner,
+      clock: SUI_SYSTEM_CLOCK,
+    });
+      
+    // - Refresh reserves
+    const reserves = packageInfo.reserves;
+
+    const priceFeedObjectReserveDeposit = await refreshReserves(tx, {
+      obligationData: null,
+      reserve,
+      pythClient: this.pythClient,
+      networkConfig: this.networkConfig,
+      contract: this.contract,
+    });
+
+    // - Refresh obligation
+    this.contract.refreshObligation(tx, [marketType, Object.keys(reserves)[0], Object.keys(reserves)[1], Object.keys(reserves)[2]], {
+      version: packageInfo.version.id,
+      obligation: obligationResult,
+      reserveT1: reserves[Object.keys(reserves)[0]].id,
+      reserveT2: reserves[Object.keys(reserves)[1]].id,
+      reserveT3: reserves[Object.keys(reserves)[2]].id,
+      clock: SUI_SYSTEM_CLOCK,
+    });
+
+    const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, RewardOption.Deposit);
+    for (const rewardConfig of rewardConfigs) {
+      const rewardTokenType = rewardConfig.rewardTokenType;
+        this.contract.initUserReward(tx, [marketType, rewardTokenType], {
+          version: packageInfo.version.id,
+          obligation: obligationResult,
+          reserve,
+          option: RewardOption.Deposit,
+          phase: rewardConfig.phase,
+        });
+    }
+
+    const tokenType = getTokenTypeForReserve(reserve, packageInfo);
+    if (!tokenType) {
+      throw new Error(`Token type not found for reserve: ${reserve}`);
+    }
+
+    if (rewardConfigs.length > 0) {
+      this.contract.updateRewardConfig(tx, [marketType, tokenType], {
+        version: packageInfo.version.id,
+        reserve,
+        option: RewardOption.Deposit,
+        clock: SUI_SYSTEM_CLOCK,
+      });
+
+      this.contract.updateUserReward(tx, [marketType, tokenType], {
+        version: packageInfo.version.id,
+        obligation: obligationResult,
+        reserve,
+        option: RewardOption.Deposit,
+      });
+    }
+
+    // - Handle deposit operation
+    await this.handleDepositOperation(tx, {
+      owner,
+      reserve,
+      amount,
+      obligationOwnerCap: obligationOwnerCapResult,
+      obligationId: obligationResult,
+      packageInfo,
+      priceFeedObjectReserveDeposit,
+    });
+
+    tx.transferObjects([obligationOwnerCapResult], owner);
+    tx.moveCall({
+      target: `${packageInfo.upgradedPackage}::lending_market::share_obligation`,
+      typeArguments: [marketType],
+      arguments: [tx.object(packageInfo.version.id), tx.object(obligationResult)],
+    });
+    return tx;
+  }
+
   private async handleDepositOperation(
     tx: Transaction,
     args: {
       owner: string;
       reserve: string;
       amount: number;
-      obligationOwnerCap: string;
-      obligationId: string;
+      obligationOwnerCap: TransactionObjectArgument | TransactionResult | string;
+      obligationId: TransactionObjectArgument | TransactionResult | string;
       packageInfo: ElendMarketConfig;
       priceFeedObjectReserveDeposit: ObjectId;
     }

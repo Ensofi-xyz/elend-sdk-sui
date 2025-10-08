@@ -5,7 +5,7 @@ import { NetworkConfig } from '../../interfaces/config';
 import { IElendMarketContract } from '../../interfaces/functions';
 import { Obligation } from '../../types/object';
 export declare const refreshReserves: (tx: Transaction, args: {
-    obligationData: Obligation;
+    obligationData: Obligation | null;
     reserve: string;
     pythClient: SuiPythClient;
     networkConfig: NetworkConfig;

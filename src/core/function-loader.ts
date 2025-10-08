@@ -25,16 +25,16 @@ export class ElendMarketContract implements IElendMarketContract {
     this.packageId = config.upgradedPackage;
   }
 
-  initObligation(tx: Transaction, typeArgs: string, args: InitObligationArgs): TransactionResult {
+  initObligation(tx: Transaction, typeArgs: string, args: InitObligationArgs): any {
     const { version, market, owner, clock } = args;
 
-    const result = tx.moveCall({
-      target: `${this.packageId}::lending_market::init_obligation`,
+    const [obligationOwnerCap, obligationId] = tx.moveCall({
+      target: `${this.packageId}::lending_market::init_obligation_v3`,
       typeArguments: [typeArgs],
       arguments: [tx.object(version), tx.object(market), tx.pure.address(owner as string), tx.object(clock)],
     });
 
-    return result;
+    return [obligationOwnerCap, obligationId];
   }
 
   refreshReserve(tx: Transaction, typeArgs: [string, string], args: RefreshReserveArgs): void {
@@ -53,7 +53,14 @@ export class ElendMarketContract implements IElendMarketContract {
     tx.moveCall({
       target: `${this.packageId}::lending_market::refresh_obligation`,
       typeArguments: typeArgs,
-      arguments: [tx.object(version), tx.object(obligation), tx.object(reserveT1), tx.object(reserveT2), tx.object(reserveT3), tx.object(clock)],
+      arguments: [
+        tx.object(version), 
+        this.isTransactionResult(obligation) ? (obligation as TransactionResult) : tx.object(obligation),
+        tx.object(reserveT1), 
+        tx.object(reserveT2), 
+        tx.object(reserveT3), 
+        tx.object(clock)
+      ],
     });
   }
 
@@ -173,5 +180,9 @@ export class ElendMarketContract implements IElendMarketContract {
       typeArguments: typeArgs,
       arguments: [tx.object(version), tx.object(tokenRewardState), tx.object(obligation), tx.pure.address(reserve), tx.pure.u8(option)],
     });
+  }
+
+  private isTransactionResult(x: any): boolean {
+    return typeof x === 'object' && x !== null && x.kind === 'Result';
   }
 }

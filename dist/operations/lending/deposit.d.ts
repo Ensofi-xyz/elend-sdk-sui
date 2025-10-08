@@ -11,5 +11,6 @@ export declare class DepositElendMarketOperation implements IDepositElendMarketO
     constructor(networkConfig: NetworkConfig, suiClient: SuiClient);
     buildInitObligationTxn(args: InitObligationArgs): Promise<Transaction>;
     buildDepositTxn(args: DepositReserveLiquidityAndObligationCollateralOperationArgs): Promise<Transaction>;
+    buildInitAndDepositTxn(args: DepositReserveLiquidityAndObligationCollateralOperationArgs): Promise<Transaction>;
     private handleDepositOperation;
 }

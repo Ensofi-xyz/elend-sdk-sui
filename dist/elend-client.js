@@ -157,12 +157,25 @@ class ElendClient {
             throw Error('Have not load obligation owner yet');
         }
         const marketType = this.getMarketTypeOfReserve(reserve);
-        return this.depositOperation.buildDepositTxn({
-            owner: this.obligationOwner,
-            reserve,
-            amount: liquidityAmount,
-            marketType,
-        });
+        const obligation = this.obligations.get(marketType);
+        if ((0, lodash_1.isNil)(obligation)) {
+            console.log("hihi");
+            return this.depositOperation.buildInitAndDepositTxn({
+                owner: this.obligationOwner,
+                reserve,
+                amount: liquidityAmount,
+                marketType,
+            });
+        }
+        else {
+            console.log("haha");
+            return this.depositOperation.buildDepositTxn({
+                owner: this.obligationOwner,
+                reserve,
+                amount: liquidityAmount,
+                marketType,
+            });
+        }
     }
     async borrow(reserve, liquidityAmount) {
         if ((0, lodash_1.isNil)(this.obligationOwner)) {

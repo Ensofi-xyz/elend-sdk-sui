@@ -7,7 +7,9 @@ const constant_1 = require("../../common/constant");
 const refreshReserves = async (tx, args) => {
     const { obligationData, reserve, networkConfig, pythClient, contract } = args;
     const packageInfo = networkConfig.packages[networkConfig.latestVersion];
-    const reservesToRefresh = new Set([...obligationData.deposits, ...obligationData.borrows]);
+    const reservesToRefresh = !(0, lodash_1.isNil)(obligationData)
+        ? new Set([...obligationData.deposits, ...obligationData.borrows])
+        : new Set();
     reservesToRefresh.add(reserve);
     const reserves = packageInfo.reserves;
     const pythPriceFeedIds = packageInfo.pythPriceFeedId;
