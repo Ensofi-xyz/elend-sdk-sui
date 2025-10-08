@@ -159,7 +159,7 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
       owner,
       clock: SUI_SYSTEM_CLOCK,
     });
-      
+
     // - Refresh reserves
     const reserves = packageInfo.reserves;
 
@@ -184,13 +184,13 @@ export class DepositElendMarketOperation implements IDepositElendMarketOperation
     const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, RewardOption.Deposit);
     for (const rewardConfig of rewardConfigs) {
       const rewardTokenType = rewardConfig.rewardTokenType;
-        this.contract.initUserReward(tx, [marketType, rewardTokenType], {
-          version: packageInfo.version.id,
-          obligation: obligationResult,
-          reserve,
-          option: RewardOption.Deposit,
-          phase: rewardConfig.phase,
-        });
+      this.contract.initUserReward(tx, [marketType, rewardTokenType], {
+        version: packageInfo.version.id,
+        obligation: obligationResult,
+        reserve,
+        option: RewardOption.Deposit,
+        phase: rewardConfig.phase,
+      });
     }
 
     const tokenType = getTokenTypeForReserve(reserve, packageInfo);

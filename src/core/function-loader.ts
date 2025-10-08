@@ -54,12 +54,12 @@ export class ElendMarketContract implements IElendMarketContract {
       target: `${this.packageId}::lending_market::refresh_obligation`,
       typeArguments: typeArgs,
       arguments: [
-        tx.object(version), 
+        tx.object(version),
         this.isTransactionResult(obligation) ? (obligation as TransactionResult) : tx.object(obligation),
-        tx.object(reserveT1), 
-        tx.object(reserveT2), 
-        tx.object(reserveT3), 
-        tx.object(clock)
+        tx.object(reserveT1),
+        tx.object(reserveT2),
+        tx.object(reserveT3),
+        tx.object(clock),
       ],
     });
   }

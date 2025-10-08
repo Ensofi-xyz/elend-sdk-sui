@@ -224,7 +224,7 @@ export class ElendClient {
     const marketType = this.getMarketTypeOfReserve(reserve);
     const obligation = this.obligations.get(marketType);
     if (isNil(obligation)) {
-      console.log("hihi");
+      console.log('hihi');
       return this.depositOperation.buildInitAndDepositTxn({
         owner: this.obligationOwner,
         reserve,
@@ -232,13 +232,13 @@ export class ElendClient {
         marketType,
       });
     } else {
-      console.log("haha");
+      console.log('haha');
       return this.depositOperation.buildDepositTxn({
         owner: this.obligationOwner,
         reserve,
         amount: liquidityAmount,
         marketType,
-      })
+      });
     }
   }
 

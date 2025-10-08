@@ -23,9 +23,7 @@ export const refreshReserves = async (
   const { obligationData, reserve, networkConfig, pythClient, contract } = args;
   const packageInfo = networkConfig.packages[networkConfig.latestVersion];
 
-  const reservesToRefresh = !isNil(obligationData) 
-    ? new Set<string>([...obligationData.deposits, ...obligationData.borrows])
-    : new Set<string>();
+  const reservesToRefresh = !isNil(obligationData) ? new Set<string>([...obligationData.deposits, ...obligationData.borrows]) : new Set<string>();
   reservesToRefresh.add(reserve);
 
   const reserves = packageInfo.reserves;
