@@ -1,0 +1,48 @@
+{
+  "name": "elend-sdk-sui",
+  "version": "1.0.0",
+  "description": "Elend SDK on SUI",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:clean": "rm -rf dist && tsc",
+    "typecheck": "tsc --project ./tsconfig.json --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky",
+    "deposit": "ts-node test/deposit.ts",
+    "borrow": "ts-node test/borrow.ts",
+    "withdraw": "ts-node test/withdraw.ts",
+    "repay": "ts-node test/repay.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ensofi-xyz/elend-sdk-sui.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ensofi-xyz/elend-sdk-sui/issues"
+  },
+  "homepage": "https://github.com/Ensofi-xyz/elend-sdk-sui#readme",
+  "dependencies": {
+    "@mysten/bcs": "^1.8.0",
+    "@mysten/sui": "^1.38.0",
+    "@pythnetwork/pyth-sui-js": "^2.2.0",
+    "decimal.js": "^10.6.0",
+    "lodash": "^4.17.21",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "@types/lodash": "^4.17.20",
+    "@types/node": "^24.5.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.0",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}

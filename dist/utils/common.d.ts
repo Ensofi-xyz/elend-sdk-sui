@@ -1,0 +1,16 @@
+import { ElendMarketConfig } from '../interfaces/config';
+export declare const MILLISECONDS_PER_SECOND = 1000;
+export declare const MILLISECONDS_PER_MINUTE: number;
+export declare const MILLISECONDS_PER_HOUR: number;
+export declare const MILLISECONDS_PER_DAY: number;
+export declare const MILLISECONDS_PER_YEAR: number;
+export declare const U64_MAX: bigint;
+export declare const SUI_COIN_TYPE = "0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI";
+export declare const GAS_BUDGET = 200000000;
+export declare const getTokenTypeForReserve: (reserveId: string, packageConfig: ElendMarketConfig) => string | null;
+export declare const i64ToBigInt: (magnitude: bigint, negative: boolean) => bigint;
+export declare const remove0xPrefix: (input: string) => string;
+export declare const add0xPrefix: (input: string) => string;
+export declare const wait: (ms: number) => Promise<void>;
+export declare function calculateAPYFromAPR(apr: number): number;
+export declare function retry<T>(fn: () => Promise<T>, delay: number, maxRetries: number): Promise<T>;

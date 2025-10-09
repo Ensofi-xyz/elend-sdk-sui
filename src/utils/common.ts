@@ -1,0 +1,62 @@
+import { Decimal as DecimalJs } from 'decimal.js';
+
+import { ElendMarketConfig } from '../interfaces/config';
+
+export const MILLISECONDS_PER_SECOND = 1000;
+
+export const MILLISECONDS_PER_MINUTE = MILLISECONDS_PER_SECOND * 60; // 60,000
+export const MILLISECONDS_PER_HOUR = MILLISECONDS_PER_MINUTE * 60; // 3,600,000
+export const MILLISECONDS_PER_DAY = MILLISECONDS_PER_HOUR * 24; // 86,400,000
+export const MILLISECONDS_PER_YEAR = MILLISECONDS_PER_DAY * 365;
+
+export const U64_MAX: bigint = 18446744073709551615n;
+export const SUI_COIN_TYPE = '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI';
+export const GAS_BUDGET = 200000000;
+
+export const getTokenTypeForReserve = (reserveId: string, packageConfig: ElendMarketConfig): string | null => {
+  const reserves = packageConfig.reserves;
+  for (const [tokenType, reserveInfo] of Object.entries(reserves)) {
+    if ((reserveInfo as any).id === reserveId) {
+      return tokenType;
+    }
+  }
+  return null;
+};
+
+export const i64ToBigInt = (magnitude: bigint, negative: boolean): bigint => {
+  return negative ? -magnitude : magnitude;
+};
+
+export const remove0xPrefix = (input: string): string => {
+  return input.startsWith('0x') ? input.slice(2) : input;
+};
+
+export const add0xPrefix = (input: string): string => {
+  return input.startsWith('0x') ? input : '0x' + input;
+};
+
+export const wait = (ms: number): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+export function calculateAPYFromAPR(apr: number) {
+  const apy = new DecimalJs(1).plus(new DecimalJs(apr).dividedBy(MILLISECONDS_PER_YEAR)).toNumber() ** MILLISECONDS_PER_YEAR - 1;
+  return apy;
+}
+
+export async function retry<T>(fn: () => Promise<T>, delay: number, maxRetries: number): Promise<T> {
+  return await recall(fn, delay, 0, maxRetries);
+}
+
+async function recall<T>(fn: () => T, delay: number, retries: number, maxRetries: number): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    if (retries > maxRetries) {
+      throw err;
+    }
+    await wait(delay);
+  }
+
+  return await recall(fn, delay, retries + 1, maxRetries);
+}

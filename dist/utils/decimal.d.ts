@@ -1,0 +1,36 @@
+import { Decimal as DecimalJs } from 'decimal.js';
+export declare class Decimal {
+    static readonly WAD: bigint;
+    static readonly U64_MAX: bigint;
+    readonly value: bigint;
+    constructor(value: bigint);
+    static one(): Decimal;
+    static from(v: number | bigint): Decimal;
+    static fromDecimalJs(v: DecimalJs): Decimal;
+    static fromU128(v: bigint): Decimal;
+    static fromPercent(v: number): Decimal;
+    static fromPercentU64(v: bigint): Decimal;
+    static fromBps(v: bigint): Decimal;
+    static fromScaledVal(v: bigint): Decimal;
+    toScaledVal(): bigint;
+    toU128(): bigint;
+    toDecimalJs(): DecimalJs;
+    add(b: Decimal): Decimal;
+    sub(b: Decimal): Decimal;
+    saturatingSub(b: Decimal): Decimal;
+    mul(b: Decimal): Decimal;
+    div(b: Decimal): Decimal;
+    mulU256(v: bigint): Decimal;
+    divU256(v: bigint): Decimal;
+    pow(e: bigint): Decimal;
+    floor(): bigint;
+    saturatingFloor(): bigint;
+    ceil(): bigint;
+    eq(b: Decimal): boolean;
+    ge(b: Decimal): boolean;
+    gt(b: Decimal): boolean;
+    le(b: Decimal): boolean;
+    lt(b: Decimal): boolean;
+    min(b: Decimal): Decimal;
+    max(b: Decimal): Decimal;
+}

@@ -1,0 +1,60 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.wait = exports.add0xPrefix = exports.remove0xPrefix = exports.i64ToBigInt = exports.getTokenTypeForReserve = exports.GAS_BUDGET = exports.SUI_COIN_TYPE = exports.U64_MAX = exports.MILLISECONDS_PER_YEAR = exports.MILLISECONDS_PER_DAY = exports.MILLISECONDS_PER_HOUR = exports.MILLISECONDS_PER_MINUTE = exports.MILLISECONDS_PER_SECOND = void 0;
+exports.calculateAPYFromAPR = calculateAPYFromAPR;
+exports.retry = retry;
+const decimal_js_1 = require("decimal.js");
+exports.MILLISECONDS_PER_SECOND = 1000;
+exports.MILLISECONDS_PER_MINUTE = exports.MILLISECONDS_PER_SECOND * 60; // 60,000
+exports.MILLISECONDS_PER_HOUR = exports.MILLISECONDS_PER_MINUTE * 60; // 3,600,000
+exports.MILLISECONDS_PER_DAY = exports.MILLISECONDS_PER_HOUR * 24; // 86,400,000
+exports.MILLISECONDS_PER_YEAR = exports.MILLISECONDS_PER_DAY * 365;
+exports.U64_MAX = 18446744073709551615n;
+exports.SUI_COIN_TYPE = '0x0000000000000000000000000000000000000000000000000000000000000002::sui::SUI';
+exports.GAS_BUDGET = 200000000;
+const getTokenTypeForReserve = (reserveId, packageConfig) => {
+    const reserves = packageConfig.reserves;
+    for (const [tokenType, reserveInfo] of Object.entries(reserves)) {
+        if (reserveInfo.id === reserveId) {
+            return tokenType;
+        }
+    }
+    return null;
+};
+exports.getTokenTypeForReserve = getTokenTypeForReserve;
+const i64ToBigInt = (magnitude, negative) => {
+    return negative ? -magnitude : magnitude;
+};
+exports.i64ToBigInt = i64ToBigInt;
+const remove0xPrefix = (input) => {
+    return input.startsWith('0x') ? input.slice(2) : input;
+};
+exports.remove0xPrefix = remove0xPrefix;
+const add0xPrefix = (input) => {
+    return input.startsWith('0x') ? input : '0x' + input;
+};
+exports.add0xPrefix = add0xPrefix;
+const wait = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
+exports.wait = wait;
+function calculateAPYFromAPR(apr) {
+    const apy = new decimal_js_1.Decimal(1).plus(new decimal_js_1.Decimal(apr).dividedBy(exports.MILLISECONDS_PER_YEAR)).toNumber() ** exports.MILLISECONDS_PER_YEAR - 1;
+    return apy;
+}
+async function retry(fn, delay, maxRetries) {
+    return await recall(fn, delay, 0, maxRetries);
+}
+async function recall(fn, delay, retries, maxRetries) {
+    try {
+        return await fn();
+    }
+    catch (err) {
+        if (retries > maxRetries) {
+            throw err;
+        }
+        await (0, exports.wait)(delay);
+    }
+    return await recall(fn, delay, retries + 1, maxRetries);
+}
+//# sourceMappingURL=common.js.map
