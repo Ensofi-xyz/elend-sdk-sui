@@ -11,6 +11,6 @@
     "rpcUrl": "https://fullnode.testnet.sui.io:443",
     "wsRpcUrl": "https://fullnode.testnet.sui.io:443",
     "pythHermesUrl": "https://hermes-beta.pyth.network",
-    "latestVersion": "v1.0.4"
+    "latestVersion": "v1.0.6"
   }
 }
