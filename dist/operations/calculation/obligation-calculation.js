@@ -239,7 +239,7 @@ class ElendMarketObligationCalculationOperation {
             if (!obligationCollateral) {
                 return sum;
             }
-            const depositedValue = new decimal_js_1.Decimal(obligationCollateral.depositedAmount)
+            const depositedValue = this.collateralToLiquidity(depositedReserve, new decimal_js_1.Decimal(obligationCollateral.depositedAmount))
                 .mul(marketPrice ?? new decimal_js_1.Decimal(0))
                 .div(new decimal_js_1.Decimal(Math.pow(10, depositedReserve.liquidity.mintDecimal)))
                 .mul(liquidationThresholdPct);

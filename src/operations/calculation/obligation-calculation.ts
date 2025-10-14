@@ -334,7 +334,7 @@ export class ElendMarketObligationCalculationOperation implements IElendMarketOb
         if (!obligationCollateral) {
           return sum;
         }
-        const depositedValue = new DecimalJs(obligationCollateral.depositedAmount)
+        const depositedValue = this.collateralToLiquidity(depositedReserve, new DecimalJs(obligationCollateral.depositedAmount))
           .mul(marketPrice ?? new DecimalJs(0))
           .div(new DecimalJs(Math.pow(10, depositedReserve.liquidity.mintDecimal)))
           .mul(liquidationThresholdPct);
