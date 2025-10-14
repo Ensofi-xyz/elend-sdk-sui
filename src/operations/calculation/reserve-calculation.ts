@@ -7,6 +7,7 @@ import { RewardOption, UserActionType } from '../../types/common';
 import { Decimal, MILLISECONDS_PER_YEAR, calculateAPYFromAPR } from '../../utils';
 import { ElendMarketQueryOperation } from '../query/query';
 import { ElendMarketRewardCalculationOperation } from './reward-calculation';
+import { cloneDeep } from 'lodash';
 
 export class ElendMarketReserveCalculationOperation implements IElendMarketReserveCalculationOperation {
   private readonly queryOperation: ElendMarketQueryOperation;
@@ -134,15 +135,15 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
     currentTimestampMs: number,
     userAction: UserActionType
   ): Promise<DecimalJs> {
-    const reserveData = reserve;
+    const reserveClone = cloneDeep(reserve);
     const actionAmount =
       userAction == UserActionType.Borrow
-        ? newBorrowedAmount.toDecimalJs().sub(reserveData.liquidity.borrowedAmount.toDecimalJs()).toNumber()
-        : reserveData.liquidity.borrowedAmount.toDecimalJs().sub(newBorrowedAmount.toDecimalJs()).toNumber();
-    reserveData.liquidity.availableAmount = newAvailableLiquidity;
-    reserveData.liquidity.borrowedAmount = newBorrowedAmount;
+        ? newBorrowedAmount.toDecimalJs().sub(reserveClone.liquidity.borrowedAmount.toDecimalJs()).toNumber()
+        : reserveClone.liquidity.borrowedAmount.toDecimalJs().sub(newBorrowedAmount.toDecimalJs()).toNumber();
+    reserveClone.liquidity.availableAmount = newAvailableLiquidity;
+    reserveClone.liquidity.borrowedAmount = newBorrowedAmount;
 
-    const borrowApy = calculateAPYFromAPR(this.calculateBorrowAPR(reserveData, currentTimestampMs));
+    const borrowApy = calculateAPYFromAPR(this.calculateBorrowAPR(reserveClone, currentTimestampMs));
 
     const rewardCalculation = new ElendMarketRewardCalculationOperation(this.queryOperation);
     const rewardIncentiveApys = await rewardCalculation.estimateIncentiveRewardNewApyInterest(

@@ -5,6 +5,7 @@ const decimal_js_1 = require("decimal.js");
 const common_1 = require("../../types/common");
 const utils_1 = require("../../utils");
 const reward_calculation_1 = require("./reward-calculation");
+const lodash_1 = require("lodash");
 class ElendMarketReserveCalculationOperation {
     constructor(queryOperation) {
         this.queryOperation = queryOperation;
@@ -97,13 +98,13 @@ class ElendMarketReserveCalculationOperation {
         return new decimal_js_1.Decimal(supplyApy).add(totalIncentiveApy);
     }
     async totalBorrowAPYWithNewBorrowedAmount(reserve, marketType, newAvailableLiquidity, newBorrowedAmount, currentTimestampMs, userAction) {
-        const reserveData = reserve;
+        const reserveClone = (0, lodash_1.cloneDeep)(reserve);
         const actionAmount = userAction == common_1.UserActionType.Borrow
-            ? newBorrowedAmount.toDecimalJs().sub(reserveData.liquidity.borrowedAmount.toDecimalJs()).toNumber()
-            : reserveData.liquidity.borrowedAmount.toDecimalJs().sub(newBorrowedAmount.toDecimalJs()).toNumber();
-        reserveData.liquidity.availableAmount = newAvailableLiquidity;
-        reserveData.liquidity.borrowedAmount = newBorrowedAmount;
-        const borrowApy = (0, utils_1.calculateAPYFromAPR)(this.calculateBorrowAPR(reserveData, currentTimestampMs));
+            ? newBorrowedAmount.toDecimalJs().sub(reserveClone.liquidity.borrowedAmount.toDecimalJs()).toNumber()
+            : reserveClone.liquidity.borrowedAmount.toDecimalJs().sub(newBorrowedAmount.toDecimalJs()).toNumber();
+        reserveClone.liquidity.availableAmount = newAvailableLiquidity;
+        reserveClone.liquidity.borrowedAmount = newBorrowedAmount;
+        const borrowApy = (0, utils_1.calculateAPYFromAPR)(this.calculateBorrowAPR(reserveClone, currentTimestampMs));
         const rewardCalculation = new reward_calculation_1.ElendMarketRewardCalculationOperation(this.queryOperation);
         const rewardIncentiveApys = await rewardCalculation.estimateIncentiveRewardNewApyInterest(reserve, marketType, common_1.RewardOption.Borrow, actionAmount, userAction);
         const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce((acc, apy) => acc.add(apy), new decimal_js_1.Decimal(0));
