@@ -1,4 +1,5 @@
 import { Decimal as DecimalJs } from 'decimal.js';
+import { cloneDeep } from 'lodash';
 
 import { IElendMarketReserveCalculationOperation } from '../../interfaces/operations';
 import { Reserve } from '../../types';
@@ -7,7 +8,6 @@ import { RewardOption, UserActionType } from '../../types/common';
 import { Decimal, MILLISECONDS_PER_YEAR, calculateAPYFromAPR } from '../../utils';
 import { ElendMarketQueryOperation } from '../query/query';
 import { ElendMarketRewardCalculationOperation } from './reward-calculation';
-import { cloneDeep } from 'lodash';
 
 export class ElendMarketReserveCalculationOperation implements IElendMarketReserveCalculationOperation {
   private readonly queryOperation: ElendMarketQueryOperation;
@@ -106,7 +106,7 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
     currentTimestampMs: number,
     userAction: UserActionType
   ): Promise<DecimalJs> {
-    const reserveData = reserve;
+    const reserveData = cloneDeep(reserve);
     const actionAmount =
       userAction == UserActionType.Deposit
         ? new DecimalJs(newAvailableAmount.toString()).sub(new DecimalJs(reserveData.liquidity.availableAmount.toString())).toNumber()

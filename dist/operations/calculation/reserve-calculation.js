@@ -2,10 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ElendMarketReserveCalculationOperation = void 0;
 const decimal_js_1 = require("decimal.js");
+const lodash_1 = require("lodash");
 const common_1 = require("../../types/common");
 const utils_1 = require("../../utils");
 const reward_calculation_1 = require("./reward-calculation");
-const lodash_1 = require("lodash");
 class ElendMarketReserveCalculationOperation {
     constructor(queryOperation) {
         this.queryOperation = queryOperation;
@@ -86,7 +86,7 @@ class ElendMarketReserveCalculationOperation {
         };
     }
     async totalSupplyAPYWithNewAvailableSupplyAmount(reserve, marketType, newAvailableAmount, currentTimestampMs, userAction) {
-        const reserveData = reserve;
+        const reserveData = (0, lodash_1.cloneDeep)(reserve);
         const actionAmount = userAction == common_1.UserActionType.Deposit
             ? new decimal_js_1.Decimal(newAvailableAmount.toString()).sub(new decimal_js_1.Decimal(reserveData.liquidity.availableAmount.toString())).toNumber()
             : new decimal_js_1.Decimal(reserveData.liquidity.availableAmount.toString()).sub(new decimal_js_1.Decimal(newAvailableAmount.toString())).toNumber();
