@@ -6,6 +6,7 @@ import { Reserve } from '../../types';
 import { DetailBorrowApyRes, DetailBorrowedRes, DetailSuppliedRes, DetailSupplyApyRes } from '../../types/client';
 import { RewardOption, UserActionType } from '../../types/common';
 import { Decimal, MILLISECONDS_PER_YEAR, calculateAPYFromAPR } from '../../utils';
+import { LSTAsset, getHaSuiLstInterest } from '../../utils/lst';
 import { ElendMarketQueryOperation } from '../query/query';
 import { ElendMarketRewardCalculationOperation } from './reward-calculation';
 
@@ -75,12 +76,17 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
     const rewardCalculation = new ElendMarketRewardCalculationOperation(this.queryOperation);
     const rewardIncentiveApys = await rewardCalculation.calculateIncentiveRewardApyInterest(reserve, marketType, RewardOption.Deposit);
     const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce((acc, apy) => acc.add(apy), new DecimalJs(0));
+
+    let lstInterest = new DecimalJs(0);
+    if (reserve.config.tokenInfo.symbol === LSTAsset.HASUI) {
+      lstInterest = await getHaSuiLstInterest();
+    }
     return {
-      totalApy: new DecimalJs(supplyApy).add(totalIncentiveApy).add(0),
+      totalApy: new DecimalJs(supplyApy).add(totalIncentiveApy).add(lstInterest),
       breakdownApy: {
         supplyApy: new DecimalJs(supplyApy),
         rewardIncentiveApy: rewardIncentiveApys,
-        lstInterest: 0,
+        lstInterest: lstInterest.toNumber(),
       },
     };
   }
@@ -124,7 +130,13 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
       userAction
     );
     const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce((acc, apy) => acc.add(apy), new DecimalJs(0));
-    return new DecimalJs(supplyApy).add(totalIncentiveApy);
+
+    let lstInterest = new DecimalJs(0);
+    if (reserve.config.tokenInfo.symbol === LSTAsset.HASUI) {
+      lstInterest = await getHaSuiLstInterest();
+    }
+
+    return new DecimalJs(supplyApy).add(totalIncentiveApy).add(lstInterest);
   }
 
   async totalBorrowAPYWithNewBorrowedAmount(
