@@ -123,13 +123,13 @@ class ElendMarketRewardCalculationOperation {
                     totalEffective = reserveCalculation.getTotalSupply(reserve).add(new decimal_js_1.Decimal(amount));
                     break;
                 case types_1.UserActionType.Borrow:
-                    totalEffective = reserveCalculation.getBorrowedAmount(reserve).add(new decimal_js_1.Decimal(amount));
+                    totalEffective = reserveCalculation.getEstimatedBorrowedAmount(reserve, currentTimestamp).add(new decimal_js_1.Decimal(amount));
                     break;
                 case types_1.UserActionType.Withdraw:
                     totalEffective = reserveCalculation.getTotalSupply(reserve).sub(new decimal_js_1.Decimal(amount));
                     break;
                 case types_1.UserActionType.Repay:
-                    totalEffective = reserveCalculation.getBorrowedAmount(reserve).sub(new decimal_js_1.Decimal(amount));
+                    totalEffective = reserveCalculation.getEstimatedBorrowedAmount(reserve, currentTimestamp).sub(new decimal_js_1.Decimal(amount));
                     break;
             }
             if (totalEffective.eq(0)) {

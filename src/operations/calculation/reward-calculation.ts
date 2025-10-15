@@ -168,13 +168,13 @@ export class ElendMarketRewardCalculationOperation implements IElendMarketReward
           totalEffective = reserveCalculation.getTotalSupply(reserve).add(new DecimalJs(amount));
           break;
         case UserActionType.Borrow:
-          totalEffective = reserveCalculation.getBorrowedAmount(reserve).add(new DecimalJs(amount));
+          totalEffective = reserveCalculation.getEstimatedBorrowedAmount(reserve, currentTimestamp).add(new DecimalJs(amount));
           break;
         case UserActionType.Withdraw:
           totalEffective = reserveCalculation.getTotalSupply(reserve).sub(new DecimalJs(amount));
           break;
         case UserActionType.Repay:
-          totalEffective = reserveCalculation.getBorrowedAmount(reserve).sub(new DecimalJs(amount));
+          totalEffective = reserveCalculation.getEstimatedBorrowedAmount(reserve, currentTimestamp).sub(new DecimalJs(amount));
           break;
       }
 
