@@ -271,27 +271,14 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
   }
 
   getEstimatedBorrowedAmount(reserve: Reserve, timestampMs: number): DecimalJs {
-    return this.getBorrowedAmount(reserve).mul(
-      this.getEstimatedCumulativeBorrowRate(reserve, timestampMs)
-    );
+    return this.getBorrowedAmount(reserve).mul(this.getEstimatedCumulativeBorrowRate(reserve, timestampMs));
   }
 
-  getEstimatedCumulativeBorrowRate(
-    reserve: Reserve,
-    timestampMs: number
-  ): DecimalJs {
-    const currentBorrowRate = new DecimalJs(
-      this.calculateBorrowAPR(reserve, timestampMs)
-    );
-    const elapsedTimestamp = Math.max(
-      timestampMs - Number(reserve.lastUpdate.timestampMs),
-      0
-    );
+  getEstimatedCumulativeBorrowRate(reserve: Reserve, timestampMs: number): DecimalJs {
+    const currentBorrowRate = new DecimalJs(this.calculateBorrowAPR(reserve, timestampMs));
+    const elapsedTimestamp = Math.max(timestampMs - Number(reserve.lastUpdate.timestampMs), 0);
 
-    const compoundInterest = this.approximateCompoundedInterest(
-      currentBorrowRate,
-      elapsedTimestamp
-    );
+    const compoundInterest = this.approximateCompoundedInterest(currentBorrowRate, elapsedTimestamp);
 
     const previousCumulativeBorrowRate = this.getCumulativeBorrowRate(reserve);
 
