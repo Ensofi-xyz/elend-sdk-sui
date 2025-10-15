@@ -61,15 +61,19 @@ export class WithdrawElendMarketOperation implements IWithdrawElendMarketOperati
     });
 
     // - Refresh obligation
-    this.contract.refreshObligation(tx, [marketType, Object.keys(reserves)[0], Object.keys(reserves)[1], Object.keys(reserves)[2], Object.keys(reserves)[3]], {
-      version: packageInfo.version.id,
-      obligation: obligationId,
-      reserveT1: reserves[Object.keys(reserves)[0]].id,
-      reserveT2: reserves[Object.keys(reserves)[1]].id,
-      reserveT3: reserves[Object.keys(reserves)[2]].id,
-      reserveT4: reserves[Object.keys(reserves)[3]].id,
-      clock: SUI_SYSTEM_CLOCK,
-    });
+    this.contract.refreshObligation(
+      tx,
+      [marketType, Object.keys(reserves)[0], Object.keys(reserves)[1], Object.keys(reserves)[2], Object.keys(reserves)[3]],
+      {
+        version: packageInfo.version.id,
+        obligation: obligationId,
+        reserveT1: reserves[Object.keys(reserves)[0]].id,
+        reserveT2: reserves[Object.keys(reserves)[1]].id,
+        reserveT3: reserves[Object.keys(reserves)[2]].id,
+        reserveT4: reserves[Object.keys(reserves)[3]].id,
+        clock: SUI_SYSTEM_CLOCK,
+      }
+    );
 
     const rewardConfigs = await this.query.fetchRewardConfigs(reserve, marketType, RewardOption.Deposit);
     for (const rewardConfig of rewardConfigs) {
