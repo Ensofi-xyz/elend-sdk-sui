@@ -1,6 +1,6 @@
 {
   "name": "elend-sdk-sui",
-  "version": "0.1.8-beta",
+  "version": "0.1.9-beta",
   "description": "Elend SDK on SUI",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
