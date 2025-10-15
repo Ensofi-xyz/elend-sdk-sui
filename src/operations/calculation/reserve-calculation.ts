@@ -6,9 +6,9 @@ import { Reserve } from '../../types';
 import { DetailBorrowApyRes, DetailBorrowedRes, DetailSuppliedRes, DetailSupplyApyRes } from '../../types/client';
 import { RewardOption, UserActionType } from '../../types/common';
 import { Decimal, MILLISECONDS_PER_YEAR, calculateAPYFromAPR } from '../../utils';
+import { LSTAsset, getHaSuiLstInterest } from '../../utils/lst';
 import { ElendMarketQueryOperation } from '../query/query';
 import { ElendMarketRewardCalculationOperation } from './reward-calculation';
-import { getHaSuiLstInterest, LSTAsset } from '../../utils/lst';
 
 export class ElendMarketReserveCalculationOperation implements IElendMarketReserveCalculationOperation {
   private readonly queryOperation: ElendMarketQueryOperation;
@@ -80,7 +80,7 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
     let lstInterest = new DecimalJs(0);
     if (reserve.config.tokenInfo.symbol === LSTAsset.HASUI) {
       lstInterest = await getHaSuiLstInterest();
-    };
+    }
     return {
       totalApy: new DecimalJs(supplyApy).add(totalIncentiveApy).add(lstInterest),
       breakdownApy: {
@@ -134,8 +134,8 @@ export class ElendMarketReserveCalculationOperation implements IElendMarketReser
     let lstInterest = new DecimalJs(0);
     if (reserve.config.tokenInfo.symbol === LSTAsset.HASUI) {
       lstInterest = await getHaSuiLstInterest();
-    };
-    
+    }
+
     return new DecimalJs(supplyApy).add(totalIncentiveApy).add(lstInterest);
   }
 
