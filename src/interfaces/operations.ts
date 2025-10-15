@@ -107,6 +107,7 @@ export interface IElendMarketReserveCalculationOperation {
   ): Promise<DecimalJs>;
   getTotalSupply(reserve: Reserve): DecimalJs;
   getBorrowedAmount(reserve: Reserve): DecimalJs;
+  getEstimatedBorrowedAmount(reserve: Reserve, timestampMs: number): DecimalJs;
   getTotalMintCollateral(reserve: Reserve): DecimalJs;
   getCumulativeBorrowRate(reserve: Reserve): DecimalJs;
   calculateSupplyAPR(reserve: Reserve, timestampMs: number): number;

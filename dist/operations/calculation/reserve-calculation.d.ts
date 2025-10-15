@@ -33,6 +33,8 @@ export declare class ElendMarketReserveCalculationOperation implements IElendMar
         totalSupply: DecimalJs;
     };
     getBorrowRate(reserve: Reserve, utilizationRate: number): number;
+    getEstimatedBorrowedAmount(reserve: Reserve, timestampMs: number): DecimalJs;
+    getEstimatedCumulativeBorrowRate(reserve: Reserve, timestampMs: number): DecimalJs;
     private compoundInterest;
     private approximateCompoundedInterest;
 }

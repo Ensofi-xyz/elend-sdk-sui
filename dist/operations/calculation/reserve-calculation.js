@@ -204,6 +204,16 @@ class ElendMarketReserveCalculationOperation {
             return borrowRateAtOptimalUtilization + jumpRateMultiplier * (utilizationRate - utilizationOptimal);
         }
     }
+    getEstimatedBorrowedAmount(reserve, timestampMs) {
+        return this.getBorrowedAmount(reserve).mul(this.getEstimatedCumulativeBorrowRate(reserve, timestampMs));
+    }
+    getEstimatedCumulativeBorrowRate(reserve, timestampMs) {
+        const currentBorrowRate = new decimal_js_1.Decimal(this.calculateBorrowAPR(reserve, timestampMs));
+        const elapsedTimestamp = Math.max(timestampMs - Number(reserve.lastUpdate.timestampMs), 0);
+        const compoundInterest = this.approximateCompoundedInterest(currentBorrowRate, elapsedTimestamp);
+        const previousCumulativeBorrowRate = this.getCumulativeBorrowRate(reserve);
+        return previousCumulativeBorrowRate.mul(compoundInterest);
+    }
     compoundInterest(reserve, timestampElapsed) {
         const currentBorrowRate = this.calculateBorrowRate(reserve);
         const protocolTakeRate = new decimal_js_1.Decimal(reserve.config.reserveFactorRateBps.toString()).div(10000);
