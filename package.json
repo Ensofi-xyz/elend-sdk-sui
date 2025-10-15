@@ -31,6 +31,7 @@
     "@mysten/bcs": "^1.8.0",
     "@mysten/sui": "^1.38.0",
     "@pythnetwork/pyth-sui-js": "^2.2.0",
+    "axios": "^1.12.2",
     "decimal.js": "^10.6.0",
     "lodash": "^4.17.21",
     "ws": "^8.18.3"

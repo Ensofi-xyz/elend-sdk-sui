@@ -17,6 +17,9 @@ importers:
       '@pythnetwork/pyth-sui-js':
         specifier: ^2.2.0
         version: 2.2.0(typescript@5.9.2)
+      axios:
+        specifier: ^1.12.2
+        version: 1.12.2
       decimal.js:
         specifier: ^10.6.0
         version: 10.6.0

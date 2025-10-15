@@ -6,6 +6,7 @@ const lodash_1 = require("lodash");
 const common_1 = require("../../types/common");
 const utils_1 = require("../../utils");
 const reward_calculation_1 = require("./reward-calculation");
+const lst_1 = require("../../utils/lst");
 class ElendMarketReserveCalculationOperation {
     constructor(queryOperation) {
         this.queryOperation = queryOperation;
@@ -63,12 +64,17 @@ class ElendMarketReserveCalculationOperation {
         const rewardCalculation = new reward_calculation_1.ElendMarketRewardCalculationOperation(this.queryOperation);
         const rewardIncentiveApys = await rewardCalculation.calculateIncentiveRewardApyInterest(reserve, marketType, common_1.RewardOption.Deposit);
         const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce((acc, apy) => acc.add(apy), new decimal_js_1.Decimal(0));
+        let lstInterest = new decimal_js_1.Decimal(0);
+        if (reserve.config.tokenInfo.symbol === lst_1.LSTAsset.HASUI) {
+            lstInterest = await (0, lst_1.getHaSuiLstInterest)();
+        }
+        ;
         return {
-            totalApy: new decimal_js_1.Decimal(supplyApy).add(totalIncentiveApy).add(0),
+            totalApy: new decimal_js_1.Decimal(supplyApy).add(totalIncentiveApy).add(lstInterest),
             breakdownApy: {
                 supplyApy: new decimal_js_1.Decimal(supplyApy),
                 rewardIncentiveApy: rewardIncentiveApys,
-                lstInterest: 0,
+                lstInterest: lstInterest.toNumber(),
             },
         };
     }
@@ -95,7 +101,12 @@ class ElendMarketReserveCalculationOperation {
         const rewardCalculation = new reward_calculation_1.ElendMarketRewardCalculationOperation(this.queryOperation);
         const rewardIncentiveApys = await rewardCalculation.estimateIncentiveRewardNewApyInterest(reserve, marketType, common_1.RewardOption.Deposit, actionAmount, userAction);
         const totalIncentiveApy = Array.from(rewardIncentiveApys.values()).reduce((acc, apy) => acc.add(apy), new decimal_js_1.Decimal(0));
-        return new decimal_js_1.Decimal(supplyApy).add(totalIncentiveApy);
+        let lstInterest = new decimal_js_1.Decimal(0);
+        if (reserve.config.tokenInfo.symbol === lst_1.LSTAsset.HASUI) {
+            lstInterest = await (0, lst_1.getHaSuiLstInterest)();
+        }
+        ;
+        return new decimal_js_1.Decimal(supplyApy).add(totalIncentiveApy).add(lstInterest);
     }
     async totalBorrowAPYWithNewBorrowedAmount(reserve, marketType, newAvailableLiquidity, newBorrowedAmount, currentTimestampMs, userAction) {
         const reserveClone = (0, lodash_1.cloneDeep)(reserve);
