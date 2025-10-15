@@ -6,12 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConfigLoader = void 0;
 const networks_json_1 = __importDefault(require("../../config/networks.json"));
 const v1_0_0_json_1 = __importDefault(require("../../config/versions/mainnet/v1.0.0.json"));
-const v1_0_6_json_1 = __importDefault(require("../../config/versions/testnet/v1.0.6.json"));
+const v1_0_7_json_1 = __importDefault(require("../../config/versions/testnet/v1.0.7.json"));
 const common_1 = require("../types/common");
 class ConfigLoader {
     static loadNetworkConfig(network) {
         let networkConfig = networks_json_1.default[network];
-        let packageConfigData = network == common_1.Network.Mainnet ? v1_0_0_json_1.default : v1_0_6_json_1.default;
+        let packageConfigData = network == common_1.Network.Mainnet ? v1_0_0_json_1.default : v1_0_7_json_1.default;
         return {
             rpcUrl: networkConfig.rpcUrl,
             wsRpcUrl: networkConfig.wsRpcUrl,
