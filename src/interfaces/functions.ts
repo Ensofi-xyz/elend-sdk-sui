@@ -3,7 +3,7 @@ import { Transaction, TransactionArgument, TransactionObjectInput, TransactionRe
 export interface IElendMarketContract {
   initObligation(tx: Transaction, typeArgs: string, args: InitObligationArgs): any;
   refreshReserve(tx: Transaction, typeArgs: [string, string], args: RefreshReserveArgs): void;
-  refreshObligation(tx: Transaction, typeArgs: [string, string, string, string], args: RefreshObligation): void;
+  refreshObligation(tx: Transaction, typeArgs: [string, string, string, string, string], args: RefreshObligation): void;
   depositReserveLiquidityAndMintCTokens(
     tx: Transaction,
     typeArgs: [string, string],
@@ -39,6 +39,7 @@ export interface RefreshObligation {
   reserveT1: TransactionObjectInput;
   reserveT2: TransactionObjectInput;
   reserveT3: TransactionObjectInput;
+  reserveT4: TransactionObjectInput;
   clock: TransactionObjectInput;
 }
 

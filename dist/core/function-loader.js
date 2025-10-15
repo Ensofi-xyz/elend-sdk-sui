@@ -25,7 +25,7 @@ class ElendMarketContract {
         });
     }
     refreshObligation(tx, typeArgs, args) {
-        const { version, obligation, reserveT1, reserveT2, reserveT3, clock } = args;
+        const { version, obligation, reserveT1, reserveT2, reserveT3, reserveT4, clock } = args;
         tx.moveCall({
             target: `${this.packageId}::lending_market::refresh_obligation`,
             typeArguments: typeArgs,
@@ -35,6 +35,7 @@ class ElendMarketContract {
                 tx.object(reserveT1),
                 tx.object(reserveT2),
                 tx.object(reserveT3),
+                tx.object(reserveT4),
                 tx.object(clock),
             ],
         });

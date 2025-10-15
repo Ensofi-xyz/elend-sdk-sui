@@ -39,12 +39,13 @@ class ElendMarketRewardOperation {
             contract: this.contract,
         });
         // - Refresh obligation
-        this.contract.refreshObligation(tx, [marketType, Object.keys(reserves)[0], Object.keys(reserves)[1], Object.keys(reserves)[2]], {
+        this.contract.refreshObligation(tx, [marketType, Object.keys(reserves)[0], Object.keys(reserves)[1], Object.keys(reserves)[2], Object.keys(reserves)[3]], {
             version: packageInfo.version.id,
             obligation: obligationId,
             reserveT1: reserves[Object.keys(reserves)[0]].id,
             reserveT2: reserves[Object.keys(reserves)[1]].id,
             reserveT3: reserves[Object.keys(reserves)[2]].id,
+            reserveT4: reserves[Object.keys(reserves)[3]].id,
             clock: constant_1.SUI_SYSTEM_CLOCK,
         });
         const tokenType = (0, utils_1.getTokenTypeForReserve)(reserve, packageInfo);

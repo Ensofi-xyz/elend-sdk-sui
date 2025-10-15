@@ -47,8 +47,8 @@ export class ElendMarketContract implements IElendMarketContract {
     });
   }
 
-  refreshObligation(tx: Transaction, typeArgs: [string, string, string, string], args: RefreshObligation): void {
-    const { version, obligation, reserveT1, reserveT2, reserveT3, clock } = args;
+  refreshObligation(tx: Transaction, typeArgs: [string, string, string, string, string], args: RefreshObligation): void {
+    const { version, obligation, reserveT1, reserveT2, reserveT3, reserveT4, clock } = args;
 
     tx.moveCall({
       target: `${this.packageId}::lending_market::refresh_obligation`,
@@ -59,6 +59,7 @@ export class ElendMarketContract implements IElendMarketContract {
         tx.object(reserveT1),
         tx.object(reserveT2),
         tx.object(reserveT3),
+        tx.object(reserveT4),
         tx.object(clock),
       ],
     });
